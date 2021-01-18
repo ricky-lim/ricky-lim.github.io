@@ -1,5 +1,11 @@
 # ricky-lim.github.io
 
+# Deploy
+
+```bash
+deploy.sh
+```
+
 ## Project setup
 ```
 npm install

@@ -8,7 +8,7 @@ npm run lint
 echo Building...
 npm run build
 
-cd dist
+cd dist && cp index.html 404.html
 
 git init
 git add -A
