@@ -21,6 +21,7 @@ jobs:
         run: pip install lektor
 
       - name: Build site
+        working-directory: kutubuku 
         run: lektor build --output-path ./public
 
       - name: Deploy to GitHub Pages
