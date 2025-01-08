@@ -1,0 +1,104 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../static/style.css">
+<title>Git Merge vs Rebase: The Art of Branch Integration — kutubuku</title>
+<body>
+  <header>
+    <h1>kutubuku</h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post">
+  
+    <h2>Git Merge vs Rebase: The Art of Branch Integration</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-01-08
+  </p>
+  <p>Let's explore how git rebase and git merge integrate changes between branches.
+In this example from develop branch to the main branch.</p>
+<p>Understanding Commits:</p>
+<p>Each C represents a commit - a snapshot of your code at a specific point in time.</p>
+<table>
+<thead><tr>
+<th>main (target)</th>
+<th>develop (source)</th>
+<th>rebase</th>
+<th>merge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>C4</td>
+<td>C4</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>C3</td>
+<td>C3</td>
+<td>C5</td>
+</tr>
+<tr>
+<td>C2</td>
+<td></td>
+<td>C2</td>
+<td>C2</td>
+</tr>
+<tr>
+<td>C1</td>
+<td></td>
+<td>C1</td>
+<td>C1</td>
+</tr>
+</tbody>
+</table>
+<p>Git Rebase:</p>
+<ul>
+<li>Takes commits from develop (C3, C4)</li>
+<li>Replays them on top of main</li>
+<li>Creates a linear history</li>
+<li>Result: C1 → C2 → C3 → C4</li>
+</ul>
+<p>Git Merge:</p>
+<ul>
+<li>Creates a new merge commit (C5)</li>
+<li>Preserves branch history</li>
+<li>Combines changes in one step</li>
+<li>Result: C1 → C2 → C5 (where C5 includes C3 and C4)</li>
+</ul>
+<p>Key Differences:</p>
+<ol>
+<li>Rebase gives linear history</li>
+<li>Merge preserves branch context</li>
+<li>Rebase may cause conflicts if the main branch (target) is changed since the develop branch (source) was created</li>
+<li>Merge creates an extra commit</li>
+</ol>
+<p><strong>Pro Tip</strong>: Choose <strong>Git Rebase</strong> for clean, linear history.</p>
+<p>The linear history C1 → C2 → C3 → C4 tells a clear story of how your code evolved, 
+making it invaluable for long-term project maintenance and collaboration.</p>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+  </footer>
+</body>
