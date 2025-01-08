@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}{{ this.title }}{% endblock %}
 {% block body %}
-  <h2>{{ this.title }}</h2>
-  {{ this.body }}
-
-  {% if this.author %}
-  <hr>
-  <p>Written by {{ this.author }}</p>
-  {% endif %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>{{ this.title }}</h1>
+    </div>
+    
+    <div class="page-content">
+        {{ this.body }}
+    </div>
+</div>
 {% endblock %}
