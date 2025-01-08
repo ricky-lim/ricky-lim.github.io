@@ -4,8 +4,12 @@
 {% block title %}{{ this.title }}{% endblock %}
 {% block body %}
   {% for child in this.pagination.items %}
-    {{ render_blog_post(child, from_index=true) }}
+  <div class="blog-post">
+    <h2><a href="{{ child|url }}">{{ child.title }}</a></h2>
+  </div>
   {% endfor %}
 
-  {{ render_pagination(this.pagination) }}
+  <div class="pagination-bottom">
+    {{ render_pagination(this.pagination) }}
+  </div>
 {% endblock %}

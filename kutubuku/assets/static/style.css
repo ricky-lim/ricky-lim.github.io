@@ -3,6 +3,10 @@
 :root {
     --primary-color: #7da382;
     --secondary-color: #F5F7F5;
+    --accent-color: #6b8c70;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --border-light: #eee;
 }
 
 * {
@@ -11,7 +15,7 @@
 
 /* Base styles (mobile first) */
 html {
-    font-family: 'Fira Code', 'Lato', sans-serif;
+    font-family: 'Fira Code', monospace;
     font-size: 21px;
 }
 
@@ -87,4 +91,101 @@ header nav ul li {
 
 div.page {
     background: var(--secondary-color)
+}
+
+.blog-post a {
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.blog-post a:hover {
+    color: var(--primary-color)
+}
+
+.pagination-bottom {
+    margin-bottom: 10px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.meta {
+    text-align: right;
+    margin-top: 10px;
+    color: #666;
+    font-style: italic;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+.blog-post {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.blog-post:hover {
+    transform: translateY(-2px);
+}
+
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+    border-bottom: 3px solid var(--primary-color);
+    padding-bottom: 1rem;
+}
+
+.page-header h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.page-content {
+    background: white;
+    padding: 3rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    line-height: 1.8;
+    width: 100%;
+}
+
+.page-content p {
+    margin-bottom: 1.5rem;
+}
+
+.page-content h2 {
+    color: var(--text-primary);
+    margin: 2rem 0 1rem;
+    font-size: 1.8rem;
 }

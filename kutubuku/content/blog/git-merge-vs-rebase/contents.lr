@@ -1,0 +1,44 @@
+title: Git Merge vs Rebase: The Art of Branch Integration
+---
+author: Ricky Lim
+---
+pub_date: 2025-01-08
+---
+body:
+
+Let's explore how git rebase and git merge integrate changes between branches.
+In this example from develop branch to the main branch.
+
+Understanding Commits:
+
+Each C represents a commit - a snapshot of your code at a specific point in time.
+
+| main (target) | develop (source) | rebase | merge |
+|---------------|------------------|--------|-------|
+|               | C4               | C4     |       |
+|               | C3               | C3     | C5    |
+| C2            |                  | C2     | C2    |
+| C1            |                  | C1     | C1    |
+
+Git Rebase:
+- Takes commits from develop (C3, C4)
+- Replays them on top of main
+- Creates a linear history
+- Result: C1 → C2 → C3 → C4
+
+Git Merge:
+- Creates a new merge commit (C5)
+- Preserves branch history
+- Combines changes in one step
+- Result: C1 → C2 → C5 (where C5 includes C3 and C4)
+
+Key Differences:
+1. Rebase gives linear history
+2. Merge preserves branch context
+3. Rebase may cause conflicts if the main branch (target) is changed since the develop branch (source) was created
+4. Merge creates an extra commit
+
+**Pro Tip**: Choose **Git Rebase** for clean, linear history.
+
+The linear history C1 → C2 → C3 → C4 tells a clear story of how your code evolved, 
+making it invaluable for long-term project maintenance and collaboration.
