@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #7da382;
+    --secondary-color: #F5F7F5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Base styles (mobile first) */
+html {
+    font-family: 'Fira Code', 'Lato', sans-serif;
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+nav a {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: #FAFBFA;
+    text-decoration: underline;
+}
+
+a {
+    color: black;
+}
+
+a:hover {
+    color: black;
+}
+
+header {
+    background: var(--primary-color);
+    padding: 20px 30px;
+}
+
+div.page {
+    flex: 1;
+    background: var(--primary-color);
+    padding: 20px 30px;
+}
+
+h2 a {
+    text-decoration: none;
+}
+
+h2 a:hover {
+    color: black;
+}
+
+footer {
+    margin-top: auto;
+    background: var(--primary-color);
+    padding: 20px 30px;
+    color: var(--secondary-color);
+}
+
+header h1 {
+    color: var(--secondary-color);
+    margin: 0;
+    font-weight: normal;
+    font-size: 42px;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+header nav ul li {
+    display: inline;
+    margin: 0 8px 0 0;
+    padding: 0;
+}
+
+div.page {
+    background: var(--secondary-color)
+}
