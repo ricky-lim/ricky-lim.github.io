@@ -1,0 +1,32 @@
+title: Hello
+---
+pub_date: 2025-01-08
+---
+author: Ricky Lim
+---
+body:
+
+```bash
+$ init_blog.sh
+> Starting blog...
+> Installing dependencies...
+> Loading personality modules...
+> Activating thought processes...
+> Mobilizing keyboad interface...
+
+SUCCESS: Blog is ready!
+```
+
+Welcome to kutubuku version 0.0.1!
+This is where I'll be dumping my /var/log/brain contents about all things CLI, development, and tech adventures.
+
+Expected output from this blog:
+
+```bash
+while true; do
+    learn_cool_stuff
+    share_knowledge
+    debug_life
+    repeat
+done
+```

@@ -1,0 +1,11 @@
+title: Welcome to kutubuku!
+---
+body:
+
+Join me in embracing the power of terminal.
+
+```bash
+Current Status:
+$ whoami
+ricky-lim
+```
