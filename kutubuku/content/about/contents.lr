@@ -1,0 +1,35 @@
+title: About 
+---
+body:
+
+```bash
+$ cat /etc/passwd | grep ricky
+> Builder: Where Biology Meets Infrastructure
+
+$ history | grep background
+> Molecular Biologist turned Code Craftsman
+> Bioinformatician by training
+> Pipeline developer of genomic sequences
+> Scientific programmer bridging high performance computing (HPC) with web
+> Software engineer who worked on laboratory automation
+> Cloud engineer building scalable infrastructures
+
+$ tree ~/expertise/
+├── infrastructure
+│   ├── aws-cdk
+│   └── docker
+│   └── linux
+├── web
+│   ├── rest-api
+│   └── dashboard
+└── bioinformatics
+    ├── genomics-pipelines
+    ├── high-performance-computing
+    └── epigenetics
+
+$ ps aux | grep tech-stack
+> Python: Django, FastAPI, Flask
+> Cloud: AWS, Docker
+> Typescript: cdk
+> Database: PostgreSQL, MongoDB
+```
