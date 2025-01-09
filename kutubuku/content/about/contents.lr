@@ -4,13 +4,13 @@ body:
 
 ```bash
 $ cat /etc/passwd | grep ricky
-> Builder: Where Biology Meets Infrastructure
+> Professional: Where Software Meets Infrastructure
 
 $ history | grep background
 > Molecular Biologist turned Code Craftsman
 > Bioinformatician by training
 > Pipeline developer of genomic sequences
-> Scientific programmer bridging scientists and ITs
+> Scientific programmer bridging Scientists and ITs
 > Software engineer who worked on laboratory automation
 > Cloud engineer building scalable infrastructures
 
