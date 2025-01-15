@@ -1,0 +1,109 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../static/style.css">
+<title>Git Config to power up your development — kutubuku</title>
+<body>
+  <header>
+    <h1>kutubuku</h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+      </ul>
+    </nav>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post">
+  
+    <h2>Git Config to power up your development</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-01-15
+  </p>
+  <p>Git configuration is a powerful way that can boost your productivity and streamline your development workflow.</p>
+<p>The global settings are stored in <strong><code>~/.gitconfig</code></strong>, which controls Git's behavior across all your repositories.
+This is where we can globally configure the behavior of our git.</p>
+<p>Here's my recommended configuration that maximizes productivity:</p>
+<pre><code class="lang-bash">[user]
+        email = kutubuku@gmail.com
+        name = Ricky Lim
+
+[color]
+        # Enable colored output for better visibility
+        ui = always
+
+[core]
+        editor = vim
+        excludesfile = ~/.gitignore_global
+
+[push]
+        # Automatically push to matching branch names on remote
+        default = current
+
+[alias]
+        # Shortcuts for frequent operations
+        ci = commit
+        st = status
+        lo = log --oneline
+
+[pull]
+        # Maintain linear history with automatic rebasing
+        rebase = true
+</code></pre>
+<p>For Python and Typescript development, I recommend using the following configuration for <code>~/.gitignore_global</code>:</p>
+<pre><code class="lang-bash"># Python Development
+__pycache__/
+*.py[cod]
+*.so
+.env
+venv/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# TypeScript/JavaScript
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+</code></pre>
+<p><strong>Key Benefits:</strong></p>
+<ul>
+<li>Efficient aliases reduce typing and save time</li>
+<li>Automatic rebasing maintains clean linear commit history</li>
+<li>Global ignore patterns prevent unexpected files from being committed</li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+  </footer>
+</body>
