@@ -9,7 +9,6 @@ body:
 Git configuration is a powerful way that can boost your productivity and streamline your development workflow.
 
 The global settings are stored in **`~/.gitconfig`**, which controls Git's behavior across all your repositories.
-
 This is where we can globally configure the behavior of our git.
 
 Here's my recommended configuration that maximizes productivity:
@@ -79,6 +78,3 @@ Thumbs.db
 - Efficient aliases reduce typing and save time
 - Automatic rebasing maintains clean linear commit history
 - Global ignore patterns prevent unexpected files from being committed
-
-My favorite is alias configuration.
-For instance, **`git lo`** provides a concise, single-line commit history view, perfect for quick repository overview.
