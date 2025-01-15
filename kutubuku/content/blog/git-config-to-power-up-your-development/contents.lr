@@ -1,0 +1,80 @@
+title: Git Config to power up your development
+---
+author: Ricky Lim
+---
+pub_date: 2025-01-15
+---
+body:
+
+Git configuration is a powerful way that can boost your productivity and streamline your development workflow.
+
+The global settings are stored in **`~/.gitconfig`**, which controls Git's behavior across all your repositories.
+This is where we can globally configure the behavior of our git.
+
+Here's my recommended configuration that maximizes productivity:
+
+```bash
+[user]
+        email = kutubuku@gmail.com
+        name = Ricky Lim
+
+[color]
+        # Enable colored output for better visibility
+        ui = always
+
+[core]
+        editor = vim
+        excludesfile = ~/.gitignore_global
+
+[push]
+        # Automatically push to matching branch names on remote
+        default = current
+
+[alias]
+        # Shortcuts for frequent operations
+        ci = commit
+        st = status
+        lo = log --oneline
+
+[pull]
+        # Maintain linear history with automatic rebasing
+        rebase = true
+```
+
+For Python and Typescript development, I recommend using the following configuration for `~/.gitignore_global`:
+
+```bash
+# Python Development
+__pycache__/
+*.py[cod]
+*.so
+.env
+venv/
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# TypeScript/JavaScript
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+**Key Benefits:**
+
+- Efficient aliases reduce typing and save time
+- Automatic rebasing maintains clean linear commit history
+- Global ignore patterns prevent unexpected files from being committed
