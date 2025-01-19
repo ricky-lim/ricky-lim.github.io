@@ -3,10 +3,10 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY matrix_rain.py .
+COPY money_rain.py .
 
 # Pre-install script dependencies
-RUN uv export --script matrix_rain.py --format requirements-txt > requirements.txt && \
+RUN uv export --script money_rain.py --format requirements-txt > requirements.txt && \
     uv pip install --system -r requirements.txt
 
-CMD ["python", "matrix_rain.py"]
+CMD ["python", "money_rain.py"]
