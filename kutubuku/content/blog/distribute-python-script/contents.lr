@@ -1,0 +1,71 @@
+title: Distribute Python Script
+---
+author: Ricky Lim
+---
+pub_date: 2025-01-22
+---
+body:
+
+This guide demonstates how to package a Python script for distribution.
+We'll use UV for dependency management and Docker for seamless distribution.
+
+## Local Development with UV
+Our [script](./matrix_rain.py) showcases modern Python packaging practices. 
+UV handles dependency resolution and installation automatically.
+
+#### Quick Start
+
+```
+uv run matrix_rain.py
+```
+
+UV does the following:
+- Reads inline script metadata
+- Installs dependencies
+- Caches dependencies for faster subsequent runs
+
+```bash
+$ uv run matrix_rain.py
+Reading inline script metadata from `matrix_rain.py`
+Installed 5 packages in 64ms
+Starting Matrix Rain...
+   ****  *** **** *     ******  **  * *  *** **   
+  * *  **  ******** *** * *  ** **  **    * **  * 
+* ** **  **  ***   *  ***** ** * *********  *    *
+**  *  **   ** *** *  **  **    ***  * * ** * *   
+* ** **  ** ******   ***   * ** *   * **   ***   *
+ **  **   **  **   *  *  * ***  **  **  ****** *  
+ *  * ***** * * *  **** ** ***  * ***     **     *
+   ***  *   **** *** * **  *** **   * *  * *  **  
+ *** * *   **  ** *   **  *  *  **  *   *  * *  **
+*    ****  *   ** * *    * **  *   **  * *  * *  *
+*  * *   **   ** *     **   **  * ** ***  **  *  *
+*** * *      ** *  ***** * ** ****  **     *  ****
+ ** *  *  *** * *** *  *** *   * * *     ** ** ** 
+* *   **  *  * ****  * ***  *****     * **   *  **
+ **       * ***     * * ** ***  *** *  ** **   * *
+^C
+Matrix Rain Terminated!
+```
+
+## Distribution with Docker
+
+To distribute this script, we create a docker image.
+The recipe is in [dockerfile](./dockerfile).
+
+To build the image `docker build -t matrix_rain:0.0.1 .`
+
+Now the image is ready to be distributed.
+
+To run the image `docker run -it matrix_rain:0.0.1`.
+
+## Key Benefits:
+
+- Fast dependency resolution and installation with UV
+- Seamless distribution with Docker
+
+This modern approach combines the speed of UV with the portability of Docker, creating a robust development and distribution workflow.
+
+
+
+
