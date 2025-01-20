@@ -6,10 +6,16 @@ pub_date: 2025-01-22
 ---
 body:
 
-This guide demonstates how to package a Python script for distribution.
-We'll use UV for dependency management and Docker for seamless distribution.
+This guide demonstates how we can share our Python script with ease
+We'll use UV for dependency management and also to run the script.
+In addition to that we will also use Docker for seamless distribution.
 
-The first thing to do is to install `uv`. 
+We'll use a practical example: a weather forecast script, [check_rain](./check_rain) that helps determine if you need an umbrella.
+
+![check_rain_output](./check-rain-output.png)
+
+## Getting started with UV
+
 Installation should be straighforward in all major operating systems.
 I encourage you to figure out the solution for your operating system.
 
@@ -18,14 +24,44 @@ I encourage you to figure out the solution for your operating system.
 wget -qO- https://astral.sh/uv/install.sh | sh
 ```
 
-## Local Development with UV
-Our [script](./money_rain.py) showcases modern Python packaging practices. 
-UV handles dependency resolution and installation automatically.
+## Script Overview
 
-#### Quick Start
+Our [check_rain](./check_rain) script delivers local weather forecasts (Netherlands and Belgium) using Buienradar API. 
+It showcases the following features:
 
+- Automatic location detection
+- Real-time precipitation forecasts
+- Clear umbrella recommendations
+- Rich terminal output
+
+In the beginning of the script, we add the following header:
+
+`#!/usr/bin/env -S uv run --script`.
+
+This is to tell UV to run the script and self-install dependencies.
+
+After that, the script includes metadata using the following comment:
+
+```python
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#   "requests",
+#   "rich",
+# ]
+# ///
 ```
-uv run money_rain.py
+
+The metadata is used to install a python version and its dependencies and cache them to run the script.
+
+The rest of the script is a normal Python script.
+Now the script is ready to be distributed and run.
+
+```bash
+# Ensure the script is executable
+$ chmod +x check_rain
+# Run the script
+$ check_rain
 ```
 
 UV does the following:
@@ -33,43 +69,31 @@ UV does the following:
 - Installs dependencies
 - Caches dependencies for faster subsequent runs
 
-```bash
-$ uv run money_rain.py
-Reading inline script metadata from `money_rain.py`
-Installed 5 packages in 64ms
-Starting Euro Rain...
- €€                        €          €      €    
-     €         €   €                 €      €     
-  €   €       €                                €  
-€   € €      €    €     €     €                  €
-€          €                     €     € €  €   € 
-    €€ €             € €                    €     
-              €    €                 €    €       
- €€           €   €                €       €    € 
-       €    €    €                                
-    €€                             €  €   €€    € 
-^C
-Euro Rain Terminated!
+## System-wide Installation
+
+To make the script runnable from anywhere, we can throw our script to our `$HOME/.local/bin` directory.
+
+```
+cp check_rain $HOME/.local/bin
+
+# Ensure that the directory is recognized by your shell (.e.g zsh)
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 ```
 
-## Distribution with Docker
+Now the script is runnable from anywhere.
 
-To distribute this script, we create a docker image.
-The recipe is in [dockerfile](./dockerfile).
+## Docker Distribution
 
-To build the image `docker build -t money_rain:0.0.1 .`
+In case your friend can't install UV, we can distribute the script with Docker.
+The recipe is in [dockerfile](./dockerfile) to package it `docker build -t check_rain .`
 
 Now the image is ready to be distributed.
 
-To run the image `docker run -it money_rain:0.0.1`.
+To run the image `docker run -it check_rain`
 
 ## Key Benefits:
 
-- Fast dependency resolution and installation with UV
-- Seamless distribution with Docker
+- With UV, we can develop, run, and distribute our Python script with ease.
+- Coupled with Docker, we can leverage UV to distribute our Python script with Docker.
 
-This modern approach combines the speed of UV with the portability of Docker, creating a robust development and distribution workflow.
-
-
-
-
+This approach combines the speed of UV with the portability of Docker, creating a robust development and distribution workflow.
