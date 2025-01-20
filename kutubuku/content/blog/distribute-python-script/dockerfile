@@ -3,10 +3,11 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY money_rain.py .
+COPY check_rain .
 
 # Pre-install script dependencies
-RUN uv export --script money_rain.py --format requirements-txt > requirements.txt && \
+RUN sed -i '1d' check_rain && \
+    uv export --script check_rain --format requirements-txt > requirements.txt && \
     uv pip install --system -r requirements.txt
 
-CMD ["python", "money_rain.py"]
+CMD ["python", "check_rain"]
