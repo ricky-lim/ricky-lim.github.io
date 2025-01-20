@@ -9,6 +9,15 @@ body:
 This guide demonstates how to package a Python script for distribution.
 We'll use UV for dependency management and Docker for seamless distribution.
 
+The first thing to do is to install `uv`. 
+Installation should be straighforward in all major operating systems.
+I encourage you to figure out the solution for your operating system.
+
+```bash
+# For Linux and macOS:
+wget -qO- https://astral.sh/uv/install.sh | sh
+```
+
 ## Local Development with UV
 Our [script](./money_rain.py) showcases modern Python packaging practices. 
 UV handles dependency resolution and installation automatically.
