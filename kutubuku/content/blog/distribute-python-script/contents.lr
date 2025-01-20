@@ -38,7 +38,7 @@ In the beginning of the script, we add the following header:
 
 `#!/usr/bin/env -S uv run --script`.
 
-This is to tell UV to run the script and self-install dependencies.
+This header is to run the script with `uv`.
 
 After that, the script includes metadata using the following comment:
 
@@ -52,10 +52,10 @@ After that, the script includes metadata using the following comment:
 # ///
 ```
 
-The metadata is used to install a python version and its dependencies and cache them to run the script.
+The metadata is leveraged by UV to **automagically** manage Python versions and dependencies. 
+It intelligently handles installation and caching, ensuring fast and reliable script execution every time you run it.
 
 The rest of the script is a normal Python script.
-Now the script is ready to be distributed and run.
 
 ```bash
 # Ensure the script is executable
@@ -64,10 +64,7 @@ $ chmod +x check_rain
 $ check_rain
 ```
 
-UV does the following:
-- Reads inline script metadata
-- Installs dependencies
-- Caches dependencies for faster subsequent runs
+Now the script is ready to be distributed and run.
 
 ## System-wide Installation
 
@@ -84,12 +81,22 @@ Now the script is runnable from anywhere.
 
 ## Docker Distribution
 
-In case your friend can't install UV, we can distribute the script with Docker.
-The recipe is in [dockerfile](./dockerfile) to package it `docker build -t check_rain .`
+In case your colleagues can't install UV, we can distribute the script with Docker.
+
+The recipe is in [dockerfile](./dockerfile), simply package the script:
+
+```bash
+docker build -t check_rain .
+```
 
 Now the image is ready to be distributed.
 
-To run the image `docker run -it check_rain`
+And run it anywhere:
+
+```bash
+docker run -it check_rain
+```
+
 
 ## Key Benefits:
 
