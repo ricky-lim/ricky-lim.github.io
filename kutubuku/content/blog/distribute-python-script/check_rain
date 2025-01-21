@@ -4,6 +4,7 @@
 # dependencies = [
 #   "requests",
 #   "rich",
+#   "geocoder",
 # ]
 # ///
 
@@ -11,8 +12,9 @@
 This script fetches the hourly rain forecast for a given location using the Buienradar API.
 """
 
-from datetime import datetime, timedelta
 import requests
+import geocoder
+from datetime import datetime, timedelta
 from rich.console import Console
 from rich.table import Table
 
@@ -23,12 +25,22 @@ console = Console()
 
 
 def get_location():
-    """Get location coordinates using ip-api.com.
+    """Get location coordinates
     Returns dict with lat, lon, and city.
     """
-    response = requests.get("http://ip-api.com/json")
-    data = response.json()
-    return {"lat": data["lat"], "lon": data["lon"], "city": data["city"]}
+    # Get current location based on IP
+    g = geocoder.ip('me')
+
+    # Extract location details
+    latitude = g.lat
+    longitude = g.lng
+    city = g.city
+
+    return {
+        'lat': latitude,
+        'lon': longitude,
+        'city': city,
+    }
 
 
 def get_hourly_rain_forecast(lat, lon):
