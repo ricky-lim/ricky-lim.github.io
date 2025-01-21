@@ -43,6 +43,9 @@ We will utilize <strong>UV</strong> for dependency management and script executi
 <p>We'll use a practical example: a weather forecast script, <a href="check_rain">check_rain</a> which helps determine if you need an umbrella.</p>
 <p>This is how the script looks like:</p>
 <p><img src="check-rain-output.png" alt="check_rain_output"></p>
+<p>If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported. 
+This ensures that the script only provides forecasts for supported regions.</p>
+<p><img src="check-rain-output-error.png" alt="check_rain_output_error"></p>
 <h2>Getting started with UV 🚀</h2>
 <p>Installation is straightforward on all major operating systems. Below are the instructions for Linux and macOS:</p>
 <pre><code class="lang-bash">wget -qO- https://astral.sh/uv/install.sh | sh
