@@ -22,6 +22,12 @@ This is how the script looks like:
 
 ![check_rain_output](./check-rain-output.png)
 
+If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported. 
+This ensures that the script only provides forecasts for supported regions.
+
+![check_rain_output_error](./check-rain-output-error.png)
+
+
 ## Getting started with UV 🚀
 
 Installation is straightforward on all major operating systems. Below are the instructions for Linux and macOS:
