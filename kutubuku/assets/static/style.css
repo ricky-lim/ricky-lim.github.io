@@ -189,3 +189,7 @@ tr:hover {
     margin: 2rem 0 1rem;
     font-size: 1.8rem;
 }
+
+.blog-post a {
+    color: var(--primary-color)
+}

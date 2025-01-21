@@ -1,0 +1,138 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#   "requests",
+#   "rich",
+# ]
+# ///
+
+"""
+This script fetches the hourly rain forecast for a given location using the Buienradar API.
+"""
+
+import sys
+import requests
+from datetime import datetime, timedelta
+from rich.console import Console
+from rich.table import Table
+
+BUIENRADAR_API = "https://data.buienradar.nl/2.0/feed/json"
+RAIN_FORECAST_API = "https://gpsgadget.buienradar.nl/data/raintext"
+
+console = Console()
+
+
+def get_location():
+    """Get location coordinates
+    Returns dict with lat, lon, and city.
+    """
+    response = requests.get("https://ipapi.co/json/")
+    data = response.json()
+
+    return {
+        "lat": data["latitude"],
+        "lon": data["longitude"],
+        "city": data["city"],
+        "country": data["country"],
+    }
+
+
+def get_hourly_rain_forecast(lat, lon):
+    """Get hourly rain forecast for given coordinates.
+
+    Args:
+        lat (float): Latitude of the location.
+        lon (float): Longitude of the location.
+
+    Returns list of hourly forecasts as a dict with time in hours and rain_mm in mm.
+    """
+    response = requests.get(f"{RAIN_FORECAST_API}?lat={lat}&lon={lon}")
+    raw_forecasts = []
+
+    for line in response.text.strip().split("\n"):
+        intensity, timestamp = line.split("|")
+        rain_mm = round(10 ** ((int(intensity) - 109) / 32), 1)
+        time = datetime.strptime(timestamp, "%H:%M")
+        raw_forecasts.append({"time": time, "rain_mm": rain_mm})
+
+    # Group by hour and get average rainfall
+    hourly_forecasts = []
+    current_hour = datetime.now().replace(minute=0, second=0, microsecond=0)
+
+    #  Get the next 3 hours
+    for i in range(3):
+        target_hour = current_hour + timedelta(hours=i)
+        hour_forecasts = [
+            f for f in raw_forecasts if f["time"].hour == target_hour.hour
+        ]
+
+        if hour_forecasts:
+            avg_rain = sum(f["rain_mm"] for f in hour_forecasts) / len(hour_forecasts)
+            hourly_forecasts.append(
+                {"time": target_hour.strftime("%H:00"), "rain_mm": round(avg_rain, 1)}
+            )
+
+    return hourly_forecasts
+
+
+def display_forecast(forecasts, location):
+    table = Table(title=f"🌧️ Hourly Rain Forecast for {location['city']}")
+    table.add_column("Hour", style="cyan")
+    table.add_column("Rain (mm/h)", justify="right")
+    table.add_column("Umbrella", justify="center")
+
+    for forecast in forecasts:
+        color = (
+            "red"
+            if forecast["rain_mm"] > 2.5
+            else "yellow"
+            if forecast["rain_mm"] > 0
+            else "green"
+        )
+        umbrella = "[red]☔ Yes" if forecast["rain_mm"] > 0.5 else "[green]✨ No"
+        table.add_row(
+            forecast["time"],
+            f"[{color}]{forecast['rain_mm']:.1f}[/{color}]",
+            umbrella,
+        )
+
+    return table
+
+
+def main():
+    try:
+        with console.status("Fetching hourly forecast..."):
+            try:
+                location = get_location()
+            except Exception as e:
+                console.print(f"[red]Error:[/red] Failed to get location. {str(e)}")
+                return 1
+
+            if location["country"] not in ["BE", "NL"]:
+                console.print(
+                    f"[red]Location Error:[/red] Your current location ({location['city']}, {location['country']}) is not supported."
+                )
+                console.print(
+                    "[yellow]The rain forecast service is only available in:[/yellow]"
+                )
+                console.print("• [green]Netherlands (NL)[/green]")
+                console.print("• [green]Belgium (BE)[/green]")
+                return 1
+
+            try:
+                forecasts = get_hourly_rain_forecast(location["lat"], location["lon"])
+            except Exception as e:
+                console.print(
+                    f"[red]Error:[/red] Failed to get hourly rain forecast. {str(e)}"
+                )
+                return 1
+
+        console.print(display_forecast(forecasts, location))
+    except Exception as e:
+        console.print(f"[red]Unexpected Error:[/red] {str(e)}")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
