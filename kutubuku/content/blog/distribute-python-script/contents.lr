@@ -6,38 +6,65 @@ pub_date: 2025-01-22
 ---
 body:
 
-This guide demonstates how we can share our Python script with ease
-We'll use UV for dependency management and also to run the script.
-In addition to that we will also use Docker for seamless distribution.
+### Disclaimer
 
-We'll use a practical example: a weather forecast script, [check_rain](./check_rain) that helps determine if you need an umbrella.
+> This guide is optimized for simplicity when all you need is a ***single*** Python script. 
+> However, it **does not** discourage making a Python package out of a script for better software maintenance. 
+> By following this guide, you will learn how to distribute your Python scripts effectively, ensuring they are easy to run and share with others.
+
+In this guide, I will demonstrate how to share a Python script effectively.
+We will utilize **UV** for dependency management and script execution, and **Docker** for seamless distribution.
+
+We'll use a practical example: a weather forecast script, [check_rain](./check_rain) which helps determine if you need an umbrella.
+
+This is how the script looks like:
 
 ![check_rain_output](./check-rain-output.png)
 
 ## Getting started with UV
 
-Installation should be straighforward in all major operating systems.
-I encourage you to figure out the solution for your operating system.
+Installation is straightforward on all major operating systems. Below are the instructions for Linux and macOS:
 
 ```bash
-# For Linux and macOS:
 wget -qO- https://astral.sh/uv/install.sh | sh
 ```
 
 ## Script Overview
 
-Our [check_rain](./check_rain) script delivers local weather forecasts (Netherlands and Belgium) using Buienradar API. 
+The [check_rain](./check_rain) script delivers local weather forecasts for the Netherlands and Belgium using Buienradar API. 
 It showcases the following features:
 
-- Automatic location detection
+- Automatic location detection (limited to NL and BE)
 - Real-time precipitation forecasts
 - Clear umbrella recommendations
-- Rich terminal output
+
+```bash
+# After downloading the script, ensure the script is executable
+$ chmod +x check_rain
+# Run the script
+$ check_rain
+```
+
+The format of the script is as follows:
+
+```python
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#   "requests",
+#   "rich",
+# ]
+# ///
+
+# Your Python script here
+```
 
 In the beginning of the script, we add the following header:
 
-`#!/usr/bin/env -S uv run --script`.
-
+```python
+#!/usr/bin/env -S uv run --script.
+```
 This header is to run the script with `uv`.
 
 After that, the script includes metadata using the following comment:
@@ -55,14 +82,14 @@ After that, the script includes metadata using the following comment:
 The metadata is leveraged by UV to **automagically** manage Python versions and dependencies. 
 It intelligently handles installation and caching, ensuring fast and reliable script execution every time you run it.
 
-The rest of the script is a normal Python script.
+The rest of the script is a normal Python script, which you can develop further with your favourite IDE or simply VIM.
+
+To format your script:
 
 ```bash
-# Ensure the script is executable
-$ chmod +x check_rain
-# Run the script
-$ check_rain
+uvx ruff format check_rain
 ```
+
 
 Now the script is ready to be distributed and run.
 
@@ -81,9 +108,27 @@ Now the script is runnable from anywhere.
 
 ## Docker Distribution
 
-In case your colleagues can't install UV, we can distribute the script with Docker.
+In case your friend can't install UV, we can distribute the script with Docker.
 
-The recipe is in [dockerfile](./dockerfile), simply package the script:
+The example below shows how to leverage UV in the Dockerfile to pre-install dependencies.
+
+```bash
+FROM python:3.12-slim-bookworm
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /app
+
+COPY check_rain .
+
+# Pre-install script dependencies
+RUN sed -i '1d' check_rain && \
+    uv export --script check_rain --format requirements-txt > requirements.txt && \
+    uv pip install --system -r requirements.txt
+
+CMD ["python", "check_rain"]
+```
+
+To simply package the script:
 
 ```bash
 docker build -t check_rain .
@@ -97,10 +142,14 @@ And run it anywhere:
 docker run -it check_rain
 ```
 
+## Key Benefits
 
-## Key Benefits:
+- **Simplified Development and Execution with UV**: 
+The script header specifies the required Python version and dependencies, ensuring consistency across different environments.
 
-- With UV, we can develop, run, and distribute our Python script with ease.
-- Coupled with Docker, we can leverage UV to distribute our Python script with Docker.
+- **Seamless Distribution with Docker**: 
+By coupling UV with Docker, we can create a Docker image that includes all necessary dependencies. 
+This allows us to distribute our Python script as a self-contained package that can run anywhere Docker is supported. 
 
-This approach combines the speed of UV with the portability of Docker, creating a robust development and distribution workflow.
+
+By leveraging these tools, you can ensure that your Python scripts are easy to develop, run, and distribute, providing a robust solution for script management and execution.
