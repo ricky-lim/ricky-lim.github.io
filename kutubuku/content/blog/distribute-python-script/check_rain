@@ -4,7 +4,6 @@
 # dependencies = [
 #   "requests",
 #   "rich",
-#   "geocoder",
 # ]
 # ///
 
@@ -12,8 +11,8 @@
 This script fetches the hourly rain forecast for a given location using the Buienradar API.
 """
 
+import sys
 import requests
-import geocoder
 from datetime import datetime, timedelta
 from rich.console import Console
 from rich.table import Table
@@ -28,18 +27,14 @@ def get_location():
     """Get location coordinates
     Returns dict with lat, lon, and city.
     """
-    # Get current location based on IP
-    g = geocoder.ip('me')
-
-    # Extract location details
-    latitude = g.lat
-    longitude = g.lng
-    city = g.city
+    response = requests.get("https://ipapi.co/json/")
+    data = response.json()
 
     return {
-        'lat': latitude,
-        'lon': longitude,
-        'city': city,
+        "lat": data["latitude"],
+        "lon": data["longitude"],
+        "city": data["city"],
+        "country": data["country"],
     }
 
 
@@ -91,7 +86,9 @@ def display_forecast(forecasts, location):
         color = (
             "red"
             if forecast["rain_mm"] > 2.5
-            else "yellow" if forecast["rain_mm"] > 0 else "green"
+            else "yellow"
+            if forecast["rain_mm"] > 0
+            else "green"
         )
         umbrella = "[red]☔ Yes" if forecast["rain_mm"] > 0.5 else "[green]✨ No"
         table.add_row(
@@ -104,12 +101,38 @@ def display_forecast(forecasts, location):
 
 
 def main():
-    with console.status("Fetching hourly forecast..."):
-        location = get_location()
-        forecasts = get_hourly_rain_forecast(location["lat"], location["lon"])
+    try:
+        with console.status("Fetching hourly forecast..."):
+            try:
+                location = get_location()
+            except Exception as e:
+                console.print(f"[red]Error:[/red] Failed to get location. {str(e)}")
+                return 1
 
-    console.print(display_forecast(forecasts, location))
+            if location["country"] not in ["BE", "NL"]:
+                console.print(
+                    f"[red]Location Error:[/red] Your current location ({location['city']}, {location['country']}) is not supported."
+                )
+                console.print(
+                    "[yellow]The rain forecast service is only available in:[/yellow]"
+                )
+                console.print("• [green]Netherlands (NL)[/green]")
+                console.print("• [green]Belgium (BE)[/green]")
+                return 1
+
+            try:
+                forecasts = get_hourly_rain_forecast(location["lat"], location["lon"])
+            except Exception as e:
+                console.print(
+                    f"[red]Error:[/red] Failed to get hourly rain forecast. {str(e)}"
+                )
+                return 1
+
+        console.print(display_forecast(forecasts, location))
+    except Exception as e:
+        console.print(f"[red]Unexpected Error:[/red] {str(e)}")
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
