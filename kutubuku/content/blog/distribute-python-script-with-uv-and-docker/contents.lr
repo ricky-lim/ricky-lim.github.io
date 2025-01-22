@@ -75,7 +75,8 @@ In the beginning of the script, we add the following header:
 ```
 
 This nifty shebang line tells the system to use `uv` to run the script. 
-I learned this cool trick from Trey Hunner's blog: [Lazy Self-Installing Python Scripts with UV](https://treyhunner.com/2024/12/lazy-self-installing-python-scripts-with-uv/).
+I learned this cool trick from Trey Hunner's blog: 
+<a href="https://treyhunner.com/2024/12/lazy-self-installing-python-scripts-with-uv/" target="_blank">Lazy Self-Installing Python Scripts with UV</a>.
 
 After that, the script includes metadata using the following comment:
 
