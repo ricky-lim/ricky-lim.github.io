@@ -22,6 +22,7 @@ This is how the script looks like:
 
 ![check_rain_output](./check-rain-output.png)
 
+
 If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported. 
 This ensures that the script only provides forecasts for supported regions.
 
@@ -41,15 +42,15 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 The [check_rain](./check_rain) script delivers local weather forecasts for the Netherlands and Belgium using Buienradar API. 
 It showcases the following features:
 
-- Automatic location detection (limited to NL and BE)
-- Real-time precipitation forecasts
-- Clear umbrella recommendations
+- 🌍 Automatic location detection (NL and BE)
+- 🌧️ Real-time precipitation forecasts
+-  ☂️ Clear umbrella recommendations
 
 ```bash
 # After downloading the script, ensure the script is executable
 $ chmod +x check_rain
 # Run the script
-$ check_rain
+$ ./check_rain
 ```
 
 The format of the script is as follows:
@@ -73,7 +74,8 @@ In the beginning of the script, we add the following header:
 #!/usr/bin/env -S uv run --script.
 ```
 
-This header is a shebang line, used to tell the system to use `uv` to run the script.
+This nifty shebang line tells the system to use `uv` to run the script. 
+I learned this cool trick from Trey Hunner's blog: [Lazy Self-Installing Python Scripts with UV](https://treyhunner.com/2024/12/lazy-self-installing-python-scripts-with-uv/).
 
 After that, the script includes metadata using the following comment:
 
@@ -87,7 +89,7 @@ After that, the script includes metadata using the following comment:
 # ///
 ```
 
-This metadata is leveraged by UV to ***automagically*** manage Python versions and dependencies. 
+This metadata is harnessed by UV to ***magically*** manage Python versions and dependencies for you.
 It intelligently handles installation and caching, ensuring fast and reliable script execution every time you run it.
 
 The rest of the script is a normal Python script 🐍, which you can develop further with your favourite IDE or a simple text editor like VIM.
@@ -97,6 +99,9 @@ To format your script, use the following command:
 ```bash
 uvx ruff format check_rain
 ```
+
+Note: uvx is included with the UV installation and provides a convenient way to manage and run your Python scripts in isolated environments.
+
 
 Now the script is ready to be distributed.
 
@@ -138,14 +143,22 @@ CMD ["python", "check_rain"]
 To simply package the script:
 
 ```bash
+# Build the docker image
 docker build -t check_rain .
+
+# Save the image to a tar.gz file
+docker save check_rain | gzip > check_rain.tar.gz
 ```
 
-Now the image is ready to be distributed.
+Now the image is ready to be distributed as `check_rain.tar.gz`.
 
-And run it anywhere:
+To load and run the Docker image from the tar.gz file:
 
 ```bash
+# Load the docker image
+gunzip -c check_rain.tar.gz | docker load
+
+# Run the image
 docker run -it check_rain
 ```
 
@@ -160,3 +173,5 @@ This allows us to distribute our Python script as a self-contained package that 
 
 
 By leveraging these tools, you can ensure that your Python scripts are easy to develop, run, and distribute, providing a robust solution for script management and execution.
+
+This guide is designed to help your Python script thrive by making it accessible, reliable, and easy to share with others.
