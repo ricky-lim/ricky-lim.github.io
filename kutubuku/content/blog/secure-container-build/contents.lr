@@ -1,0 +1,151 @@
+title: Secure your container build
+---
+author: Ricky Lim
+---
+pub_date: 2025-01-29
+---
+body:
+
+
+> "Ever wondered how your secrets might be exposed in your docker image? You're not alone 😉".
+
+In this blog post, we'll dive into the world of Docker builds to learn two powerful ways to handle variables: **build arguments** and **mount secrets**.
+
+Imagine you're building a container that needs both configuration value and API token. 
+***Which method should you use? When should you use each?***
+By the end of this post, you'll have a clear understanding of how to handle both scenarios with confidence.
+
+First we'll build an image with build arguments, expose why it's risky to do so.
+Then, level up our security by using mount secrets.
+Let's dive in 🚀 !
+
+## Let's Start with Build Arguments 🛠  ️
+
+Here's a typical [Dockerfile](./app.dockerfile) that uses build arguments:
+
+```Dockerfile
+FROM alpine
+
+ARG API_URL
+ARG API_TOKEN
+
+RUN echo "API_URL=${API_URL}" > /config.txt
+RUN echo "API_TOKEN=${API_TOKEN}" > /token.txt
+```
+
+Let's build the image:
+
+```bash
+$ docker build \
+     -f app.dockerfile \
+     --build-arg API_URL=https://api.example.com \
+     --build-arg API_TOKEN=super_secret_12345 \
+     -t app .
+```
+
+Now, here's the issue - let's see what's stored in our image:
+
+```bash
+$ docker history app
+
+# Output
+IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+660d66666fc9   18 minutes ago   RUN |2 API_URL=https://api.example.com API_T…   8.19kB    buildkit.dockerfile.v0
+<missing>      18 minutes ago   RUN |2 API_URL=https://api.example.com API_T…   8.19kB    buildkit.dockerfile.v0
+<missing>      18 minutes ago   ARG API_TOKEN=super_secret_12345                0B        buildkit.dockerfile.v0
+<missing>      18 minutes ago   ARG API_URL=https://api.example.com             0B        buildkit.dockerfile.v0
+<missing>      2 weeks ago      CMD ["/bin/sh"]                                 0B        buildkit.dockerfile.v0
+<missing>      2 weeks ago      ADD alpine-minirootfs-3.21.2-x86_64.tar.gz /…   8.5MB     buildkit.dockerfile.v0
+```
+
+> **"Look at that - our secret, API token is right there in plain sight!"**
+
+***No Bueno, right?*** This is exactly why we need a better approach. Let's level up our security game."
+
+## Level Up with Mount Secrets 🔒
+
+When you mount a secret, Docker creates a file at `/run/secrets/<secret_id>`.
+The `<secret_id>` is a temporary name you give to access your secret only during build time.
+
+Here's the pattern:
+
+```dockerfile
+RUN --mount=type=secret,id=mysecret \
+    cat /run/secrets/mysecret
+```
+
+Let's see it in action.
+Here's our improved [Dockerfile](./secure-app.dockerfile):
+
+```dockerfile
+FROM alpine
+
+ARG API_URL
+
+RUN echo "API_URL=${API_URL}" > /config.txt
+RUN --mount=type=secret,id=api_token \
+    cat /run/secrets/api_token > /token.txt
+```
+
+Build it the secure way:
+
+```bash
+$ API_TOKEN=super_secret_12345
+$ docker build \                           
+    -f secure-app.dockerfile \
+    --build-arg API_URL=https://api.example.com \
+    --secret id=api_token,env=API_TOKEN \
+    -t secure-app .
+```
+
+Now, let's verify the secret is not stored:
+
+```bash
+$ docker history secure-app
+
+# Output
+IMAGE          CREATED         CREATED BY                                      SIZE      COMMENT
+88f88888c950   3 minutes ago   RUN |1 API_URL=https://api.example.com /bin/…   4.1kB     buildkit.dockerfile.v0
+<missing>      3 minutes ago   RUN |1 API_URL=https://api.example.com /bin/…   8.19kB    buildkit.dockerfile.v0
+<missing>      3 minutes ago   ARG API_URL=https://api.example.com             0B        buildkit.dockerfile.v0
+<missing>      2 weeks ago     CMD ["/bin/sh"]                                 0B        buildkit.dockerfile.v0
+<missing>      2 weeks ago     ADD alpine-minirootfs-3.21.2-x86_64.tar.gz /…   8.5MB     buildkit.dockerfile.v0
+
+# Check secret is empty
+$ docker run --rm secure-app cat /token.txt
+```
+
+The output shows that:
+
+- The secret `API_TOKEN` is not stored in the image history.
+- The `token.txt` file exists only during build time and it's empty or inaccessible after build.
+
+### Key Points to Remember:
+
+- Each secret needs a unique id and is stored in `/run/secrets/<secret_id>`
+- Secret is only available during the build time in `RUN` steps
+- After the build step, the secret is automatically cleaned up
+
+
+## The Right Tool for the Job  🔧
+
+🛠  build args for non-sensitive variables, such as:
+
+- Build-time configurations ️
+- Public URLs
+- Version numbers
+
+🔒 mount secrets for sensitive variables, such as:
+
+- API tokens
+- Database credentials
+- Private keys
+- Certificates
+
+## Key takeaways 🎯
+
+- Build arguments are like writing on a whiteboard. They're visible to everyone.
+- Mount secrets are like passing a note that self-destructs after reading.
+
+Ready to secure your docker builds? Start using mount secrets today! 🔒 and keep build args for public configurations.
+
