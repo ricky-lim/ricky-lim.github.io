@@ -11,7 +11,10 @@ body:
 
 In this blog post, we'll dive into the world of Docker builds to learn two powerful ways to handle variables: **build arguments** and **mount secrets**.
 
-Imagine you're building a container that needs both configuration value and API token. 
+Imagine you're building a container that needs both configuration value, like **`API_URL`** and **`API token`**. 
+`API_URL` is generally fine to be exposed, as it's not sensitive information.
+However, the `API_TOKEN` must be kept secret to prevent unauthorized access and potential security breaches.
+
 ***Which method should you use? When should you use each?***
 By the end of this post, you'll have a clear understanding of how to handle both scenarios with confidence.
 
@@ -63,6 +66,8 @@ IMAGE          CREATED          CREATED BY                                      
 ***No Bueno, right?*** This is exactly why we need a better approach. Let's level up our security game."
 
 ## Level Up with Mount Secrets 🔒
+
+> To use this feature, Docker 23.0.0 or later and the buildx plugin are required.
 
 When you mount a secret, Docker creates a file at `/run/secrets/<secret_id>`.
 The `<secret_id>` is a temporary name you give to access your secret only during build time.
@@ -148,4 +153,3 @@ The output shows that:
 - Mount secrets are like passing a note that self-destructs after reading.
 
 Ready to secure your docker builds? Start using mount secrets today! 🔒 and keep build args for public configurations.
-
