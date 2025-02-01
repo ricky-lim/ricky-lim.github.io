@@ -1,0 +1,162 @@
+title: Optimize Your Docker Build
+---
+author: Ricky Lim
+---
+pub_date: 2025-02-05
+---
+body:
+
+## Why Docker Size Matters for Data Scientists
+Data scientists work with various dependencies that can quickly bloat the size of docker images.
+A typical Python data science container can easily exceed **1GB**. 
+Bloated images can lead to slower development and deployment times, impacting your overall data science workflow.
+
+Dependencies is a given, however not all dependencies are created equal.
+There is an **intended dependency** like `Numpy` that helps data scientist to do data analysis.
+Unfortunately, there is also the **unintended dependency** like build tools such as `gcc`, `build-essential`, that sneaks into your final docker image.
+Though these dependencies are necessary for building the application, they are ***not required*** for running the application.
+In this blog, we will learn how to prevent those unintended dependencies from bloating your docker images with **Docker multi-stage builds**.
+
+## The Car Factory Analogy
+
+Think of Docker multi-stage builds like car manufacturing and delivery.
+
+- Traditional Build:
+  Shipping an entire car factory with all machinery, raw materials, and the finished car to your customer.
+
+- Multi-stage Build:
+  Shipping only the finished car
+
+
+Just we don't need a whole factory to drive a car, we don't need build tools to run our application.
+
+## Data Science Container Example
+
+Let's build a container for our matrix operations tool [`matrixops.py`](./matrixops.py)
+
+### 🐘 Traditional Build Approach
+
+This approach includes all build dependencies in the final image, making it **unintendedly large**.
+
+Here's a typical [unoptimized Dockerfile](./unoptimized.dockerfile):
+
+```dockerfile
+FROM python:3.12
+
+WORKDIR /app
+
+# Build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install numpy
+
+COPY matrixops.py .
+
+ENTRYPOINT [ "python", "matrixops.py" ]
+CMD ["--help"]
+```
+
+### 🚀 The Multi-stage Build Approach
+
+With multi-stage build, we can separate the unintended dependencies from the final image, resulting in an **intendedly smaller image**.
+
+Here's an [optimized Dockerfile](./optimized.dockerfile):
+
+```dockerfile
+# Build stage
+FROM python:3.12 AS builder
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --prefix=/install numpy
+
+# Final stage
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY --from=builder /install /usr/local
+
+COPY matrixops.py .
+
+ENTRYPOINT [ "python", "matrixops.py" ]
+CMD ["--help"]
+```
+
+## Hands-on Demo
+
+Download the required files:
+
+- [matrixops.py](./matrixops.py)
+- [unoptimized.dockerfile](./unoptimized.dockerfile)
+- [optimized.dockerfile](./optimized.dockerfile)
+
+To build this image, run:
+
+```bash
+$ docker build -f unoptimized.dockerfile -t matrixops:unoptimized .
+$ docker build -f optimized.dockerfile -t matrixops:optimized .
+```
+
+Example run:
+
+```bash
+$ docker run -it matrixops:optimized identity 3 3 
+
+🔢 Generated IDENTITY Matrix (3x3):
+[[1. 0. 0.]
+ [0. 1. 0.]
+ [0. 0. 1.]]
+
+📊 Matrix Analysis:
+Mean: 0.3333333333333333
+Std Dev: 0.4714045207910317
+Min: 0.0
+Max: 1.0
+Sum: 3.0
+Determinant: 1.0
+```
+
+## Image Size comparison
+
+Let's compare the image sizes:
+
+```bash
+$ docker images | grep matrixops
+
+matrixops                  optimized     d8a7716ca91c   6 minutes ago    276MB
+matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
+```
+
+### Impact by numbers
+
+- Original Image Size: 1.61GB
+- Optimized Image Size: 276MB
+- Size Reduction: 83%
+- Benefits: 6x smaller, faster boot times, quicker deployments
+
+## Key Takeawsys
+
+1. Multi-stage builds separate intended and unintended dependencies.
+   The uninteded dependencies are moved to the builder stage, reducing the final image size.
+
+2. Smaller images lead to faster container initialization.
+   The smaller our docker image, less data to load into memory and process at runtime, giving you a more responsive application.
+
+3. Efficient deployment.
+  Quicker deployments when pushing the image to a registry and also when pulling the image from the registry, perfect for CI/CD pipelines.
+
+## Next Steps:
+
+- Apply these optimization techniques to your own projects.
+- Explore different base images.
+- Share your optimization journey with the community.
