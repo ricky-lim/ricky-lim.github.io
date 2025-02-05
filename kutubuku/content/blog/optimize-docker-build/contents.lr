@@ -151,7 +151,7 @@ matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
 1. Multi-stage builds separate intended and unintended dependencies.
    The uninteded dependencies are moved to the builder stage, reducing the final image size.
 
-2. Smaller images lead to faster container initialization.
+2. Leaner images lead to faster container initialization.
    The smaller our docker image, less data to load into memory and process at runtime, giving you a more responsive application.
 
 3. Efficient development and deployment.
@@ -163,4 +163,4 @@ matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
 - Explore different base images.
 - Share your optimization journey with the community.
 
-> Remember: Small Docker images = Faster to iterate. KISS - Keep It Simple & Small!
+> Remember: Learner Docker images = Faster to iterate. KISS - Keep It Simple & Small!
