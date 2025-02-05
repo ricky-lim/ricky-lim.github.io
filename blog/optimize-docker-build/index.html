@@ -1,0 +1,177 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../static/style.css">
+<title>Optimize Your Docker Build — kutubuku</title>
+<body>
+  <header>
+    <h1>kutubuku</h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+      </ul>
+    </nav>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post">
+  
+    <h2>Optimize Your Docker Build</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-02-05
+  </p>
+  <h2>Why Docker Size Matters for Data Scientists</h2>
+<p>Data scientists often rely on powerful computational libraries to drive innovative research and analysis.
+These essential libraries, when packaged as a docker container, can significantly impact the size of the container.
+A typical Python data science container can easily exceed <strong>1GB</strong>. 
+Optimizing these container sizes presents an opportunity to speed up development and deployment cycles,
+empowering your overall data science workflow.</p>
+<p>While dependencies are essential for any project, not all dependencies come equally.
+There is an <strong>intended dependency</strong> like <code>Numpy</code> that helps data scientist to do data analysis.
+Unfortunately, there is also the <strong>unintended dependency</strong> like build tools such as <code>gcc</code>, <code>build-essential</code>, that sneaks into your final docker image.
+Though these dependencies are necessary for building the application, they are <strong><em>not required</em></strong> for running the application.
+In this blog, we will learn how to create a docker image using <strong>Docker multi-stage builds</strong>, keeping only the dependencies you need for your application.</p>
+<h2>The Car Factory Analogy</h2>
+<p>Think of Docker multi-stage builds like car manufacturing and delivery.</p>
+<ul>
+<li><p>Traditional Build:
+Shipping an entire car factory with all machinery, raw materials, and the finished car to your customer.</p>
+</li>
+<li><p>Multi-stage Build:
+Shipping only the finished car</p>
+</li>
+</ul>
+<p>Just we don't need a whole factory to drive a car, we don't need build tools to run our application.</p>
+<h2>Data Science Container Example</h2>
+<p>Let's build a container for our matrix operations tool <a href="matrixops.py"><code>matrixops.py</code></a></p>
+<h3>🐘 Traditional Build Approach</h3>
+<p>This approach includes all build dependencies in the final image, making it <strong>unintendedly large</strong>.</p>
+<p>Here's a typical <a href="unoptimized.dockerfile">unoptimized Dockerfile</a>:</p>
+<pre><code class="lang-dockerfile">FROM python:3.12
+
+WORKDIR /app
+
+# Build dependencies
+RUN apt-get update &amp;&amp; \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+RUN pip install numpy
+
+COPY matrixops.py .
+
+ENTRYPOINT [ &quot;python&quot;, &quot;matrixops.py&quot; ]
+CMD [&quot;--help&quot;]
+</code></pre>
+<h3>🚀 The Multi-stage Build Approach</h3>
+<p>With multi-stage build, we can separate the unintended dependencies from the final image, resulting in an <strong>intendedly smaller image</strong>.</p>
+<p>Here's an <a href="optimized.dockerfile">optimized Dockerfile</a>:</p>
+<pre><code class="lang-dockerfile"># Build stage
+FROM python:3.12 AS builder
+
+WORKDIR /app
+
+RUN apt-get update &amp;&amp; \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+RUN pip install --prefix=/install numpy
+
+# Final stage
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY --from=builder /install /usr/local
+
+COPY matrixops.py .
+
+ENTRYPOINT [ &quot;python&quot;, &quot;matrixops.py&quot; ]
+CMD [&quot;--help&quot;]
+</code></pre>
+<h2>Hands-on Demo</h2>
+<p>Download the required files:</p>
+<ul>
+<li><a href="matrixops.py">matrixops.py</a></li>
+<li><a href="unoptimized.dockerfile">unoptimized.dockerfile</a></li>
+<li><a href="optimized.dockerfile">optimized.dockerfile</a></li>
+</ul>
+<p>To build this image, run:</p>
+<pre><code class="lang-bash">$ docker build -f unoptimized.dockerfile -t matrixops:unoptimized .
+$ docker build -f optimized.dockerfile -t matrixops:optimized .
+</code></pre>
+<p>Example run:</p>
+<pre><code class="lang-bash">$ docker run -it matrixops:optimized identity 3 3 
+
+🔢 Generated IDENTITY Matrix (3x3):
+[[1. 0. 0.]
+ [0. 1. 0.]
+ [0. 0. 1.]]
+
+📊 Matrix Analysis:
+Mean: 0.3333333333333333
+Std Dev: 0.4714045207910317
+Min: 0.0
+Max: 1.0
+Sum: 3.0
+Determinant: 1.0
+</code></pre>
+<h2>Image Size comparison</h2>
+<p>Let's compare the image sizes:</p>
+<pre><code class="lang-bash">$ docker images | grep matrixops
+
+matrixops                  optimized     d8a7716ca91c   6 minutes ago    276MB
+matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
+</code></pre>
+<h3>Impact by numbers</h3>
+<ul>
+<li>Original Image Size: 1.61GB</li>
+<li>Optimized Image Size: 276MB</li>
+<li>Size Reduction: 83%</li>
+<li>Benefits: 6x smaller, faster boot times, quicker to iterate during development.</li>
+</ul>
+<h2>Key Takeawsys</h2>
+<ol>
+<li><p>Multi-stage builds separate intended and unintended dependencies.
+The uninteded dependencies are moved to the builder stage, reducing the final image size.</p>
+</li>
+<li><p>Leaner images lead to faster container initialization.
+The smaller our docker image, less data to load into memory and process at runtime, giving you a more responsive application.</p>
+</li>
+<li><p>Efficient development and deployment.
+Quicker deployments when pushing the image to a registry and also when pulling the image from the registry, perfect for CI/CD pipelines.</p>
+</li>
+</ol>
+<h2>Next Steps:</h2>
+<ul>
+<li>Apply these optimization techniques to your own projects.</li>
+<li>Explore different base images.</li>
+<li>Share your optimization journey with the community.</li>
+</ul>
+<blockquote><p>Remember: Learner Docker images = Faster to iterate. KISS - Keep It Simple &amp; Small!</p>
+</blockquote>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+  </footer>
+</body>
