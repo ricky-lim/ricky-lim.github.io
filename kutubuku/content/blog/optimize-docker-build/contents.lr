@@ -7,15 +7,17 @@ pub_date: 2025-02-05
 body:
 
 ## Why Docker Size Matters for Data Scientists
-Data scientists work with various dependencies that can quickly bloat the size of docker images.
+Data scientists often rely on powerful computational libraries to drive innovative research and analysis.
+These essential libraries, when packaged as a docker container, can significantly impact the size of the container.
 A typical Python data science container can easily exceed **1GB**. 
-Bloated images can lead to slower development and deployment times, impacting your overall data science workflow.
+Optimizing these container sizes presents an opportunity to speed up development and deployment cycles,
+empowering your overall data science workflow.
 
-Dependencies is a given, however not all dependencies are created equal.
+While dependencies are essential for any project, not all dependencies come equally.
 There is an **intended dependency** like `Numpy` that helps data scientist to do data analysis.
 Unfortunately, there is also the **unintended dependency** like build tools such as `gcc`, `build-essential`, that sneaks into your final docker image.
 Though these dependencies are necessary for building the application, they are ***not required*** for running the application.
-In this blog, we will learn how to prevent those unintended dependencies from bloating your docker images with **Docker multi-stage builds**.
+In this blog, we will learn how to create a docker image using **Docker multi-stage builds**, keeping only the dependencies you need for your application.
 
 ## The Car Factory Analogy
 
@@ -142,7 +144,7 @@ matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
 - Original Image Size: 1.61GB
 - Optimized Image Size: 276MB
 - Size Reduction: 83%
-- Benefits: 6x smaller, faster boot times, quicker deployments
+- Benefits: 6x smaller, faster boot times, quicker to iterate during development.
 
 ## Key Takeawsys
 
@@ -152,7 +154,7 @@ matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
 2. Smaller images lead to faster container initialization.
    The smaller our docker image, less data to load into memory and process at runtime, giving you a more responsive application.
 
-3. Efficient deployment.
+3. Efficient development and deployment.
   Quicker deployments when pushing the image to a registry and also when pulling the image from the registry, perfect for CI/CD pipelines.
 
 ## Next Steps:
@@ -160,3 +162,5 @@ matrixops                  unoptimized   54f928a6525b   10 minutes ago   1.61GB
 - Apply these optimization techniques to your own projects.
 - Explore different base images.
 - Share your optimization journey with the community.
+
+> Remember: Small Docker images = Faster to iterate. KISS - Keep It Simple & Small!
