@@ -1,0 +1,135 @@
+title: Test Docker App
+---
+author: Ricky Lim
+---
+pub_date: 2025-02-12
+---
+body:
+
+Testing Dockerized Python Applications with Testcontainers.
+
+## Why 
+
+When developing Python applications that needs a database, testing can be challenging.
+We often need to set up and manage test databases, which can be time-consuming and error-prone. 
+In this blog post, we'll explore how to use Testcontainers to simplify the process of testing Dockerized Python applications.
+
+## Analogy
+
+Think of testing database applications like running experiments in a lab:
+- Manual testing = A scientist performing each step: sterilize, prepare, experiment, and clean up every time 
+- Testcontainers = A laboratory robot that self-prepares and self-destructs after each experiment
+
+Let's walk through a practical example from a demo repository: https://github.com/ricky-lim/pycontainer-demo
+
+In this demo repository, we have a simple python application `robot` that interacts with a database.
+
+## The manual testing
+
+### 🐘 Manual Testing
+In the manual testing approach, we need to set up a test database, run the application, and then clean up the database after the test.
+
+The process looks like this:
+
+- Set up a test database
+
+```bash
+# Start PostgreSQL container
+$ docker run -d --name robot-postgres \
+    -e POSTGRES_USER=postgres \
+    -e POSTGRES_PASSWORD=postgres \
+    -e POSTGRES_DB=postgres \
+    -p 5432:5432 \
+    postgres:17-alpine
+
+# Wait for PostgreSQL to be ready
+$ until docker exec robot-postgres pg_isready -U postgres; do echo "Waiting for PostgreSQL..."; sleep 1; done
+```
+
+- Build and run the application
+
+```bash
+# Build the docker application
+$ docker build -t robot .
+
+# Run the docker application
+$ docker run -it --network host robot add --name pixie --description "cleaning up my garden"
+```
+
+- Check  the database
+
+```bash
+# Check if the robot was added
+$ docker exec -it robot-postgres psql -U postgres -d postgres -c "SELECT * FROM robot;"
+
+ id | name  |      description
+----+-------+-----------------------
+  1 | pixie | cleaning up my garden
+(1 row)
+```
+
+- Clean up the database
+
+```bash
+# Stop and remove the PostgreSQL container
+$ docker stop robot-postgres
+$ docker rm robot-postgres
+```
+
+A lot of manual work, and that's only for a single test if we can add a robot. 
+From this example, we can see that manual approach is time-consuming and will not scale well.
+
+### 🐘 Testcontainer
+
+Let's see now how can we use Testcontainers to simplify the process of testing this application.
+
+
+```python
+# Automate the setup and teardown of the database
+@pytest.fixture(scope="function")
+def postgres_container():
+    with PostgresContainer("postgres:17-alpine") as postgres:
+        yield postgres
+
+
+# Initialize the table
+@pytest.fixture
+def robot_repository(postgres_container):
+    connection_string = postgres_container.get_connection_url()
+    repo = RobotRepository(connection_string)
+    repo.init_db()
+    return repo
+
+
+# Test the add_robot function
+@pytest.mark.integration
+def test_add_robot(robot_repository):
+    robot_id = robot_repository.add_robot("pixie", "cleaning up my garden")
+    assert robot_id == 1
+```
+
+The test function is now much simpler and also we can easily run by leveraging the `pytest` command `uv run pytest -m integration`.
+
+With this approach, we can scale our testing process and for the full example, please refer to the [demo repository](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/test_robot_repository.py).
+
+## CI/CD
+
+Furthermore, we can also integrate this part of CI/CD pipeline to automate this process.
+The example with github actions, can be found [here](https://github.com/ricky-lim/pycontainer-demo/blob/main/.github/workflows/ci.yml).
+
+## Key Takeaways
+
+What benefits can we get from using Testcontainers?
+
+- Effectiveness: Like a lab robot, it handles all database setup and teardown automatically, letting you focus on writing meaningful tests and improving your application's business logic.
+
+- Reliability: Every test runs in a pristine environment with clean database, preventing contaminated test data
+
+- Reproducibility: Every test runs in a reproducible test environments, such as in Github Actions CI - no more "works on my machine" issues
+
+Testcontainers leverages Docker's powerful containerization to:
+
+- Isolate each test in its own environment
+- Start fresh instances rapidly
+- Clean up automatically when done
+- Scale easily in CI/CD pipelines
