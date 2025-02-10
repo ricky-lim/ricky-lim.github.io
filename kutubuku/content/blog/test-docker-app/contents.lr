@@ -6,32 +6,51 @@ pub_date: 2025-02-12
 ---
 body:
 
-Testing Dockerized Python Applications with Testcontainers.
+Testing Dockerized Python Applications with Docker ❤️ Testcontainers ❤️ Pytest.
 
-## Why 
+## Why ?
 
-When developing Python applications that needs a database, testing can be challenging.
+When developing a dockerized Python application that needs a database, testing can be challenging.
 We often need to set up and manage test databases, which can be time-consuming and error-prone. 
-In this blog post, we'll explore how to use Testcontainers to simplify the process of testing Dockerized Python applications.
+
+In this blog post, I am going to take you through a practical example of how to use Docker + Testcontainers + Pytest, to simplify the testing process.
+
+### 🐳 Docker + 🧪 Testcontainers + 🎯 Pytest
+
+This powerful testing stack leverages three powerful Python tools:
+
+- **D**ocker SDK for Python (docker) - Lets us programmatically control Docker, build images, and run containers right from our Python code
+- **T**estcontainers - A library that creates on-demand, isolated Docker containers for your tests.
+- **P**ytest - A robust testing framework that makes writing and running tests ***fun*** again, with fixtures that automagically handle setup and teardown
+
+Together, they create a seamless automation where:
+
+- Docker SDK builds and manages our application container
+- Testcontainers handles our PostgreSQL test database
+- Pytest orchestrates everything with elegant fixtures
+
+Note: Throughout this blog, we'll refer to this testing trinity as the **DTP** stack.
+
 
 ## Analogy
 
-Think of testing database applications like running experiments in a lab:
-- Manual testing = A scientist performing each step: sterilize, prepare, experiment, and clean up every time 
-- Testcontainers = A laboratory robot that self-prepares and self-destructs after each experiment
+Testing with **DTP** stack is like modern laboratory automation:
+
+- Manual testing = A scientist performing each step: prepare, experiment, and clean up every time 
+- Docker + Testcontainers + Pytest = A laboratory robot that self-prepares, self-executes, and self-destructs after each experiment
 
 Let's walk through a practical example from a demo repository: https://github.com/ricky-lim/pycontainer-demo
 
-In this demo repository, we have a simple python application `robot` that interacts with a database.
+Our demo repository features a simple dockerized python application, `robot`, that works with a database.
 
-## The manual testing
+Get ready to see how we can test this application from manual testing to automated testing with DTP stack.
 
 ### 🐘 Manual Testing
-In the manual testing approach, we need to set up a test database, run the application, and then clean up the database after the test.
+In the manual testing approach, we need to set up a test database, build and run the application, run the test, and then clean up the database and the application after the test.
 
 The process looks like this:
 
-- Set up a test database
+- Set up a test database (also ensure it's ready to use)
 
 ```bash
 # Start PostgreSQL container
@@ -56,7 +75,7 @@ $ docker build -t robot .
 $ docker run -it --network host robot add --name pixie --description "cleaning up my garden"
 ```
 
-- Check  the database
+- Run the test
 
 ```bash
 # Check if the robot was added
@@ -74,62 +93,142 @@ $ docker exec -it robot-postgres psql -U postgres -d postgres -c "SELECT * FROM 
 # Stop and remove the PostgreSQL container
 $ docker stop robot-postgres
 $ docker rm robot-postgres
+
+# Clean your docker application
+$ docker rmi robot
 ```
 
-A lot of manual work, and that's only for a single test if we can add a robot. 
-From this example, we can see that manual approach is time-consuming and will not scale well.
+Manual testing works, but we can do better!
 
-### 🐘 Testcontainer
+Just as laboratory automation revolutionized scientific research,
+our **DTP** stack can supercharge our testing process into a streamlined operation.
 
-Let's see now how can we use Testcontainers to simplify the process of testing this application.
+### Automated Testing with DTP
 
+Let's discover how ️DTP, turns our boring manual tasks into an elegant automated solution.
+
+First, we automate the setup of our test in `conftest.py`.
+Here are the key features that power our DTP stack.
+
+The complete code is available in the [demo repository](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/conftest.py).
 
 ```python
-# Automate the setup and teardown of the database
+@pytest.fixture(scope="session")
+def robot_docker_image(docker_client, request):
+    dockerfile = request.config.rootpath / "Dockerfile"
+    image, _ = docker_client.images.build(
+        path=str(dockerfile.parent),
+        dockerfile=dockerfile.name,
+        tag="robot:test",
+    )
+
+    request.addfinalizer(lambda: docker_client.images.remove(image.id, force=True))
+    return image
+
+
+@pytest.fixture(scope="function")
+def docker_robot(postgres_container, robot_docker_image, docker_client):
+    def _run_robot_command(command: list[str]):
+        return docker_client.containers.run(
+            robot_docker_image.id,
+            command=command,
+            tty=True,
+            stderr=True,
+            stdout=True,
+            extra_hosts={DOCKER_HOST: "host-gateway"},
+            environment={
+                "PGUSER": postgres_container.username,
+                "PGPASSWORD": postgres_container.password,
+                "PGHOST": DOCKER_HOST,
+                "PGPORT": postgres_container.get_exposed_port(5432),
+                "PGDATABASE": postgres_container.dbname,
+            },
+        )
+
+    return _run_robot_command
+
+
 @pytest.fixture(scope="function")
 def postgres_container():
-    with PostgresContainer("postgres:17-alpine") as postgres:
+    with PostgresContainer(POSTGRES_IMAGE) as postgres:
         yield postgres
 
 
-# Initialize the table
 @pytest.fixture
 def robot_repository(postgres_container):
-    connection_string = postgres_container.get_connection_url()
-    repo = RobotRepository(connection_string)
+    repo = RobotRepository(postgres_container.get_connection_url())
     repo.init_db()
     return repo
-
-
-# Test the add_robot function
-@pytest.mark.integration
-def test_add_robot(robot_repository):
-    robot_id = robot_repository.add_robot("pixie", "cleaning up my garden")
-    assert robot_id == 1
 ```
 
-The test function is now much simpler and also we can easily run by leveraging the `pytest` command `uv run pytest -m integration`.
+Key Features:
 
-With this approach, we can scale our testing process and for the full example, please refer to the [demo repository](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/test_robot_repository.py).
+- `robot_docker_image`: This fixture is to dockerize our robot application.
+- `docker_robot`: This fixture is to run the dockerized robot application.
+- `postgres_container`: This fixture is to set up a PostgreSQL container.
+- `robot_repository`: This fixture is to set up a robot database repository.
+
+🎯 Here's how we leverage the DTP stack in our tests:
+
+```python
+@pytest.mark.end_to_end
+def test_robot_add_and_get(docker_robot):
+    # Create robot
+    result = docker_robot(
+        [
+            "add",
+            "--name",
+            "pixie",
+            "--description",
+            "cleaning up my garden",
+        ]
+    )
+    assert "Robot created successfully" in result.decode()
+
+    # Verify using both name and id lookups
+    for get_cmd in [
+        ["get", "--name", "pixie"],
+        ["get", "--id", "1"],
+    ]:
+        result = docker_robot(get_cmd)
+        output = result.decode()
+        assert "pixie" in output
+        assert "cleaning up my garden" in output
+```
+
+The DTP stack transforms our test into a clean, expressive implementation that runs with a simple command:
+
+```bash
+pytest -m end_to_end
+```
+
+With this approach, we can scale our testing process and for the complete example, please refer to the [demo repository](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/test_docker_cli.py).
 
 ## CI/CD
 
-Furthermore, we can also integrate this part of CI/CD pipeline to automate this process.
-The example with github actions, can be found [here](https://github.com/ricky-lim/pycontainer-demo/blob/main/.github/workflows/ci.yml).
+As a bonus, we can also integrate this part of CI/CD pipeline to automate this process.
 
-## Key Takeaways
+Check out our Github Actions workflow that demonstrates this powerful automation [here](https://github.com/ricky-lim/pycontainer-demo/blob/main/.github/workflows/ci.yml).
 
-What benefits can we get from using Testcontainers?
+The same elegant testing process will run automatically on every pull request, ensuring consistent quality during development.
 
-- Effectiveness: Like a lab robot, it handles all database setup and teardown automatically, letting you focus on writing meaningful tests and improving your application's business logic.
+This is modern DevOps at its finest! 🚀
 
-- Reliability: Every test runs in a pristine environment with clean database, preventing contaminated test data
+## 🚀 Key Benefits of the DTP Stack (🐳🧪🎯)
 
-- Reproducibility: Every test runs in a reproducible test environments, such as in Github Actions CI - no more "works on my machine" issues
+- Effectiveness
 
-Testcontainers leverages Docker's powerful containerization to:
+    - Automated environment management
+    - Clean, declarative test implementations
 
-- Isolate each test in its own environment
-- Start fresh instances rapidly
-- Clean up automatically when done
-- Scale easily in CI/CD pipelines
+- Reliability
+
+    - Isolated test containers
+    - Consistent database states, preventing contaminated data
+
+- Reproducibility
+
+    - Seamless CI/CD integration
+    - No more "works on my machine"
+
+The DTP stack delivers elegant solution to testing workflows, from local development to production deployment. ✨
