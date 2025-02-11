@@ -46,9 +46,7 @@ Our demo repository features a simple dockerized python application, `robot`, th
 Get ready to see how we can test this application from manual testing to automated testing with DTP stack.
 
 ### 🐘 Manual Testing
-In the manual testing approach, we need to set up a test database, build and run the application, run the test, and then clean up the database and the application after the test.
-
-The process looks like this:
+In the manual testing approach, the process looks like this:
 
 - Set up a test database (also ensure it's ready to use)
 
@@ -110,7 +108,7 @@ Let's discover how ️DTP, turns our boring manual tasks into an elegant automat
 First, we automate the setup of our test in `conftest.py`.
 Here are the key features that power our DTP stack.
 
-The complete code is available in the [demo repository](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/conftest.py).
+The complete code is available in the [conftest.py](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/conftest.py).
 
 ```python
 @pytest.fixture(scope="session")
@@ -202,13 +200,13 @@ The DTP stack transforms our test into a clean, expressive implementation that r
 pytest -m end_to_end
 ```
 
-With this approach, we can scale our testing process and for the complete example, please refer to the [demo repository](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/test_docker_cli.py).
+With this approach, we can scale our testing process and for the complete example, please refer to [test_docker_cli.py](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/test_docker_cli.py).
 
 ## CI/CD
 
 As a bonus, we can also integrate this part of CI/CD pipeline to automate this process.
 
-Check out our Github Actions workflow that demonstrates this powerful automation [here](https://github.com/ricky-lim/pycontainer-demo/blob/main/.github/workflows/ci.yml).
+Check out our Github Actions workflow that demonstrates this powerful automation on [ci.yml](https://github.com/ricky-lim/pycontainer-demo/blob/main/.github/workflows/ci.yml).
 
 The same elegant testing process will run automatically on every pull request, ensuring consistent quality during development.
 
@@ -218,7 +216,7 @@ This is modern DevOps at its finest! 🚀
 
 - Effectiveness
 
-    - Automated environment management
+    - Automated test execution
     - Clean, declarative test implementations
 
 - Reliability
@@ -231,4 +229,12 @@ This is modern DevOps at its finest! 🚀
     - Seamless CI/CD integration
     - No more "works on my machine"
 
-The DTP stack delivers elegant solution to testing workflows, from local development to production deployment. ✨
+## Next Steps:
+
+- Apply this DTP stack in your own projects
+- Explore different testing stacks to optimize your workflow
+- Share your testing stacks with the community
+
+Found a bug or have suggestions? Please report them at [GitHub Issues](https://github.com/ricky-lim/pycontainer-demo/issues). Your input helps make this demo better for everyone.
+
+
