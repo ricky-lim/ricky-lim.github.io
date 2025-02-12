@@ -29,7 +29,7 @@ Together, they create a seamless automation where:
 - Testcontainers handles our PostgreSQL test database
 - Pytest orchestrates everything with elegant fixtures
 
-Note: Throughout this blog, we'll refer to this testing trinity as the **DTP** stack.
+Note: Throughout this blog, we'll refer to this testing trinity as **DTP** stack.
 
 
 ## Analogy
@@ -43,7 +43,7 @@ Let's walk through a practical example from a demo repository: https://github.co
 
 Our demo repository features a simple dockerized python application, `robot`, that works with a database.
 
-Get ready to see how we can test this application from manual testing to automated testing with DTP stack.
+Get ready to see how we can test this application from **manual testing** to **automated testing** with DTP stack.
 
 ### 🐘 Manual Testing
 In the manual testing approach, the process looks like this:
@@ -107,8 +107,6 @@ Let's discover how ️DTP, turns our boring manual tasks into an elegant automat
 
 First, we automate the setup of our test in `conftest.py`.
 Here are the key features that power our DTP stack.
-
-The complete code is available in the [conftest.py](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/conftest.py).
 
 ```python
 @pytest.fixture(scope="session")
@@ -200,13 +198,44 @@ The DTP stack transforms our test into a clean, expressive implementation that r
 pytest -m end_to_end
 ```
 
-With this approach, we can scale our testing process and for the complete example, please refer to [test_docker_cli.py](https://github.com/ricky-lim/pycontainer-demo/blob/main/tests/robot/test_docker_cli.py).
+## CI
 
-## CI/CD
+As a bonus, we can also integrate this, part of CI pipeline to automate this process.
 
-As a bonus, we can also integrate this part of CI/CD pipeline to automate this process.
+Here is the snippet of the workflow:
 
-Check out our Github Actions workflow that demonstrates this powerful automation on [ci.yml](https://github.com/ricky-lim/pycontainer-demo/blob/main/.github/workflows/ci.yml).
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [ '*']
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
+
+            - name: Install the project
+              run: uv sync --all-extras
+
+            - name: Run unit tests
+              run: uv run pytest -m unit
+
+            - name: Run integration tests
+              run: uv run pytest -m integration
+
+            - name: Run end-to-end tests
+              run: uv run pytest -m end_to_end
+```
+
 
 The same elegant testing process will run automatically on every pull request, ensuring consistent quality during development.
 
@@ -235,6 +264,5 @@ This is modern DevOps at its finest! 🚀
 - Explore different testing stacks to optimize your workflow
 - Share your testing stacks with the community
 
-Found a bug or have suggestions? Please report them at [GitHub Issues](https://github.com/ricky-lim/pycontainer-demo/issues). Your input helps make this demo better for everyone.
-
-
+Found a bug or have suggestions? Please report them at [GitHub Issues](https://github.com/ricky-lim/pycontainer-demo/issues). 
+Your input will help make this demo better for everyone.
