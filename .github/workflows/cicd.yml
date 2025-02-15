@@ -5,6 +5,19 @@ on:
     branches: [ main ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - uses: pre-commit/action@v3.0.0
+        env:
+          SKIP: no-commit-to-branch
+
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -21,7 +34,7 @@ jobs:
         run: pip install lektor
 
       - name: Build site
-        working-directory: kutubuku 
+        working-directory: kutubuku
         run: lektor build --output-path ./public
 
       - name: Deploy to GitHub Pages
