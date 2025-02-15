@@ -11,7 +11,7 @@ body:
 
 In this blog post, we'll dive into the world of Docker builds to learn two powerful ways to handle variables: **build arguments** and **mount secrets**.
 
-Imagine you're building a container that needs both configuration value, like **`API_URL`** and **`API_TOKEN`**. 
+Imagine you're building a container that needs both configuration value, like **`API_URL`** and **`API_TOKEN`**.
 `API_URL` is generally fine to be exposed, as it's not sensitive information.
 However, the `API_TOKEN` must be kept secret to prevent unauthorized access and potential security breaches.
 
@@ -96,7 +96,7 @@ Build it the secure way:
 
 ```bash
 $ API_TOKEN=super_secret_12345
-$ docker build \                           
+$ docker build \
     -f secure-app.dockerfile \
     --build-arg API_URL=https://api.example.com \
     --secret id=api_token,env=API_TOKEN \
