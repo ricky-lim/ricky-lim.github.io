@@ -40,5 +40,5 @@ Key Differences:
 
 **Pro Tip**: Choose **Git Rebase** for clean, linear history.
 
-The linear history C1 → C2 → C3 → C4 tells a clear story of how your code evolved, 
+The linear history C1 → C2 → C3 → C4 tells a clear story of how your code evolved,
 making it invaluable for long-term project maintenance and collaboration.
