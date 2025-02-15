@@ -11,7 +11,7 @@ Testing Dockerized Python Applications with Docker ❤️ Testcontainers ❤️ 
 ## Why ?
 
 When developing a dockerized Python application that needs a database, testing can be challenging.
-We often need to set up and manage test databases, which can be time-consuming and error-prone. 
+We often need to set up and manage test databases, which can be time-consuming and error-prone.
 
 In this blog post, I am going to take you through a practical example of how to use Docker + Testcontainers + Pytest, to simplify the testing process.
 
@@ -36,7 +36,7 @@ Note: Throughout this blog, we'll refer to this testing trinity as **DTP** stack
 
 Testing with **DTP** stack is like modern laboratory automation:
 
-- Manual testing = A scientist performing each step: prepare, experiment, and clean up every time 
+- Manual testing = A scientist performing each step: prepare, experiment, and clean up every time
 - Docker + Testcontainers + Pytest = A laboratory robot that self-prepares, self-executes, and self-destructs after each experiment
 
 Let's walk through a practical example from a demo repository: https://github.com/ricky-lim/pycontainer-demo
@@ -264,5 +264,5 @@ This is modern DevOps at its finest! 🚀
 - Explore different testing stacks to optimize your workflow
 - Share your testing stacks with the community
 
-Found a bug or have suggestions? Please report them at [GitHub Issues](https://github.com/ricky-lim/pycontainer-demo/issues). 
+Found a bug or have suggestions? Please report them at [GitHub Issues](https://github.com/ricky-lim/pycontainer-demo/issues).
 Your input will help make this demo better for everyone.

@@ -8,7 +8,7 @@ body:
 
 ### Note
 
-> This guide focuses on simplicity for single Python scripts but does not discourage creating Python packages for better maintenance. 
+> This guide focuses on simplicity for single Python scripts but does not discourage creating Python packages for better maintenance.
 > You'll learn how to distribute Python scripts effectively, ensuring they are easy to run and share.
 
 <br>
@@ -23,7 +23,7 @@ This is how the script looks like:
 ![check_rain_output](./check-rain-output.png)
 
 
-If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported. 
+If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported.
 This ensures that the script only provides forecasts for supported regions.
 
 ![check_rain_output_error](./check-rain-output-error.png)
@@ -39,7 +39,7 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 
 ## Script Overview 📜
 
-The [check_rain](./check_rain) script delivers local weather forecasts for the Netherlands and Belgium using Buienradar API. 
+The [check_rain](./check_rain) script delivers local weather forecasts for the Netherlands and Belgium using Buienradar API.
 It showcases the following features:
 
 - 🌍 Automatic location detection (NL and BE)
@@ -74,8 +74,8 @@ In the beginning of the script, we add the following header:
 #!/usr/bin/env -S uv run --script.
 ```
 
-This nifty shebang line tells the system to use `uv` to run the script. 
-I learned this cool trick from Trey Hunner's blog: 
+This nifty shebang line tells the system to use `uv` to run the script.
+I learned this cool trick from Trey Hunner's blog:
 <a href="https://treyhunner.com/2024/12/lazy-self-installing-python-scripts-with-uv/" target="_blank">Lazy Self-Installing Python Scripts with UV</a>.
 
 After that, the script includes metadata using the following comment:
@@ -165,12 +165,12 @@ docker run -it check_rain
 
 ## Key Benefits 🎯
 
-- **Simplified Development and Execution with UV**: 
+- **Simplified Development and Execution with UV**:
 The script header specifies the required Python version and dependencies, ensuring consistency across different environments.
 
-- **Seamless Distribution with Docker**: 
-By coupling UV with Docker, we can create a Docker image that includes all necessary dependencies. 
-This allows us to distribute our Python script as a self-contained package that can run anywhere Docker is supported. 
+- **Seamless Distribution with Docker**:
+By coupling UV with Docker, we can create a Docker image that includes all necessary dependencies.
+This allows us to distribute our Python script as a self-contained package that can run anywhere Docker is supported.
 
 
 By leveraging these tools, you can ensure that your Python scripts are easy to develop, run, and distribute, providing a robust solution for script management and execution.
