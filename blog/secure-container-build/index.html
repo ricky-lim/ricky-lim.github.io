@@ -36,7 +36,7 @@
   <blockquote><p>"Ever wondered how your secrets might be exposed in your docker image? You're not alone 😉".</p>
 </blockquote>
 <p>In this blog post, we'll dive into the world of Docker builds to learn two powerful ways to handle variables: <strong>build arguments</strong> and <strong>mount secrets</strong>.</p>
-<p>Imagine you're building a container that needs both configuration value, like <strong><code>API_URL</code></strong> and <strong><code>API_TOKEN</code></strong>. 
+<p>Imagine you're building a container that needs both configuration value, like <strong><code>API_URL</code></strong> and <strong><code>API_TOKEN</code></strong>.
 <code>API_URL</code> is generally fine to be exposed, as it's not sensitive information.
 However, the <code>API_TOKEN</code> must be kept secret to prevent unauthorized access and potential security breaches.</p>
 <p><strong><em>Which method should you use? When should you use each?</em></strong>
@@ -97,7 +97,7 @@ RUN --mount=type=secret,id=api_token \
 </code></pre>
 <p>Build it the secure way:</p>
 <pre><code class="lang-bash">$ API_TOKEN=super_secret_12345
-$ docker build \                           
+$ docker build \
     -f secure-app.dockerfile \
     --build-arg API_URL=https://api.example.com \
     --secret id=api_token,env=API_TOKEN \

@@ -34,7 +34,7 @@
     on 2025-01-22
   </p>
   <h3>Note</h3>
-<blockquote><p>This guide focuses on simplicity for single Python scripts but does not discourage creating Python packages for better maintenance. 
+<blockquote><p>This guide focuses on simplicity for single Python scripts but does not discourage creating Python packages for better maintenance.
 You'll learn how to distribute Python scripts effectively, ensuring they are easy to run and share.</p>
 </blockquote>
 <p><br></p>
@@ -43,7 +43,7 @@ We will utilize <strong>UV</strong> for dependency management and script executi
 <p>We'll use a practical example: a weather forecast script, <a href="check_rain">check_rain</a> which helps determine if you need an umbrella.</p>
 <p>This is how the script looks like:</p>
 <p><img src="check-rain-output.png" alt="check_rain_output"></p>
-<p>If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported. 
+<p>If you are not located in the Netherlands (NL) or Belgium (BE), the script will show an error message indicating that the location is not supported.
 This ensures that the script only provides forecasts for supported regions.</p>
 <p><img src="check-rain-output-error.png" alt="check_rain_output_error"></p>
 <h2>Getting started with UV 🚀</h2>
@@ -51,7 +51,7 @@ This ensures that the script only provides forecasts for supported regions.</p>
 <pre><code class="lang-bash">wget -qO- https://astral.sh/uv/install.sh | sh
 </code></pre>
 <h2>Script Overview 📜</h2>
-<p>The <a href="check_rain">check_rain</a> script delivers local weather forecasts for the Netherlands and Belgium using Buienradar API. 
+<p>The <a href="check_rain">check_rain</a> script delivers local weather forecasts for the Netherlands and Belgium using Buienradar API.
 It showcases the following features:</p>
 <ul>
 <li>🌍 Automatic location detection (NL and BE)</li>
@@ -78,8 +78,8 @@ $ ./check_rain
 <p>In the beginning of the script, we add the following header:</p>
 <pre><code class="lang-python">#!/usr/bin/env -S uv run --script.
 </code></pre>
-<p>This nifty shebang line tells the system to use <code>uv</code> to run the script. 
-I learned this cool trick from Trey Hunner's blog: 
+<p>This nifty shebang line tells the system to use <code>uv</code> to run the script.
+I learned this cool trick from Trey Hunner's blog:
 <a href="https://treyhunner.com/2024/12/lazy-self-installing-python-scripts-with-uv/" target="_blank">Lazy Self-Installing Python Scripts with UV</a>.</p>
 <p>After that, the script includes metadata using the following comment:</p>
 <pre><code class="lang-python"># /// script
@@ -140,11 +140,11 @@ docker run -it check_rain
 </code></pre>
 <h2>Key Benefits 🎯</h2>
 <ul>
-<li><p><strong>Simplified Development and Execution with UV</strong>: 
+<li><p><strong>Simplified Development and Execution with UV</strong>:
 The script header specifies the required Python version and dependencies, ensuring consistency across different environments.</p>
 </li>
-<li><p><strong>Seamless Distribution with Docker</strong>: 
-By coupling UV with Docker, we can create a Docker image that includes all necessary dependencies. 
+<li><p><strong>Seamless Distribution with Docker</strong>:
+By coupling UV with Docker, we can create a Docker image that includes all necessary dependencies.
 This allows us to distribute our Python script as a self-contained package that can run anywhere Docker is supported.</p>
 </li>
 </ul>

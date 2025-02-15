@@ -36,7 +36,7 @@
   <h2>Why Docker Size Matters for Data Scientists</h2>
 <p>Data scientists often rely on powerful computational libraries to drive innovative research and analysis.
 These essential libraries, when packaged as a docker container, can significantly impact the size of the container.
-A typical Python data science container can easily exceed <strong>1GB</strong>. 
+A typical Python data science container can easily exceed <strong>1GB</strong>.
 Optimizing these container sizes presents an opportunity to speed up development and deployment cycles,
 empowering your overall data science workflow.</p>
 <p>While dependencies are essential for any project, not all dependencies come equally.
@@ -117,7 +117,7 @@ CMD [&quot;--help&quot;]
 $ docker build -f optimized.dockerfile -t matrixops:optimized .
 </code></pre>
 <p>Example run:</p>
-<pre><code class="lang-bash">$ docker run -it matrixops:optimized identity 3 3 
+<pre><code class="lang-bash">$ docker run -it matrixops:optimized identity 3 3
 
 🔢 Generated IDENTITY Matrix (3x3):
 [[1. 0. 0.]
