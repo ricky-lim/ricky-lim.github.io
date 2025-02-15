@@ -24,3 +24,8 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ricky_lim_github_io"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3.5.0",
+]
