@@ -1,0 +1,116 @@
+title: Protect Your Main Branch in Github
+---
+author: Ricky Lim
+---
+pub_date: 2025-02-19
+---
+body:
+
+Let's explore a strategy to protect your main branch in Github.
+
+Think of your main branch like your house's main door.
+You always check who's there before opening it.
+The same goes for code - you shouldn't push code *directly* to **main** without proper review!
+
+In this blog, I want to share a two-stage strategy to protect your main branch.
+First, we'll hook **pre-commit** to prevent commits to main branch.
+Then, we'll write a **rule** in Github to protect pushing directly to your main branch.
+
+### Pre-commit Hooks - Your Local Guardian
+
+pre-commit is like a guard at the door.
+It checks your code before you commit.
+
+Below is an example of how we can hook pre-commit:
+
+1\. Install `pre-commit`
+
+Official Website: https://pre-commit.com/
+
+```bash
+pip install pre-commit
+```
+
+2\. Create a `.pre-commit-config.yaml` file in your project root
+
+```yaml
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    -   id: no-commit-to-branch
+        args: ["--branch", "main"]
+```
+
+3\. Install pre-commit hooks
+
+
+```
+pre-commit install
+```
+
+With this, we have our first strategy in place - you can't commit directly to the main branch.
+
+### Branch Protection - Your Repository Guardian
+
+While pre-commit **guards** your local code,
+branch protection prevents **pushing** to main branch directly.
+
+Here's how we can set up a branch protection rule:
+
+1\. Install `gh`
+
+Official Documentation: https://cli.github.com/
+
+```bash
+brew install gh
+```
+
+2\. Login to Github
+
+```bash
+gh auth login
+```
+
+3\. Create a branch protection rule `branch-protection-rules.json`
+
+```json
+{
+    "required_status_checks": {
+        "strict": true,
+        // List of status checks that must pass before merging
+        "contexts": [
+            "lint"
+        ]
+    },
+    // Forces admins to follow the same branch protection rules
+    "enforce_admins": true,
+    "required_pull_request_reviews": {
+        "required_approving_review_count": 0
+    },
+    // Restrict to specific users or teams, work only for github organization
+    "restrictions": null,
+    "required_linear_history": true,
+    "allow_force_pushes": false,
+    "allow_deletions": false
+}
+```
+
+- Apply the branch protection rule
+
+```bash
+gh api repos/{owner}/{repo}/branches/{branch}/protection --input <branch-protection-rules.json>
+
+# For Example
+gh api --method PUT /repos/ricky-lim/ricky-lim.github.io/branches/main/protection \
+  --input branch-protection-rules.json
+```
+
+## Key Takeaways
+
+A two-stage strategy protects your main branch with the following steps:
+
+1. **pre-commit**: prevent committing to main branch
+2. **branch protection rule**: prevent pushing to main branch
+
+Together, they provide a defense against unreviewed changes to your main branch in your github repository.
