@@ -1,7 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
 <meta charset="utf-8">
 <link rel="stylesheet" href="{{ '/static/style.css'|url }}">
 <title>{% block title %}Welcome{% endblock %} — kutubuku</title>
+{% block extra_head %}{% endblock %}
 <body>
   <header>
     <h1>kutubuku</h1>
@@ -11,7 +13,8 @@
           %}><a href="{{ '/'|url }}">Welcome</a></li>
         {% for href, title in [
           ['/blog', 'Blog'],
-          ['/about', 'About']
+          ['/about', 'About'],
+          ['/search', 'Search'],
         ] %}
           <li{% if this.is_child_of(href) %} class="active"{% endif
             %}><a href="{{ href|url }}">{{ title }}</a></li>
@@ -28,4 +31,6 @@
   <footer>
     &copy; Copyright 2025 by Ricky Lim.
   </footer>
+  {% block scripts %}{% endblock %}
 </body>
+</html>
