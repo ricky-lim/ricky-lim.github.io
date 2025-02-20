@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block extra_head %}
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div id="search"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/pagefind/pagefind-ui.js"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+        new PagefindUI({
+            element: "#search",
+            showSubResults: true ,
+            processResult: (result) => {
+                if (result?.meta?.image) {
+                    const resultBase = new URL(result.url, window.location);
+                    const remappedImage = new URL(result.meta.image, resultBase);
+
+                    result.meta.image = remappedImage.hostname !== window.location.hostname
+                        ? remappedImage.toString()
+                        : remappedImage.pathname;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

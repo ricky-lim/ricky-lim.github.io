@@ -1,0 +1,7 @@
+_model: page
+---
+title: Search Blog
+---
+_template: search.html
+---
+body:

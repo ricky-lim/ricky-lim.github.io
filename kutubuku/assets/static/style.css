@@ -64,10 +64,22 @@ h2 a:hover {
 }
 
 footer {
+    text-align: right;
+    padding: 10px;
     margin-top: auto;
     background: var(--primary-color);
     padding: 20px 30px;
     color: var(--secondary-color);
+}
+
+footer a {
+    color: #8C1515;  /* A specific maroon shade */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
 }
 
 header h1 {

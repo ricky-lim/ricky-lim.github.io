@@ -10,3 +10,6 @@ wheels/
 .venv
 
 .vscode
+
+# Generated static files
+kutubuku/public/
