@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>Search — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+
+</head>
+<body>
+  <header>
+    <h1>kutubuku</h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../">Welcome</a></li>
+        
+          <li><a href="../blog/">Blog</a></li>
+        
+          <li><a href="../about/">About</a></li>
+        
+          <li class="active"><a href="./">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+<div id="search"></div>
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.<br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+<script src="/pagefind/pagefind-ui.js"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+        new PagefindUI({
+            element: "#search",
+            showSubResults: true ,
+            processResult: (result) => {
+                if (result?.meta?.image) {
+                    const resultBase = new URL(result.url, window.location);
+                    const remappedImage = new URL(result.meta.image, resultBase);
+
+                    result.meta.image = remappedImage.hostname !== window.location.hostname
+                        ? remappedImage.toString()
+                        : remappedImage.pathname;
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
