@@ -27,6 +27,13 @@ jobs:
         working-directory: kutubuku
         run: lektor build --output-path ./public
 
+      - name: Install Pagefind
+        run: npm install -g pagefind
+
+      - name: Index site
+        working-directory: kutubuku
+        run: pagefind --site public
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
