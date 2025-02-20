@@ -143,6 +143,14 @@ div.page {
     color: var(--primary-color)
 }
 
+/* Responsive image sizing for blog posts */
+.blog-post img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 .pagination-bottom {
     margin-bottom: 10px;
     text-align: center;
