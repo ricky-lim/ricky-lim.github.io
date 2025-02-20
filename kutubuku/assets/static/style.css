@@ -19,12 +19,25 @@ html {
     font-size: 21px;
 }
 
+.logo-rlim {
+    height: 1em;
+    width: 1em;
+    border-radius: 50%;
+    /* This makes the image circular */
+    object-fit: cover;
+    /* Ensures the image covers the circular area */
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
 body {
     margin: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
+
+
 
 nav a {
     color: var(--secondary-color);
@@ -73,7 +86,8 @@ footer {
 }
 
 footer a {
-    color: #8C1515;  /* A specific maroon shade */
+    color: #8C1515;
+    /* A specific maroon shade */
     text-decoration: none;
     font-weight: bold;
 }
@@ -138,7 +152,8 @@ table {
     margin: 20px 0;
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
@@ -162,7 +177,7 @@ tr:hover {
     border-radius: 8px;
     padding: 2rem;
     margin: 1.5rem 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
 }
 
@@ -192,7 +207,7 @@ tr:hover {
     background: white;
     padding: 3rem;
     border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     line-height: 1.8;
     width: 100%;
 }
