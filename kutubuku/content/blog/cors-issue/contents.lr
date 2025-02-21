@@ -45,7 +45,7 @@ In summary, CORS is like a security guard that protects your web application by 
 
 ### Demo Example
 
-In this repository: <github repo>
+In this repository: https://github.com/ricky-lim/cors-issue
 
 Without CORS enabled, when we attempt to call our API from the front end, we encounter the following error:
 
