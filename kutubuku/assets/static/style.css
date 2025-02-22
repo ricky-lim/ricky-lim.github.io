@@ -47,8 +47,6 @@ body {
     min-height: 100vh;
 }
 
-
-
 nav a {
     color: var(--secondary-color);
     text-decoration: none;
@@ -57,6 +55,12 @@ nav a {
 nav a:hover {
     color: #FAFBFA;
     text-decoration: underline;
+}
+
+nav a.active,
+nav li.active a {
+    text-decoration: underline;
+    color: var(--secondary-color);
 }
 
 a {
