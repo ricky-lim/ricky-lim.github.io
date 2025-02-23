@@ -8,17 +8,17 @@ body:
 
 ## Why Search Matters
 
-As your blog grows, finding specific posts can feel like searching for a needle in a haystack.
+As your blog content grows, finding specific posts can feel like searching for a needle in a haystack.
 Without a search feature, you'd be endlessly scrolling through content, your hands getting tired and your patience wearing thin.
 This is where search comes to the rescue.
 
 ## The Search Needle: Pagefind
 
-In this simple static blog site, I aim to maintain simplicity while adding search functionality.
-
 During one of Michael Kennedy's [Python Podcast episodes](https://pythonbytes.fm),
 I heard about [Pagefind](https://pagefind.app/).
 The tool immediately caught my attention, because of its simplicity.
+
+In this simple static blog site, I aim to maintain simplicity while adding search functionality.
 
 For static sites like mine, Pagefind adds search magically by:
 
@@ -30,8 +30,6 @@ For static sites like mine, Pagefind adds search magically by:
 - Requiring no complex server-side infrastructure.
 - Providing a search user interface that's easy to incorporate.
 
-Just as a magnet can find a needle without disturbing the entire haystack, Pagefind allows you to quickly find your desired content.
-
 In this post, I'll walk you through how I added search to my blog using Pagefind.
 This how the search looks like on my blog, https://ricky-lim.github.io/search/:
 
@@ -39,7 +37,7 @@ This how the search looks like on my blog, https://ricky-lim.github.io/search/:
 
 ## Implementing Pagefind
 
-### 1. Install Pagefind
+### 1. Install Pagefind 🛠️
 
 Getting started with Pagefind is a breeze.
 
@@ -51,7 +49,7 @@ npm install -g pagefind
 npx pagefind
 ```
 
-### 2. Build the Search Index
+### 2. Build the Search Index 🏗️
 
 The process is as follows:
 
@@ -66,7 +64,7 @@ lektor build --output-path ./public
 ```bash
 npx pagefind --site ./public
 ```
-3\. Integrate the search interface
+3\. Integrate the search interface 🔍
 
 Add these few lines to your HTML file:
 
@@ -90,7 +88,7 @@ Add these few lines to your HTML file:
 
 Extras:
 
-- You can also select the content in your html file to be indexed via the `data-pagefind-body` attribute. For example:
+- You can also select the content in your html file to be indexed via the **`data-pagefind-body`** attribute. For example:
 
 ```html
 <div data-pagefind-body>
@@ -99,12 +97,12 @@ Extras:
 </div>
 ```
 
-- Automate with Github Actions
+- Automate with Github Actions 🤖
 
-The simple infrastructure of Pagefind allows easy automation. Here's my Github Actions workflow:
+The simple infrastructure of Pagefind allows easy automation. Here's my Github Actions workflow looks like:
 
 ```yaml
-...
+... # previous steps omitted for brevity
 
 jobs:
   build:
@@ -120,7 +118,8 @@ jobs:
         run: pagefind --site public
 ```
 
-Now every push to main automagically rebuilds the search index!
+Now every merge to a main branch will automagically rebuild the search index!,
+keeping your content searchable with ease.
 
 ## Key Takeaways
 
