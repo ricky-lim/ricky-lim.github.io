@@ -161,6 +161,23 @@ div.page {
     border-top: 1px solid #eee;
 }
 
+.pagination .active {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.pagination a {
+    padding: 5px 10px;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
 .meta {
     text-align: right;
     margin-top: 10px;
