@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>Adding Search to a Static Site — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">Adding Search to a Static Site</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-02-22
+  </p>
+  <h2>Why Search Matters</h2>
+<p>As your blog content grows, finding specific posts can feel like searching for a needle in a haystack.
+Without a search feature, you'd be endlessly scrolling through content, your hands getting tired and your patience wearing thin.
+This is where search comes to the rescue.</p>
+<h2>The Search Needle: Pagefind</h2>
+<p>During one of Michael Kennedy's <a href="https://pythonbytes.fm">Python Podcast episodes</a>,
+I heard about <a href="https://pagefind.app/">Pagefind</a>.
+The tool immediately caught my attention, because of its simplicity.</p>
+<p>In this simple static blog site, my true desire is to maintain simplicity while adding search functionality.</p>
+<p>For static sites like mine, Pagefind adds search magically by:</p>
+<ul>
+<li><p>Creating a search index by scanning through my site's HTML files.</p>
+<blockquote><p>Think of a search index like a book's index at the back.
+ Instead of flipping through the entire book, you can quickly look it up in the index.</p>
+</blockquote>
+</li>
+<li><p>Requiring no complex server-side infrastructure.</p>
+</li>
+<li>Providing a search user interface that's easy to incorporate.</li>
+</ul>
+<p>In this post, I'll walk you through how I added search to my blog using Pagefind.
+This how my search's page looks like on my blog, <a href="https://ricky-lim.github.io/search/">https://ricky-lim.github.io/search/</a>:</p>
+<p><img src="kutubuku-search.png" alt="kutubuku-search"></p>
+<h2>Implementing Pagefind</h2>
+<h3>1. Install Pagefind 🛠️</h3>
+<p>Getting started with Pagefind is a breeze.</p>
+<pre><code class="lang-bash"># If you want to install it globally
+npm install -g pagefind
+
+# Or just want to use it without installing it globally
+npx pagefind
+</code></pre>
+<h3>2. Build the Search Index 🏗️</h3>
+<p>The process is as follows:</p>
+<p>1. Build your static HTML files:</p>
+<pre><code class="lang-bash">lektor build --output-path ./public
+</code></pre>
+<p>2. Generate the search index:</p>
+<pre><code class="lang-bash">npx pagefind --site ./public
+</code></pre>
+<p>3. Integrate the search interface 🔍</p>
+<p>Add these few lines to your HTML file:</p>
+<pre><code class="lang-html">{% block extra_head %}
+&lt;link rel=&quot;stylesheet&quot; href=&quot;{{ &#39;/pagefind/pagefind-ui.css&#39;|url }}&quot;&gt;
+{% endblock %}
+
+{% block scripts %}
+&lt;script src=&quot;/pagefind/pagefind-ui.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    window.addEventListener(&#39;DOMContentLoaded&#39;, (event) =&gt; {
+        new PagefindUI({
+            element: &quot;#search&quot;,
+            showSubResults: true
+        });
+    });
+&lt;/script&gt;
+{% endblock %}
+</code></pre>
+<p>Extras:</p>
+<ul>
+<li>You can also select the content in your html file to be indexed via the <strong><code>data-pagefind-body</code></strong> attribute. For example:</li>
+</ul>
+<pre><code class="lang-html">&lt;div data-pagefind-body&gt;
+    &lt;h1&gt;My Blog Post&lt;/h1&gt;
+    &lt;p&gt;This is the content of my blog post.&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<ul>
+<li>Automate with Github Actions 🤖</li>
+</ul>
+<p>The simple infrastructure of Pagefind allows easy automation. Here's my Github Actions workflow looks like:</p>
+<pre><code class="lang-yaml">... # previous steps omitted for brevity
+
+jobs:
+  build:
+      - name: Build site
+        working-directory: kutubuku
+        run: lektor build --output-path ./public
+
+      - name: Install Pagefind
+        run: npm install -g pagefind
+
+      - name: Index site
+        working-directory: kutubuku
+        run: pagefind --site public
+</code></pre>
+<p>Now every merge to a main branch will automagically rebuild the search index!,
+keeping your content searchable with ease.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Pagefind brings powerful search to your Lektor static site without the need for complex infrastructure.</li>
+<li>To keep the search index up-to-date, you can automate the process with Github Actions.</li>
+<li>If you have a static site, give Pagefind a try!</li>
+</ul>
+<p>Found a cool way to enhance Pagefind? Built something awesome with Lektor?
+Let's learn from each other and make our site better together.</p>
+<p>Connect with me and share your stories!</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://pagefind.app/">Pagefind</a></li>
+<li><a href="https://www.getlektor.com/">Lektor</a></li>
+<li><a href="https://docs.github.com/en/actions">Github Actions</a></li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
