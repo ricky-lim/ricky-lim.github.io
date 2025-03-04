@@ -68,7 +68,7 @@ To roll back to a previous version, use `git checkout <tag>`. For example, run `
 Using [common-changelog](https://common-changelog.org), developers manually curate `CHANGELOG.md`
 
 ```markdown
-## Next
+## NEXT
 
 ### Added
 - New genome analysis pipeline
