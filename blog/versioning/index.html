@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>Human-First Versioning: A Guide for Scientific Software — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">Human-First Versioning: A Guide for Scientific Software</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-03-05
+  </p>
+  <h2>🤔 Why Versioning Matters in Science</h2>
+<p>Imagine you're developing a Python software for genome sequence analysis.
+Everything works perfectly <strong>today</strong>—but without proper versioning of software dependencies, the <strong>future</strong> is uncertain:</p>
+<p>❌ Your results may become non-reproducible as dependencies change.</p>
+<p>❌ Collaborators may struggle to run your code.</p>
+<p>❌ Future updates could silently break your software.</p>
+<p>The solution? Managing dependencies properly using <code>pyproject.toml</code>. For example:</p>
+<pre><code class="lang-toml">[project]
+dependencies = [
+    &quot;tensorflow&gt;=2.1,&lt;3.0&quot;,
+    &quot;pandas&gt;=1.3,&lt;2.0&quot;
+]
+</code></pre>
+<p>Explicitly specifying dependencies ensures your software always runs with compatible versions, preventing unexpected issues.</p>
+<p>But versioning isn’t just about managing your own dependencies—it also makes your software reliable for others.
+Proper versioning allows seamless integration into other workflows, ensuring stability and long-term compatibility.</p>
+<p>In this blog post, we'll explore best practices for versioning scientific software to enhance reliability and reproducibility.</p>
+<h2>🎯 A Human-First Approach to Versioning</h2>
+<p>A human-first approach keeps people at the center—ensuring changelogs are carefully crafted, peer-reviewed, and verified before release.
+Combined with automation, this approach ensures consistency, making changes clear, reliable, and seamless for collaboration.</p>
+<p>To showcase this approach, I've created a demo repository, <a href="https://github.com/ricky-lim/versioning">https://github.com/ricky-lim/versioning</a>, demonstrating how to:</p>
+<ul>
+<li>Implement semantic versioning for meaningful version numbers</li>
+<li>Maintain a clear, human-readable changelog</li>
+<li>Automate version management with GitHub Actions</li>
+</ul>
+<p>With this approach, each version carries semantic meaning, includes a Git tag for easy rollbacks, and provides a clear changelog to communicate changes effectively.</p>
+<h3>🔧 Key Components</h3>
+<h4>1. 🔢 Semantic Versioning</h4>
+<p>I use <code>bump-my-version</code> to automate version updates.
+This tool allows you to update the version in pyproject.toml and can also be configured directly within the file for seamless integration.</p>
+<p>Version bumps trigger automatically when merging to main:</p>
+<ul>
+<li>release-* branches trigger major version bump (2.0.0)</li>
+<li>feature-* branches trigger minor version bump (1.1.0)</li>
+<li>bugfix-* branches trigger patch version bump (1.0.1)</li>
+</ul>
+<p>Additionally, <code>bump-my-version</code> automates Git tag creation, ensuring each new version is properly tagged for easy tracking and rollbacks.
+To roll back to a previous version, use <code>git checkout &lt;tag&gt;</code>. For example, run <code>git checkout v1.0.0</code> to revert to version 1.0.0.</p>
+<h4>2. 📝 Changelog management</h4>
+<p>Using <a href="https://common-changelog.org">common-changelog</a>, developers manually curate <code>CHANGELOG.md</code></p>
+<pre><code class="lang-markdown">## Next
+
+### Added
+- New genome analysis pipeline
+
+### Fixed
+- Memory leak in sequence processing
+
+### Changed
+- Updated TensorFlow to 2.15.0
+</code></pre>
+<p>GitHub Actions automatically transforms this into a release entry:</p>
+<pre><code class="lang-markdown">## [1.2.0] - 2025-02-26
+
+### Added
+- New genome analysis pipeline
+
+### Fixed
+- Memory leak in sequence processing
+
+### Changed
+- Updated TensorFlow to 2.15.0
+</code></pre>
+<p>This approach combines human-curated changes with automated versioning.</p>
+<h4>3. ⚡ Github Actions Automation</h4>
+<p>Automate versioning with two essential workflows:</p>
+<p>1. <code>check_changelog.yml</code></p>
+<ul>
+<li>Checks if the changelog has been updated</li>
+<li>Verifies <code>## NEXT</code> section presence</li>
+</ul>
+<p>2. <code>version_bump.yml</code></p>
+<ul>
+<li>Updates version in <code>pyproject.toml</code></li>
+<li>Replaces NEXT with the release version and date.</li>
+<li>Handles Git tagging and main branch updates.</li>
+<li>Includes smart rollback protection to maintain main branch integrity</li>
+</ul>
+<h2>💡 Key Takeaways</h2>
+<ul>
+<li>🎯 Semantic versioning = meaningful version numbers</li>
+<li>🏷️ Git tags = simple, reliable rollbacks</li>
+<li>📖 Changelog = changes from and for humans</li>
+<li>🤖 Github Actions Automation = consistent releases</li>
+</ul>
+<p>"This human-centered versioning strategy ensures reliable and reproducible scientific software while effectively communicating changes to users, contributors, and our future selves"</p>
+<h2>📚 References</h2>
+<ul>
+<li><a href="https://semver.org/">Semantic Versioning</a></li>
+<li><a href="https://common-changelog.org/">Common Changelog</a></li>
+<li><a href="https://pypi.org/project/bump-my-version/">Bump My Version</a></li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
