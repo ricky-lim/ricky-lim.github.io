@@ -1,4 +1,4 @@
-title:Pre-commit check changelog
+title: Pre-Commit: Your Changelog's Guardian
 ---
 pub_date: 2025-03-12
 ---
@@ -6,9 +6,9 @@ author: Ricky Lim
 ---
 body:
 
-## Why Check Changelog with Pre-Commit ? 🤔
+## Why Guard Changelog with Pre-Commit ? 🤔
 
-Keeping a changelog is crucial for tracking changes in any software project, but it's easy to **forget** updating it.
+Guarding a changelog is crucial for tracking changes in any software project, but it's easy to **forget** updating it.
 
 In this post, I'll show you how to use a pre-commit hook to ensure changelog is checked before pushing changes— *** so forgetting to update it becomes a thing of the past!***
 
@@ -18,9 +18,18 @@ Pre-commit is a framework for managing and running git hooks.
 It automagically checks code before commits or pushes, ensuring that code meets certain standards.
 By integrating pre-commit hooks to check for changelog updates, we can ensure that the changelog is always up-to-date.
 
+### How to install Pre-commit ?
+
+```bash
+uv tool install pre-commit
+
+# Verify the installation
+uv run pre-commit -V
+```
+
 ### Pre-commit Hook in Action ⚡
 
-With the help of this pre-commit hook, when we are about to push for a PR but forget to update the changelog,
+With the help of this pre-commit hook, when we are about to push for a PR but **forget** to update the changelog,
 This pre-commit hook will triggers an error message and prevent us from pushing.
 
 ```bash
@@ -45,7 +54,27 @@ The format must be:
 No spaces after '## NEXT' are allowed, and there must be exactly one empty line after it.
 ```
 
+This error occurs because the CHANGELOG.md file does not contain a properly formatted `## NEXT section`.
+The `## NEXT section` is where new changes should be added before they are pushed.
+
+To resolve this error, you need to update your CHANGELOG.md file with the correct ## NEXT section.
+Here's how:
+
+- Open your `CHANGELOG.md` file.
+- Add or ensure there is a section at the top of the file looks like:
+
+```md
+## NEXT
+
+<Describe your changes>
+```
+
+- Save the file and try pushing again.
+
+If everything is correct, the pre-commit hooks will pass without errors.
+
 #### Why Run on Pre-Push Instead of Pre-Commit? 🤔
+
 By default, the pre-commit hook that checks the changelog runs on pre-push rather than pre-commit.
 This is intentional because not every commit needs to be directly tied to the changelog.
 Instead, I want a reminder before pushing—especially when preparing a pull request—to ensure the changelog is updated when necessary.
