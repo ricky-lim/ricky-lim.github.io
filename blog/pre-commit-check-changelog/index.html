@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>Pre-Commit: Your Changelog&#39;s Guardian — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">Pre-Commit: Your Changelog&#39;s Guardian</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-03-12
+  </p>
+  <h2>Why Guard Changelog with Pre-Commit ? 🤔</h2>
+<p>Guarding a changelog is crucial for tracking changes in any software project, but it's easy to <strong>forget</strong> updating it.</p>
+<p>In this post, I'll show you how to use a pre-commit hook to ensure changelog is checked before pushing changes— <strong><em> so forgetting to update it becomes a thing of the past!</em></strong></p>
+<h3>What is Pre-commit ? 🛠️</h3>
+<p>Pre-commit is a framework for managing and running git hooks.
+It automagically checks code before commits or pushes, ensuring that code meets certain standards.
+By integrating pre-commit hooks to check for changelog updates, we can ensure that the changelog is always up-to-date.</p>
+<h3>How to install Pre-commit ?</h3>
+<pre><code class="lang-bash">uv tool install pre-commit
+
+# Verify the installation
+uv run pre-commit -V
+</code></pre>
+<h3>Pre-commit Hook in Action ⚡</h3>
+<p>With the help of this <a href="https://github.com/ricky-lim/pre-commit-hooks">pre-commit hook</a>, when we are about to push for a PR but <strong>forget</strong> to update the changelog,
+This pre-commit hook will triggers an error message and prevent us from pushing.</p>
+<pre><code class="lang-bash">(versioning) ➜  versioning git:(feature/add-check-changelog-precommit) git push
+trim trailing whitespace.................................................Passed
+fix end of files.........................................................Passed
+check yaml...............................................................Passed
+check for added large files..............................................Passed
+detect private key.......................................................Passed
+detect aws credentials...................................................Passed
+don&#39;t commit to branch...................................................Passed
+ruff.................................................(no files to check)Skipped
+ruff-format..........................................(no files to check)Skipped
+Check changelog format...................................................Failed
+- hook id: check-changelog
+- exit code: 1
+
+Error: CHANGELOG.md must contain exactly one &#39;## NEXT&#39; section.
+The format must be:
+## NEXT
+&lt;empty line&gt;
+No spaces after &#39;## NEXT&#39; are allowed, and there must be exactly one empty line after it.
+</code></pre>
+<p>This error occurs because the CHANGELOG.md file does not contain a properly formatted <code>## NEXT section</code>.
+The <code>## NEXT section</code> is where new changes should be added before they are pushed.</p>
+<p>To resolve this error, you need to update your CHANGELOG.md file with the correct ## NEXT section.
+Here's how:</p>
+<ul>
+<li>Open your <code>CHANGELOG.md</code> file.</li>
+<li>Add or ensure there is a section at the top of the file looks like:</li>
+</ul>
+<pre><code class="lang-md">## NEXT
+
+&lt;Describe your changes&gt;
+</code></pre>
+<ul>
+<li>Save the file and try pushing again.</li>
+</ul>
+<p>If everything is correct, the pre-commit hooks will pass without errors.</p>
+<h4>Why Run on Pre-Push Instead of Pre-Commit? 🤔</h4>
+<p>By default, the pre-commit hook that checks the changelog runs on pre-push rather than pre-commit.
+This is intentional because not every commit needs to be directly tied to the changelog.
+Instead, I want a reminder before pushing—especially when preparing a pull request—to ensure the changelog is updated when necessary.</p>
+<h3>How to Add This Pre-commit Hook? 📝</h3>
+<ul>
+<li>Add the following to your <code>.pre-commit-config.yaml</code></li>
+</ul>
+<pre><code class="lang-bash">default_install_hook_types: [pre-commit, pre-push]
+repos:
+-   repo: https://github.com/ricky-lim/pre-commit-hooks
+    rev: v0.5.0
+    hooks:
+    -   id: check-changelog
+        args:
+          # Custom changelog filename
+          - --filename=CHANGES.md
+          # Only run on these branch types
+          - --branch-prefixes=feature hotfix bugfix release
+        # Only run at push time
+        stages: [pre-push]
+        # Always run, regardless of which files changed
+        always_run: true
+</code></pre>
+<p>This hook is highly configurable, allowing you to:</p>
+<ul>
+<li>✅ Customize the changelog filename (e.g., CHANGES.md).</li>
+<li>✅ Specify branch prefixes to determine when the hook runs (e.g., feature, hotfix, bugfix, release). Some branches might not require a changelog update, making this flexibility useful.</li>
+<li>✅ Run at different stages, not just pre-push but also pre-commit if needed.</li>
+</ul>
+<p>This ensures that changelog updates are enforced when necessary while keeping the workflow flexible.</p>
+<h3>How to run this pre-commit hook part of the CI/CD pipeline? 🚀</h3>
+<p>While developers should install this pre-commit, newcomers to the project might forget to do so.
+To ensure consistency, we can integrate the pre-commit hook into the CI/CD pipeline, automatically enforcing it during development.</p>
+<ul>
+<li>Add the following to your <code>.github/workflows/ci.yml</code></li>
+</ul>
+<pre><code class="lang-bash">   - name: Run check-changelog hook manually
+        run: |
+          pre-commit run check-changelog --hook-stage pre-push --all-files --verbose
+</code></pre>
+<h3>Extras 💡</h3>
+<p>To learn more about this hook, explore its implementation at <a href="https://github.com/ricky-lim/pre-commit-hooks">https://github.com/ricky-lim/pre-commit-hooks</a>,
+where you'll find details on how it works and various configuration options.</p>
+<p>For guidance on using this hook in your workflow, visit <a href="https://github.com/ricky-lim/versioning">https://github.com/ricky-lim/versioning</a>,
+which provides practical integration examples.</p>
+<h2>Key takeaways 🎯</h2>
+<p>🔍 Pre-commit hooks enforce changelog updates before pushing changes</p>
+<p>🚀 Running on pre-push (not pre-commit) ensures updates happen at the right time</p>
+<p>⚙ ️ Highly configurable:</p>
+<pre><code>- Custom changelog filename
+- Branch-specific triggers
+- Flexible execution stages
+</code></pre>
+<p>🤖 CI/CD integration catches missed updates, especially helpful for new team members</p>
+<p>📖 Maintains consistent changelog practices across the team</p>
+<h3>References 📚</h3>
+<ul>
+<li><a href="https://pre-commit.com/">pre-commit</a></li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>

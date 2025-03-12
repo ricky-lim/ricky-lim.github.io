@@ -115,10 +115,9 @@ To roll back to a previous version, use <code>git checkout &lt;tag&gt;</code>. F
 <p>This approach combines human-curated changes with automated versioning.</p>
 <h4>3. ⚡ Github Actions Automation</h4>
 <p>Automate versioning with two essential workflows:</p>
-<p>1. <code>check_changelog.yml</code></p>
+<p>1. <code>pre-commit.yml</code></p>
 <ul>
-<li>Checks if the changelog has been updated</li>
-<li>Verifies <code>## NEXT</code> section presence</li>
+<li>Run the pre-commit hooks including check for changelog</li>
 </ul>
 <p>2. <code>version_bump.yml</code></p>
 <ul>
