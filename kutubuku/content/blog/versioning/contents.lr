@@ -101,10 +101,9 @@ This approach combines human-curated changes with automated versioning.
 
 Automate versioning with two essential workflows:
 
-1\. `check_changelog.yml`
+1\. `pre-commit.yml`
 
-- Checks if the changelog has been updated
-- Verifies `## NEXT` section presence
+- Run the pre-commit hooks including check for changelog
 
 2\. `version_bump.yml`
 
