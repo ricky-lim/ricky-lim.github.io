@@ -29,7 +29,7 @@ uv run pre-commit -V
 
 ### Pre-commit Hook in Action ⚡
 
-With the help of this pre-commit hook, when we are about to push for a PR but **forget** to update the changelog,
+With the help of this [pre-commit hook](https://github.com/ricky-lim/pre-commit-hooks), when we are about to push for a PR but **forget** to update the changelog,
 This pre-commit hook will triggers an error message and prevent us from pushing.
 
 ```bash
@@ -111,7 +111,7 @@ This ensures that changelog updates are enforced when necessary while keeping th
 
 ### How to run this pre-commit hook part of the CI/CD pipeline? 🚀
 
-While developers can run this pre-commit hook manually, newcomers to the project might forget to do so.
+While developers should install this pre-commit, newcomers to the project might forget to do so.
 To ensure consistency, we can integrate the pre-commit hook into the CI/CD pipeline, automatically enforcing it during development.
 
 - Add the following to your `.github/workflows/ci.yml`
