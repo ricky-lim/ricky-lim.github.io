@@ -13,3 +13,5 @@ wheels/
 
 # Generated static files
 kutubuku/public/
+
+tmp.md
