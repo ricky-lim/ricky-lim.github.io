@@ -33,5 +33,6 @@ repos:
         entry: python scripts/check_blog_titles.py
         language: python
         additional_dependencies: [python-slugify]
-        types: [file]
-        files: kutubuku/content/blog/
+        pass_filenames: false
+        always_run: true
+        args: ["--fix"]
