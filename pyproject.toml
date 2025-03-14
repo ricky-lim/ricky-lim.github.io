@@ -15,10 +15,6 @@ requires-python = ">= 3.8"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = []
-
 [tool.hatch.metadata]
 allow-direct-references = true
 
@@ -29,6 +25,8 @@ packages = ["src/ricky_lim_github_io"]
 dev = [
     "bump-my-version>=1.0.2",
     "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
+    "python-slugify>=8.0.4",
 ]
 
 [tool.bumpversion]
