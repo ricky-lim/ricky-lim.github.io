@@ -1,5 +1,9 @@
 # Kutubuku Blog
 
+![CI](https://github.com/ricky-lim/ricky-lim.github.io/actions/workflows/ci.yml/badge.svg)
+![CD](https://github.com/ricky-lim/ricky-lim.github.io/actions/workflows/cd.yml/badge.svg)
+[![Changelog](https://img.shields.io/badge/changelog-Common%20Changelog-blue.svg)](CHANGELOG.md)
+
 My blog about tech, life, and everything in between.
 
 ## Developmemt Setup
