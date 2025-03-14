@@ -41,3 +41,7 @@ Apply branch protection rules
 gh api --method PUT /repos/ricky-lim/ricky-lim.github.io/branches/main/protection \
   --input branch-protection-rules.json
 ```
+
+## CHANGELOG
+
+All notabel changes to this project are documented in the [CHANGELOG](CHANGELOG.md).
