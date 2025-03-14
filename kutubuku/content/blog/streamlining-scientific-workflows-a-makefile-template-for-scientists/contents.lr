@@ -1,0 +1,103 @@
+title: Streamlining Scientific Workflows: A Makefile Template for Scientists
+---
+author: Ricky Lim
+---
+pub_date: 2025-03-14
+---
+body:
+
+## Why Scientists Should Care About Makefiles 📚
+
+In computational scientific research, simplicity and reproducibility are crucial.
+Enter the underrated Makefile 📝—a simple yet powerful tool to streamline your workflow.
+Here’s why you should care and how to get started 🚀.
+
+### Why Makefiles Matter
+
+- Simplicity: Easy to learn and use with minimal setup.
+- Reproducibility: Ensure consistent results by specifiying dependencies and steps.
+- Efficiency: Automate repetitive tasks, saving time and effort.
+
+Makefiles are perfect for managing tasks like running tests 🧪, building software projects 🛠️, generating documentation 📄, and deploying software for others to use 🚀.
+This makes them a must-have for computational scientists.
+
+### A Simple Makefile Template
+
+First get `Make` installed on your system.
+
+```bash
+# Debian/Ubuntu
+sudo apt install make
+
+# macOS
+brew install make
+
+# Windows
+choco install make
+```
+
+Here's a basic template to get you started:
+
+
+
+```makefile
+.DEFAULT_GOAL := help
+
+.PHONY: test
+test: ## Run tests
+        @echo "Running tests..."
+
+.PHONY: help
+help:
+        @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
+```
+
+#### How It Works
+
+- Default Goal: The `help` target is set as the default. This means running `make` without any arguments will run the `help` target.
+- Phony Targets: Targets like `test` are commands, not files
+- Help Message: The `help` target generates a help message with descriptions of each target.
+
+#### Adding More Targets
+
+To add more tasks, simply follow the pattern:
+
+```makefile
+.DEFAULT_GOAL := help
+
+.PHONY: deploy
+deploy: test docs build ## Deploy to production
+	@echo "Deploying to production..."
+	# Add your deployment commands here
+
+.PHONY: build
+build: ## Build the project
+	@echo "Building the project..."
+	# Add your build commands here
+
+.PHONY: test
+test: ## Run tests
+	@echo "Running tests..."
+	# Add your test commands here
+
+.PHONY: docs
+docs: ## Generate documentation
+	@echo "Generating documentation...."
+	# Add your documentation commands here
+
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
+
+```
+
+In this example, we've added a new target `deploy` that depends on `test`, `docs`, and `build`.
+
+The dependencies are specified from Left to Right.
+When you run `make deploy`, it will first run `make test` then `make docs`, and then `make build`, and finally run the deployment commands.
+
+### Key Takeaways
+
+Makefiles are an underrated gem in the scientific world, offering powerful automation capabilities that take care of the boring tasks 🤖, while ensuring complete reproducibility of your research workflows 📊.
+
+By automating the boring, Makefiles let you focus on what matters most—the science itself 🔬.
