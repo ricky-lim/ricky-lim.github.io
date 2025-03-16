@@ -27,6 +27,32 @@ new-blog: ## Create a new blog post
 	echo "Write your content here" >> $$BLOG_PATH/contents.lr; \
 	echo "Created new blog at $$BLOG_PATH on branch $$BRANCH"
 
+.PHONY: rename-blog
+rename-blog: ## Rename blog title and branch
+	@if [ -z "$(title)" ]; then \
+		echo "Usage: make rename-blog title=\"Your Blog Title\""; \
+		exit 1; \
+	fi
+	@CURRENT_BRANCH=$$(git branch --show-current); \
+	OLD_SLUG=$${CURRENT_BRANCH#blog/}; \
+	python -c "from slugify import slugify; print(slugify('$(title)'))" > /tmp/new_slug; \
+	NEW_SLUG=$$(cat /tmp/new_slug); \
+	OLD_PATH="kutubuku/content/blog/$$OLD_SLUG"; \
+	NEW_PATH="kutubuku/content/blog/$$NEW_SLUG"; \
+	NEW_BRANCH="blog/$$NEW_SLUG"; \
+	if [ ! -d "$$OLD_PATH" ]; then \
+		echo "Blog post not found at $$OLD_PATH"; \
+		exit 1; \
+	fi; \
+	git mv "$$OLD_PATH" "$$NEW_PATH"; \
+	OLD_TITLE=$$(grep "^title:" "$$NEW_PATH/contents.lr" | cut -d' ' -f2-); \
+	sed -i "" "s|title: $$OLD_TITLE|title: $(title)|" "$$NEW_PATH/contents.lr"; \
+	git branch -m "$$NEW_BRANCH"; \
+	echo "Renamed blog from '$$OLD_TITLE' to '$(title)'"; \
+	echo "Old path: $$OLD_PATH"; \
+	echo "New path: $$NEW_PATH"; \
+	echo "Branch renamed to: $$NEW_BRANCH"
+
 .PHONY: dev
 dev: prepare serve ## Run development server
 

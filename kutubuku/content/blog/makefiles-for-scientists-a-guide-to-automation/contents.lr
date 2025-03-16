@@ -1,4 +1,4 @@
-title: Streamlining Scientific Workflows: A Makefile Template for Scientists
+title: Makefiles for Scientists: A Guide to Automation
 ---
 author: Ricky Lim
 ---
@@ -9,7 +9,7 @@ body:
 ## Why Scientists Should Care About Makefiles 📚
 
 In computational scientific research, simplicity and reproducibility are crucial.
-Enter the underrated Makefile 📝—a simple yet powerful tool to streamline your workflow.
+Enter the underrated Makefile 📝—a simple yet powerful tool to streamline your project development workflow.
 Here’s why you should care and how to get started 🚀.
 
 ### Why Makefiles Matter
@@ -38,29 +38,6 @@ choco install make
 
 Here's a basic template to get you started:
 
-
-
-```makefile
-.DEFAULT_GOAL := help
-
-.PHONY: test
-test: ## Run tests
-        @echo "Running tests..."
-
-.PHONY: help
-help:
-        @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
-```
-
-#### How It Works
-
-- Default Goal: The `help` target is set as the default. This means running `make` without any arguments will run the `help` target.
-- Phony Targets: Targets like `test` are commands, not files
-- Help Message: The `help` target generates a help message with descriptions of each target.
-
-#### Adding More Targets
-
-To add more tasks, simply follow the pattern:
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -91,9 +68,12 @@ help:
 
 ```
 
-In this example, we've added a new target `deploy` that depends on `test`, `docs`, and `build`.
+#### How It Works
 
-The dependencies are specified from Left to Right.
+- Default Goal: The `help` target is set as the default. This means running `make` without any arguments will run the `help` target.
+- Phony Targets: Targets like `test` are commands, not files
+- Help Message: The `help` target generates a help message with descriptions of each target.
+- The dependencies are specified from Left to Right.
 When you run `make deploy`, it will first run `make test` then `make docs`, and then `make build`, and finally run the deployment commands.
 
 ### Key Takeaways
