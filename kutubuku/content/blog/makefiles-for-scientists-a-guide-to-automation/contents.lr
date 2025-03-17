@@ -8,20 +8,42 @@ body:
 
 ## Why Scientists Should Care About Makefiles 📚
 
-In computational scientific research, simplicity and reproducibility are crucial.
-Enter the underrated Makefile 📝—a simple yet powerful tool to streamline your project development workflow.
-Here’s why you should care and how to get started 🚀.
+In computational scientific research, automating repetitive tasks is essential.
+By leveraging automation, Scientists can focus more on the science.
 
-### Why Makefiles Matter
+> Enter Makefile 📝—a simple yet powerful tool to automate your project development process.
 
-- Simplicity: Easy to learn and use with minimal setup.
-- Reproducibility: Ensure consistent results by specifiying dependencies and steps.
-- Efficiency: Automate repetitive tasks, saving time and effort.
+Here's **when and when not** to use Makefiles:
 
-Makefiles are perfect for managing tasks like running tests 🧪, building software projects 🛠️, generating documentation 📄, and deploying software for others to use 🚀.
-This makes them a must-have for computational scientists.
+### When to use Makefiles 📝
 
-### A Simple Makefile Template
+- Simplifying Repetitive Tasks:
+Makefiles are ideal for automating routine tasks such as building code projects,
+running tests, generating documentation and deploying applications.
+
+- Efficiency and Reproducibility:
+By defining dependencies and commands in a Makefile, researchers can automate tasks efficiently, saving time and reducing manual errors.
+This also ensures that development process is reproducible across different environments, like on MacOs, Linux, or even Windows.
+
+- Small to Medium-Sized Projects:
+Makefiles are well-suited for smaller projects where dependencies are straightforward.
+Keep it simple and avoid overcomplicating the Makefile.
+
+### When not to use Makefiles 🚫
+
+- Complex Projects:
+For such complex data analysis pipelines with intricate dependencies or dynamic outputs, tools like Nextflow or Snakemake are more suitable.
+
+- Large-Scale Projects:
+As projects grow in size and complexity, Makefiles can become cumbersome.
+They may struggle to scale efficiently with the computational resources required to run them, especially when managing large-scale data processing pipelines.
+
+In summary, Makefiles are best for automating simple development tasks, while for complex data analysis tasks, consider more advanced tools.
+
+## Getting Started with Makefiles 🚀
+
+When you think Makefiles is the right fit for your project, let's dive in and explore how to set them up!
+
 
 First get `Make` installed on your system.
 
@@ -36,8 +58,11 @@ brew install make
 choco install make
 ```
 
-Here's a basic template to get you started:
+⚠️ Please ensure proper tab indentation for the Makefile since Make requires **tabs**, not spaces for indentation.
 
+🚨 Using spaces instead of tabs can lead to errors when running the Makefile, so configure your editor to use tabs for indentation.
+
+Here's a basic [template](./Makefile) to get you started:
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -46,11 +71,6 @@ Here's a basic template to get you started:
 deploy: test docs build ## Deploy to production
 	@echo "Deploying to production..."
 	# Add your deployment commands here
-
-.PHONY: build
-build: ## Build the project
-	@echo "Building the project..."
-	# Add your build commands here
 
 .PHONY: test
 test: ## Run tests
@@ -62,6 +82,11 @@ docs: ## Generate documentation
 	@echo "Generating documentation...."
 	# Add your documentation commands here
 
+.PHONY: build
+build: ## Build the project
+	@echo "Building the project..."
+	# Add your build commands here
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -71,13 +96,25 @@ help:
 #### How It Works
 
 - Default Goal: The `help` target is set as the default. This means running `make` without any arguments will run the `help` target.
-- Phony Targets: Targets like `test` are commands, not files
+
+```bash
+$ make
+build            Build the project
+deploy           Deploy to production
+docs             Generate documentation
+test             Run tests
+```
+
+- Phony Targets: Targets like `test` are action commands, not files.
+These targets do not depend on whether files have been changed, they simply execute the commands.
 - Help Message: The `help` target generates a help message with descriptions of each target.
 - The dependencies are specified from Left to Right.
-When you run `make deploy`, it will first run `make test` then `make docs`, and then `make build`, and finally run the deployment commands.
+When you run `make deploy`, it will run these targets in sequence:
+first `test`, then `docs`, followed by  `build`, and finally it will execute the `deploy` command.
 
 ### Key Takeaways
 
-Makefiles are an underrated gem in the scientific world, offering powerful automation capabilities that take care of the boring tasks 🤖, while ensuring complete reproducibility of your research workflows 📊.
+Makefiles are an underrated gem in the scientific world, offering powerful automation capabilities that take care of the boring tasks 🤖,
+while ensuring efficiency and reproducibility of your development process.
 
 By automating the boring, Makefiles let you focus on what matters most—the science itself 🔬.

@@ -3,22 +3,22 @@
 .PHONY: deploy
 deploy: test docs build ## Deploy to production
 	@echo "Deploying to production..."
-	# Add your deployment commands here
-
-.PHONY: build
-build: ## Build the project
-	@echo "Building the project..."
-	# Add your build commands here
+    # Add your deployment commands here
 
 .PHONY: test
 test: ## Run tests
 	@echo "Running tests..."
-	# Add your test commands here
+    # Add your test commands here
 
 .PHONY: docs
 docs: ## Generate documentation
 	@echo "Generating documentation...."
-	# Add your documentation commands here
+    # Add your documentation commands here
+
+.PHONY: build
+build: ## Build the project
+	@echo "Building the project..."
+    # Add your build commands here
 
 .PHONY: help
 help:
