@@ -1,0 +1,122 @@
+title: Makefiles for Scientists: A Guide to Automation
+---
+author: Ricky Lim
+---
+pub_date: 2025-03-14
+---
+body:
+
+## Why Scientists Should Care About Makefiles 📚
+
+A Makefile is like a lab protocol, just like a lab protocol outlines the steps to prepare a sample,
+a makefile lists the steps to build your project.
+This enables scientists to automate these steps efficiently,
+allowing them to focus more on the science.
+Much like following a protocol ensures reproducibility in an experiment,
+using a Makefile ensures the reproducibility of your project development process.
+
+Here's **when and when not** to use Makefiles:
+
+### When to use Makefiles 📝
+
+- Simplifying Repetitive Tasks:
+Makefiles are ideal for automating routine tasks such as building code projects,
+running tests, generating documentation and deploying applications.
+
+- Efficiency and Reproducibility:
+By defining dependencies and commands in a Makefile, researchers can automate tasks efficiently, saving time and reducing manual errors.
+This also ensures that development process is reproducible across different environments, like on MacOs, Linux, or even Windows.
+
+- Small to Medium-Sized Projects:
+Makefiles are well-suited for smaller projects where dependencies are straightforward.
+Keep it simple and avoid overcomplicating the Makefile.
+
+### When not to use Makefiles 🚫
+
+- Complex Projects:
+For such complex data analysis pipelines with intricate dependencies or dynamic outputs, tools like Nextflow or Snakemake are more suitable.
+
+- Large-Scale Projects:
+As projects grow in size and complexity, Makefiles can become cumbersome.
+They may struggle to scale efficiently with the computational resources required to run them, especially when managing large-scale data processing pipelines.
+
+In summary, Makefiles are best for automating simple development tasks, while for complex data analysis tasks, consider more advanced tools.
+
+## Getting Started with Makefiles 🚀
+
+When you think Makefiles is the right fit for your project, let's dive in and explore how to set them up!
+
+
+First get `Make` installed on your system.
+
+```bash
+# Debian/Ubuntu
+sudo apt install make
+
+# macOS
+brew install make
+
+# Windows
+choco install make
+```
+
+> ⚠️ Please ensure proper tab indentation for the Makefile since Make requires **tabs**, not spaces for indentation.
+
+> 🚨 Using spaces instead of tabs can lead to errors when running the Makefile, so configure your editor to use tabs for indentation.
+
+Here's a basic [template](./Makefile) to get you started:
+
+```makefile
+.DEFAULT_GOAL := help
+
+.PHONY: deploy
+deploy: test docs build ## Deploy to production
+	@echo "Deploying to production..."
+	# Add your deployment commands here
+
+.PHONY: test
+test: ## Run tests
+	@echo "Running tests..."
+	# Add your test commands here
+
+.PHONY: docs
+docs: ## Generate documentation
+	@echo "Generating documentation...."
+	# Add your documentation commands here
+
+.PHONY: build
+build: ## Build the project
+	@echo "Building the project..."
+	# Add your build commands here
+
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
+
+```
+
+#### How It Works
+
+- Default Goal: The `help` target is set as the default. This means running `make` without any arguments will run the `help` target.
+
+```bash
+$ make
+build            Build the project
+deploy           Deploy to production
+docs             Generate documentation
+test             Run tests
+```
+
+- Phony Targets: Targets like `test` are action commands, not files.
+These targets do not depend on whether files have been changed, they simply execute the commands.
+- Help Message: The `help` target generates a help message with descriptions of each target.
+- The dependencies are specified from Left to Right.
+When you run `make deploy`, it will run these targets in sequence:
+first `test`, then `docs`, followed by  `build`, and finally it will execute the `deploy` command.
+
+### Key Takeaways
+
+Makefiles are an underrated gem in the scientific world, offering powerful automation capabilities that take care of the boring tasks 🤖,
+while ensuring efficiency and reproducibility of your development process.
+
+By automating the boring, Makefiles let you focus on what matters most—the science itself 🔬.
