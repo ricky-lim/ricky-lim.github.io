@@ -8,10 +8,12 @@ body:
 
 ## Why Scientists Should Care About Makefiles 📚
 
-In computational scientific research, automating repetitive tasks is essential.
-By leveraging automation, Scientists can focus more on the science.
-
-> Enter Makefile 📝—a simple yet powerful tool to automate your project development process.
+A Makefile is like a lab protocol, just like a lab protocol outlines the steps to prepare a sample,
+a makefile lists the steps to build your project.
+This enables scientists to automate these steps efficiently,
+allowing them to focus more on the science.
+Much like following a protocol ensures reproducibility in an experiment,
+using a Makefile ensures the reproducibility of your project development process.
 
 Here's **when and when not** to use Makefiles:
 
@@ -58,9 +60,9 @@ brew install make
 choco install make
 ```
 
-⚠️ Please ensure proper tab indentation for the Makefile since Make requires **tabs**, not spaces for indentation.
+> ⚠️ Please ensure proper tab indentation for the Makefile since Make requires **tabs**, not spaces for indentation.
 
-🚨 Using spaces instead of tabs can lead to errors when running the Makefile, so configure your editor to use tabs for indentation.
+> 🚨 Using spaces instead of tabs can lead to errors when running the Makefile, so configure your editor to use tabs for indentation.
 
 Here's a basic [template](./Makefile) to get you started:
 
