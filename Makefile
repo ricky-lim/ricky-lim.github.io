@@ -44,9 +44,10 @@ rename-blog: ## Rename blog title and branch
 		echo "Blog post not found at $$OLD_PATH"; \
 		exit 1; \
 	fi; \
-	git mv "$$OLD_PATH" "$$NEW_PATH"; \
-	OLD_TITLE=$$(grep "^title:" "$$NEW_PATH/contents.lr" | cut -d' ' -f2-); \
-	sed -i "" "s|title: $$OLD_TITLE|title: $(title)|" "$$NEW_PATH/contents.lr"; \
+	OLD_TITLE=$$(grep "^title:" "$$OLD_PATH/contents.lr" | cut -d' ' -f2-); \
+	echo o "Renaming blog from '$$OLD_TITLE' to '$(title)'"; \
+	sed -i "" "s|title: $$OLD_TITLE|title: $(title)|" "$$OLD_PATH/contents.lr"; \
+	mv "$$OLD_PATH" "$$NEW_PATH"; \
 	git branch -m "$$NEW_BRANCH"; \
 	echo "Renamed blog from '$$OLD_TITLE' to '$(title)'"; \
 	echo "Old path: $$OLD_PATH"; \
