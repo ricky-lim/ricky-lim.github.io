@@ -52,21 +52,21 @@ So let's start the migration.
 
 ```bash
 # Activate virtualenv
-uv venv --python=3.13
-source .venv/bin/activate
+$ uv venv --python=3.13
+$ source .venv/bin/activate
 
 # Initiate pyproject.toml, our project name is 'microbe-in-flask'
-uv init --bare --name microbe-in-flask
+$ uv init --bare --name microbe-in-flask
 ```
 
 3\. Import dependencies
 
 ```bash
 # Runtime dependencies
-uv add -r requirements.txt
+$ uv add -r requirements.txt
 
 # Development dependencies
-uv add --dev -r requirements-dev.txt
+$ uv add --dev -r requirements-dev.txt
 ```
 
 4\. Configure pytest
@@ -104,20 +104,20 @@ testpaths = ["tests", "integration"]
 Once verified, we can begin the cleanup process.
 
 ```bash
-rm requirements.txt requirements-dev.txt pytest.ini
+$ rm requirements.txt requirements-dev.txt pytest.ini
 ```
 
 7\. Manage dependencies with UV:
 
 ```bash
 # Add a new runtime dependency
-$uv add requests
+$ uv add requests
 
 # Add a development dependency
-$uv add --dev pytest
+$ uv add --dev pytest
 
 # Remove the runtime dependency
-$uv remove requests
+$ uv remove requests
 ```
 
 ## Key takeaways
