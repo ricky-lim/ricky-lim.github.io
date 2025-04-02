@@ -1,0 +1,129 @@
+title: A Guide to pyproject.toml Migration
+---
+author: Ricky Lim
+---
+pub_date: 2025-03-28
+---
+body:
+
+## Why Migrate from `requirements.txt` to `pyproject.toml` ?
+
+Imagine managing a library. **`requirements.txt`** is like keeping a
+a manual list of books on paper, requiring updates and separate lists for different sections
+(e.g., requirements.txt and requirements-dev.txt).
+
+In contrast, **`pyproject.toml`** works like a library catalog system that lists all books (dependencies),
+includes library layout (project structure), book types (dependency types), and rules (tool configurations).
+With pyproject.toml, we can streamline the management of our Python project's dependencies.
+
+Here we'll use `UV` to migrate a scientific project
+which relies on `requirements.txt` and `requirements-dev.txt`, along with pytest configurations,
+into a setup with `pyproject.toml`.
+
+## Introduction to UV and pyproject.toml
+
+UV: A tool designed to simplify python project management.
+
+pyproject.toml: A file serves as a central configuration for Python projects.
+
+# Steps to migrate
+
+In our python project, we assume to have the following files.
+
+```bash
+$ cat requirements.txt
+Flask==0.11.1
+requests
+
+$ cat requirements-dev.txt
+pytest
+
+$ cat pytest.ini
+testpaths =
+    tests
+    integration
+```
+
+### So let's start the migration.
+
+1\. Install UV
+
+2\. Create a `pyproject.toml`
+
+```bash
+# Activate virtualenv
+$ uv venv --python=3.13
+$ source .venv/bin/activate
+
+# Initiate pyproject.toml, our project name is 'microbe-in-flask'
+$ uv init --bare --name microbe-in-flask
+```
+
+3\. Import dependencies
+
+```bash
+# Runtime dependencies
+$ uv add -r requirements.txt
+
+# Development dependencies
+$ uv add --dev -r requirements-dev.txt
+```
+
+4\. Configure pytest
+
+Manually move pytest configurations from pytest.ini to the `[tool.pytest.ini_options]` section in pyproject.toml.
+
+Please refer to the pytest documentation for guidance on migrating from .ini to .toml configuration files.
+
+5\. Verify project configuration
+
+Compare the output in `pyproject.toml` with our original `requirements.txt` and `requirements-dev.txt`,
+to ensure all dependencies and configuration are imported correctly.
+
+```toml
+[project]
+name = "microbe-in-flask"
+version = "0.1.0"
+requires-python = ">=3.12.3"
+dependencies = [
+    "flask==0.11.1",
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "integration"]
+```
+
+6\. Remove old Files
+
+Once verified, we can begin the cleanup process.
+
+```bash
+$ rm requirements.txt requirements-dev.txt pytest.ini
+```
+
+7\. Manage dependencies with UV:
+
+```bash
+# Add a new runtime dependency
+$ uv add requests
+
+# Add a development dependency
+$ uv add --dev pytest
+
+# Remove the runtime dependency
+$ uv remove requests
+```
+
+## Key takeaways
+
+- Unified Configuration: `pyproject.toml` consolidates dependencies and configurations, enhancing maintainability and reducing complexity.
+- Automated Environment Management: UV automagically manages virtual environments across machines, including specific Python installation.
+- Simplified Dependency Management: Easily add, remove, and update dependencies with UV.
+- Enhanced Reproducibility: Uses `uv.lock` to ensure precise dependency versions, making projects highly reproducible.
+- Streamlined Workflow: Focus on development, not managing project configurations
