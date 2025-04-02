@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>A Guide to pyproject.toml Migration — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">A Guide to pyproject.toml Migration</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-03-28
+  </p>
+  <h2>Why Migrate from <code>requirements.txt</code> to <code>pyproject.toml</code> ?</h2>
+<p>Imagine managing a library. <strong><code>requirements.txt</code></strong> is like keeping a
+a manual list of books on paper, requiring updates and separate lists for different sections
+(e.g., requirements.txt and requirements-dev.txt).</p>
+<p>In contrast, <strong><code>pyproject.toml</code></strong> works like a library catalog system that lists all books (dependencies),
+includes library layout (project structure), book types (dependency types), and rules (tool configurations).
+With pyproject.toml, we can streamline the management of our Python project's dependencies.</p>
+<p>Here we'll use <code>UV</code> to migrate a scientific project
+which relies on <code>requirements.txt</code> and <code>requirements-dev.txt</code>, along with pytest configurations,
+into a setup with <code>pyproject.toml</code>.</p>
+<h2>Introduction to UV and pyproject.toml</h2>
+<p>UV: A tool designed to simplify python project management.</p>
+<p>pyproject.toml: A file serves as a central configuration for Python projects.</p>
+<h1>Steps to migrate</h1>
+<p>In our python project, we assume to have the following files.</p>
+<pre><code class="lang-bash">$ cat requirements.txt
+Flask==0.11.1
+requests
+
+$ cat requirements-dev.txt
+pytest
+
+$ cat pytest.ini
+testpaths =
+    tests
+    integration
+</code></pre>
+<h3>So let's start the migration.</h3>
+<p>1. Install UV</p>
+<p>2. Create a <code>pyproject.toml</code></p>
+<pre><code class="lang-bash"># Activate virtualenv
+$ uv venv --python=3.13
+$ source .venv/bin/activate
+
+# Initiate pyproject.toml, our project name is &#39;microbe-in-flask&#39;
+$ uv init --bare --name microbe-in-flask
+</code></pre>
+<p>3. Import dependencies</p>
+<pre><code class="lang-bash"># Runtime dependencies
+$ uv add -r requirements.txt
+
+# Development dependencies
+$ uv add --dev -r requirements-dev.txt
+</code></pre>
+<p>4. Configure pytest</p>
+<p>Manually move pytest configurations from pytest.ini to the <code>[tool.pytest.ini_options]</code> section in pyproject.toml.</p>
+<p>Please refer to the pytest documentation for guidance on migrating from .ini to .toml configuration files.</p>
+<p>5. Verify project configuration</p>
+<p>Compare the output in <code>pyproject.toml</code> with our original <code>requirements.txt</code> and <code>requirements-dev.txt</code>,
+to ensure all dependencies and configuration are imported correctly.</p>
+<pre><code class="lang-toml">[project]
+name = &quot;microbe-in-flask&quot;
+version = &quot;0.1.0&quot;
+requires-python = &quot;&gt;=3.12.3&quot;
+dependencies = [
+    &quot;flask==0.11.1&quot;,
+    &quot;requests&gt;=2.32.3&quot;,
+]
+
+[dependency-groups]
+dev = [
+    &quot;pytest&gt;=8.3.5&quot;,
+]
+
+[tool.pytest.ini_options]
+testpaths = [&quot;tests&quot;, &quot;integration&quot;]
+</code></pre>
+<p>6. Remove old Files</p>
+<p>Once verified, we can begin the cleanup process.</p>
+<pre><code class="lang-bash">$ rm requirements.txt requirements-dev.txt pytest.ini
+</code></pre>
+<p>7. Manage dependencies with UV:</p>
+<pre><code class="lang-bash"># Add a new runtime dependency
+$ uv add requests
+
+# Add a development dependency
+$ uv add --dev pytest
+
+# Remove the runtime dependency
+$ uv remove requests
+</code></pre>
+<h2>Key takeaways</h2>
+<ul>
+<li>Unified Configuration: <code>pyproject.toml</code> consolidates dependencies and configurations, enhancing maintainability and reducing complexity.</li>
+<li>Automated Environment Management: UV automagically manages virtual environments across machines, including specific Python installation.</li>
+<li>Simplified Dependency Management: Easily add, remove, and update dependencies with UV.</li>
+<li>Enhanced Reproducibility: Uses <code>uv.lock</code> to ensure precise dependency versions, making projects highly reproducible.</li>
+<li>Streamlined Workflow: Focus on development, not managing project configurations</li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
