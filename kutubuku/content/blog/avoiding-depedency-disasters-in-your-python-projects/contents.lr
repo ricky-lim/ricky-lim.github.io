@@ -9,12 +9,10 @@ body:
 
 ## Why should we care about our python projects' dependency ?
 
-In python development, forgetting to declare dependencies can lead to runtime errors such as `ModuleNotFoundError` or `ImportError`.
-In contrast, declaring too many dependencies, can bloat your project.
-especially when your project shipped as a docker container where size matters.
-This [article](https://ricky-lim.github.io/blog/optimize-your-docker-build/) offers practical tips on how to optimize your docker build.
+Forgetting to declare dependencies in Python projects can result in runtime errors like `ModuleNotFoundError` or `ImportError`.
+In contrast, including unnecessary dependencies can unnecessarily bloat your project, particularly when deploying it as a Docker container where size matters.
 
-> Here's where FawltyDeps comes to the rescue, to ensure you have dependencies in check.
+Tools like FawltyDeps can help manage dependencies effectively, ensuring your project includes only what it needs.
 
 ## Common Problems in Python Projects
 
@@ -30,7 +28,7 @@ FawltyDeps is a tool that helps you find both undeclared and unused dependencies
 Here's a simple guide how you can integrate it into your projects.
 
 Let's consider a simple python project [pycontainer-demo](https://github.com/ricky-lim/pycontainer-demo/).
-In this project, we are going to setup FawltyDeps to the pre-commit hooks.
+In this project, we are going to setup FawltyDeps as a pre-commit hooks to ensure our dependencies are in check.
 
 ### Setting up FawltyDeps
 
@@ -44,8 +42,9 @@ Then we can run the tool.
 
 2\. Configure FawltyDeps
 
-FawltyDeps v0.19.0 incorrectly flags dependencies provided by other declared dependencies as undeclared.
-For example, it may identify rich as undeclared, even though it is a dependency of the declared package typer.
+> FawltyDeps v0.19.0 incorrectly flags dependencies provided by other declared dependencies as undeclared.
+For example, it may identify `rich` as undeclared, even though it is a dependency of the declared package `typer`.
+
 To address this and exclude dependencies not intended for direct import in `pycontainer-demo` project,
 I added the following configuration to `pyproject.toml`
 
@@ -79,10 +78,42 @@ ignore_unused = [
 4\. Install the pre-commit hooks
 
 ```bash
-pre-commit install
+$ pre-commit install
 ```
 
-Now when you commit changes, FawltyDeps will run and report any undeclared or unused dependencies.
+Now when you commit changes, `FawltyDeps` will run and report any undeclared or unused dependencies.
+
+#### Detect the unused dependencies
+
+If we add a dependency to `pyproject.toml` ***but*** never used in the code.
+For example we add the following code to `pyproject.toml`.
+
+```toml
+# Example numpy that is not used
+dependencies = [
+    ...
+    numpy
+]
+```
+
+Then we commit the changes.
+
+```bash
+$ git add .
+$ git commit -m "Add numpy"
+FawltyDeps-unused........................................................Failed
+- hook id: check-unused
+- exit code: 4
+
+These dependencies appear to be unused (i.e. not imported):
+- 'numpy' declared in:
+    pyproject.toml
+```
+
+This approach is helpful because it prevents unused dependencies from being committed.
+To resolve such issues, you can simply remove the unnecessary dependency from pyproject.toml.
+
+#### Detect the undeclared dependencies
 
 For example if we add the following code to `src/robot/cli.py` and install `art` with `uv pip install art`
 
@@ -94,9 +125,8 @@ app = typer.Typer(help=header, no_args_is_help=True)
 console = Console()
 ```
 
-
-The change is to add a nice header with `art` package.
-So when we run this cli it looks like this:
+The update involves adding a header using the art package, enhancing the appearance of the CLI output.
+When you run the CLI, it will look like this:
 
 ```bash
 $ robot
@@ -122,12 +152,12 @@ These imports appear to be undeclared dependencies:
     src/robot/cli.py:2
 ```
 
-Unfortunately, the commit fails.
+Fortunately, the commit fails.
 Because we forget to declare `art` as a dependency.
 
 This is really nice because with such failure we can prevent undeclared dependencies from being committed.
 
-Now we can add `art` to the dependencies.
+Next, we can add art to the dependencies and update the pyproject.toml file accordingly.
 
 ```toml
 dependencies = [
@@ -138,7 +168,7 @@ dependencies = [
 ]
 ```
 
-Now we can commit the changes and it will pass.
+We can now commit the changes, and they should pass successfully.
 
 ```bash
 git add .
@@ -150,6 +180,4 @@ FawltyDeps-unused........................................................Passed
 
 ## Key Takeaways
 
-By setting up FawltyDeps, you can catch undeclared and unused dependencies before they cause problems in your project.
-This configuration helps ensure your project dependencies are both declared and used.
-So it reduces the risk of runtime errors and unnecessary bloat.
+Setting up FawltyDeps as a pre-commit hook helps catch **undeclared** and **unused** dependencies, ensuring your project stays lean and avoids runtime errors.
