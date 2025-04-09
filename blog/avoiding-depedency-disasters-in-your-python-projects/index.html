@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>Avoiding Depedency Disasters in Your Python Projects — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">Avoiding Depedency Disasters in Your Python Projects</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-04-05
+  </p>
+  <h2>Why should we care about our python projects' dependency ?</h2>
+<p>Forgetting to declare dependencies in Python projects can result in runtime errors like <code>ModuleNotFoundError</code> or <code>ImportError</code>.
+In contrast, including unnecessary dependencies can unnecessarily bloat your project, particularly when deploying it as a Docker container where size matters.</p>
+<p>Tools like FawltyDeps can help manage dependencies effectively, ensuring your project includes only what it needs.</p>
+<h2>Common Problems in Python Projects</h2>
+<ul>
+<li><p>Undeclared dependencies: You import a module in your code, but forget to declare it in your project's depedency files like <code>requirements.txt</code> or <code>pyproject.toml</code>.
+Your project might fail at runtime when run on a different machine or in a different environment.</p>
+</li>
+<li><p>Unused dependencies: these are dependencies listed but never used in your project.
+They take up space, make your project slow to install, and to run in a docker container and also may pose security risks.</p>
+</li>
+</ul>
+<h2>FawltyDeps</h2>
+<p>FawltyDeps is a tool that helps you find both undeclared and unused dependencies in your python projects.
+Here's a simple guide how you can integrate it into your projects.</p>
+<p>Let's consider a simple python project <a href="https://github.com/ricky-lim/pycontainer-demo/">pycontainer-demo</a>.
+In this project, we are going to setup FawltyDeps as a pre-commit hooks to ensure our dependencies are in check.</p>
+<h3>Setting up FawltyDeps</h3>
+<p>1. Install FawltyDeps</p>
+<pre><code class="lang-bash">uv add --dev fawltydeps
+</code></pre>
+<p>Then we can run the tool.</p>
+<p>2. Configure FawltyDeps</p>
+<blockquote><p>FawltyDeps v0.19.0 incorrectly flags dependencies provided by other declared dependencies as undeclared.
+For example, it may identify <code>rich</code> as undeclared, even though it is a dependency of the declared package <code>typer</code>.</p>
+</blockquote>
+<p>To address this and exclude dependencies not intended for direct import in <code>pycontainer-demo</code> project,
+I added the following configuration to <code>pyproject.toml</code></p>
+<pre><code class="lang-toml">...
+
+[tool.fawltydeps]
+ignore_undeclared = [
+    &quot;rich&quot;
+]
+ignore_unused = [
+    &quot;bump-my-version&quot;,
+    &quot;psycopg2-binary&quot;,
+    &quot;pre-commit&quot;,
+    &quot;flawtydeps&quot;,
+]
+</code></pre>
+<p>3. Add to the pre-commit hooks</p>
+<pre><code class="lang-yaml">...
+
+-   repo: https://github.com/tweag/FawltyDeps
+    rev: v0.19.0
+    hooks:
+      - id: check-undeclared
+      - id: check-unused
+</code></pre>
+<p>4. Install the pre-commit hooks</p>
+<pre><code class="lang-bash">$ pre-commit install
+</code></pre>
+<p>Now when you commit changes, <code>FawltyDeps</code> will run and report any undeclared or unused dependencies.</p>
+<h4>Detect the unused dependencies</h4>
+<p>If we add a dependency to <code>pyproject.toml</code> <strong><em>but</em></strong> never used in the code.
+For example we add the following code to <code>pyproject.toml</code>.</p>
+<pre><code class="lang-toml"># Example numpy that is not used
+dependencies = [
+    ...
+    numpy
+]
+</code></pre>
+<p>Then we commit the changes.</p>
+<pre><code class="lang-bash">$ git add .
+$ git commit -m &quot;Add numpy&quot;
+FawltyDeps-unused........................................................Failed
+- hook id: check-unused
+- exit code: 4
+
+These dependencies appear to be unused (i.e. not imported):
+- &#39;numpy&#39; declared in:
+    pyproject.toml
+</code></pre>
+<p>This approach is helpful because it prevents unused dependencies from being committed.
+To resolve such issues, you can simply remove the unnecessary dependency from pyproject.toml.</p>
+<h4>Detect the undeclared dependencies</h4>
+<p>For example if we add the following code to <code>src/robot/cli.py</code> and install <code>art</code> with <code>uv pip install art</code></p>
+<pre><code class="lang-python">from art import tprint
+
+header = tprint(&quot;Robot Management System&quot;)
+app = typer.Typer(help=header, no_args_is_help=True)
+console = Console()
+</code></pre>
+<p>The update involves adding a header using the art package, enhancing the appearance of the CLI output.
+When you run the CLI, it will look like this:</p>
+<pre><code class="lang-bash">$ robot
+ ____          _             _     __  __                                                            _     ____               _
+|  _ \   ___  | |__    ___  | |_  |  \/  |  __ _  _ __    __ _   __ _   ___  _ __ ___    ___  _ __  | |_  / ___|  _   _  ___ | |_   ___  _ __ ___
+| |_) | / _ \ | &#39;_ \  / _ \ | __| | |\/| | / _` || &#39;_ \  / _` | / _` | / _ \| &#39;_ ` _ \  / _ \| &#39;_ \ | __| \___ \ | | | |/ __|| __| / _ \| &#39;_ ` _ \
+|  _ &lt; | (_) || |_) || (_) || |_  | |  | || (_| || | | || (_| || (_| ||  __/| | | | | ||  __/| | | || |_   ___) || |_| |\__ \| |_ |  __/| | | | | |
+|_| \_\ \___/ |_.__/  \___/  \__| |_|  |_| \__,_||_| |_| \__,_| \__, | \___||_| |_| |_| \___||_| |_| \__| |____/  \__, ||___/ \__| \___||_| |_| |_|
+</code></pre>
+<p>Then we commit the changes.</p>
+<pre><code class="lang-bash">git add .
+
+git commit -m &quot;Add header with art&quot;
+FawltyDeps-undeclared....................................................Failed
+- hook id: check-undeclared
+- exit code: 3
+
+These imports appear to be undeclared dependencies:
+- &#39;art&#39; imported at:
+    src/robot/cli.py:2
+</code></pre>
+<p>Fortunately, the commit fails.
+Because we forget to declare <code>art</code> as a dependency.</p>
+<p>This is really nice because with such failure we can prevent undeclared dependencies from being committed.</p>
+<p>Next, we can add art to the dependencies and update the pyproject.toml file accordingly.</p>
+<pre><code class="lang-toml">dependencies = [
+    &quot;sqlmodel&gt;=0.0.22&quot;,
+    &quot;typer&gt;=0.9.0&quot;,
+    &quot;psycopg2-binary&gt;=2.9.9&quot;,
+    &quot;art&gt;=6.4&quot;,
+]
+</code></pre>
+<p>We can now commit the changes, and they should pass successfully.</p>
+<pre><code class="lang-bash">git add .
+git commit -m &quot;Add header cli with art&quot;
+...
+FawltyDeps-undeclared....................................................Passed
+FawltyDeps-unused........................................................Passed
+</code></pre>
+<h2>Key Takeaways</h2>
+<p>Setting up FawltyDeps as a pre-commit hook helps catch <strong>undeclared</strong> and <strong>unused</strong> dependencies, ensuring your project stays lean and avoids runtime errors.</p>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
