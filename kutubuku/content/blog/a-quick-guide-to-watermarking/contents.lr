@@ -1,0 +1,32 @@
+title: A Quick Guide to Watermarking
+---
+author: Ricky Lim
+---
+pub_date: 2025-04-12
+---
+body:
+
+In many situations - whether it's for personal (e.g travel documents) or professional setting (e.g business contracts) - we're dealing with sensitive documents.
+We want to ensure that these documents are marked as CONFIDENTIAL.
+Adding a watermark is a simple way to make this explicit.
+
+Here’s how you can do it using Python with the watermark library:
+
+- **Single File Example**: Add a grid watermark to a report called report.pdf:
+
+```bash
+$ uvx watermark grid report.pdf "CONFIDENTIAL" -h 3 -v 3 -s watermarked_report.pdf
+```
+
+- **Batch Processing**: Apply the same grid watermark to all PDFs in a folder:
+
+```bash
+$ uvx watermark grid report_folder "CONFIDENTIAL" -h 3 -v 3 -s watermarked_folder
+```
+
+This approach is quick, and works for both individual files and batches.
+
+## Key Takeaways
+
+Using `watermark` is an easy yet powerful way to mark your documents as confidential.
+Give it a try and watermark your documents effortlessly!
