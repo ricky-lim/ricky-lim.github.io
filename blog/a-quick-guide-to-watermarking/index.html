@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>A Quick Guide to Watermarking — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">A Quick Guide to Watermarking</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-04-12
+  </p>
+  <p>In many situations - whether it's for personal (e.g travel documents) or professional setting (e.g business contracts) - we're dealing with sensitive documents.
+We want to ensure that these documents are marked as CONFIDENTIAL.
+Adding a watermark is a simple way to make this explicit.</p>
+<p>Here’s how you can do it using Python with the watermark library:</p>
+<ul>
+<li><strong>Single File Example</strong>: Add a grid watermark to a report called report.pdf:</li>
+</ul>
+<pre><code class="lang-bash">$ uvx watermark grid report.pdf &quot;CONFIDENTIAL&quot; -h 3 -v 3 -s watermarked_report.pdf
+</code></pre>
+<ul>
+<li><strong>Batch Processing</strong>: Apply the same grid watermark to all PDFs in a folder:</li>
+</ul>
+<pre><code class="lang-bash">$ uvx watermark grid report_folder &quot;CONFIDENTIAL&quot; -h 3 -v 3 -s watermarked_folder
+</code></pre>
+<p>This approach is quick, and works for both individual files and batches.</p>
+<h2>Key Takeaways</h2>
+<p>Using <code>watermark</code> is an easy yet powerful way to mark your documents as confidential.
+Give it a try and watermark your documents effortlessly!</p>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
