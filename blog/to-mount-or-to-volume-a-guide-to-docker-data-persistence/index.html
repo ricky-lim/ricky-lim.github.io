@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>To Mount or to Volume? A Guide to Docker Data Persistence — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">To Mount or to Volume? A Guide to Docker Data Persistence</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-04-19
+  </p>
+  <p>Docker containers are designed to be ephemeral - once stopped or removed, any data stored inside is lost.</p>
+<p>Let’s take a quick CLI tour to see just how ephemeral Docker containers really are.</p>
+<pre><code class="lang-bash"># Run a container
+# -w is to specify the working directory
+$ docker run -it -w /app ubuntu:24.04 bash
+
+# Once inside the container, create a file
+$ root@kecapabc:/app# echo &quot;Hello&quot; &gt; hello.txt
+
+# Exit the container with `ctrl + d`
+
+# Run the container again
+$ docker run -it -w /app ubuntu:24.04 bash
+
+# Oops, the file is not there
+root@kecapabc:/app# ls
+</code></pre>
+<p>This stateless nature works well for many use cases, but for applications like databases or web apps often we need to persist data across restarts and rebuilds.
+Docker solves this with <strong>volumes</strong> and <strong>mounts</strong>.</p>
+<p>In this blog post, we'll explore how Docker handles data persistence and how to seamlessly set it up for your web application development.</p>
+<h3>Volume</h3>
+<p>To volume is to use a persistent storage outside the container, so data stored in a volume remains outside the container even if the container is deleted.</p>
+<p>Here's a quick CLI tour of using volumes with Docker.</p>
+<pre><code class="lang-bash"># Create a docker volume
+$ docker volume create myvolume
+
+# Check the volume
+$ docker volume ls
+
+# Run the container with the volume
+# -it is to run in interactive mode
+# -w is to specify the working directory
+# -v is to mount the volume
+$ docker run -it -w /app -v myvolume:/app ubuntu:24.04 bash
+
+# Once inside the container, create a file
+$ root@kecapabc:/app# echo &quot;Hello&quot; &gt; hello.txt
+
+# Exit the container with `ctrl + d`
+
+# Run the container again
+$ docker run -it -w /app -v myvolume:/app ubuntu:24.04 bash
+
+# Voila, the file is still there
+$ root@kecapabc:/app# cat hello.txt
+</code></pre>
+<h4>Managing Docker Volumes</h4>
+<p>Here are a few essential commands to help you manage Docker volumes effectively:</p>
+<pre><code class="lang-bash"># List all volumes
+$ docker volume ls
+
+# Inspect a volume
+$ docker volume inspect &lt;volume-name&gt;
+
+# Remove a volume
+$ docker volume rm &lt;volume-name&gt;
+
+# Clean up unused data in your Docker environment
+$ docker system prune
+</code></pre>
+<h3>Bind</h3>
+<p>To bind mount is to link a specific file or directory from your host machine directly into the container.
+With such link, changes made in either place are reflected instantly in the other.</p>
+<pre><code class="lang-bash">$ docker run -v /host/path:/container/path ubuntu:24.04
+</code></pre>
+<h3>Persisting Data with volume and bind mount</h3>
+<p>Thanks to its data persistence and virtualization features, Docker makes web development more portable and hassle-free.</p>
+<p>Here's a <code>docker-compose.yml</code> for Django development that leverages Docker volumes and bind mounts.</p>
+<pre><code class="lang-yaml">services:
+  web:
+    build: .
+    command: python /code/manage.py runserver 0.0.0.0:8000
+    volumes:
+      # Bind mount
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    volumes:
+      # Use volume
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - &quot;POSTGRES_HOST_AUTH_METHOD=trust&quot;
+
+volumes:
+  postgres_data:
+</code></pre>
+<table>
+<thead><tr>
+<th><strong>Use Case</strong></th>
+<th><strong>Mount Type</strong></th>
+<th><strong>Example in Compose</strong></th>
+<th><strong>When to Use</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code live reload</td>
+<td>Bind mount</td>
+<td><code>- .:/code</code></td>
+<td>Development</td>
+</tr>
+<tr>
+<td>DB persistence</td>
+<td>Volume</td>
+<td><code>- postgres_data:/var/lib/postgresql/data/</code></td>
+<td>Databases data</td>
+</tr>
+</tbody>
+</table>
+<h2>Key takeaways</h2>
+<p>To make data persistent in Docker, use volumes for databases and bind mounts for live code during development.
+With Docker Compose, managing both becomes simple — ideal for developing web applications like those built with Django.</p>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
