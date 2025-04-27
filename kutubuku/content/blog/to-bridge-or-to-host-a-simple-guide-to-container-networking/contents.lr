@@ -6,8 +6,17 @@ pub_date: 2025-04-26
 ---
 body:
 
-In this blog post, we're going to explore two types of networking: bridge, and host.
-Before that, we're going to have a short CLI tour on managing docker network.
+When it comes to Docker, understanding how containers communicate — both with each other and the outside world — is essential to building reliable applications.
+One of the most important pieces of that puzzle is Docker networking.
+
+In this post, we'll take a hands-on tour through the Docker CLI to learn how to manage networks effectively.
+Then, we'll dive into two essential network types you’ll encounter often: **bridge** and **host**. Let's get started!
+
+### Managing Docker Networking ♻️
+
+Before diving deeper into the types of networks, it's important to know how to manage networks using Docker's CLI tools.
+
+Here's a quick tour of the essential commands:
 
 ```bash
 # Create network
@@ -29,56 +38,69 @@ docker network disconnect mynetwork <container_id>
 docker network rm mynetwork
 ```
 
-### To Bridge or To Host
+### To Bridge or To Host 🧩
 
 Imagine a research building with many labs.
 
-### Bridge Network:
+#### Bridge Network
+
 In this type, each container is a separate lab room.
 Each lab has its own door and address.
-Scientists can move between labs in the same building (host system).
-However to get in or get out of the building, they must go through the main entrance (port mapping).
-However, each room is still separte, so what happens in one rooom stays there without affecting the rest of the building.
+Scientists can move between labs in the same building (host system),
+but to reach the outside world (the internet), they must go through the main entrance - this is like **port mapping** in Docker.
 
-### Host Network:
-Now, imagine you're doing experiment in the buidling's main lobby, with no walls separating you from the rest of the building.
-Everyone in the building (host system) can interact directly, without separation.
+Each room is still separate, so what happens in one rooom stays there without affecting the rest of the building.
+Similarly, in bridge mode, each container is isolated yet connected within a private virtual network.
 
-In this mode, the containers use the host network stack.
-The containers share your machine IP address, and also could directly listen on a port of the host machine.
-However, this mode is less secure as the container running has direct access to the host network.
+By default, Docker uses a bridge network.
+It creates a virtual network (docker0) on the host and assigns an IP address (e.g 172.17.0.0/16) to each container.
+Containers on the same bridge can talk to each other directly.
+However, communicating with the host or the internet requires explicit port mapping.
 
-### To bridge
-
-Bridge network is the default network mode.
-Containers in the same bridge can talk to each other.
-In this mode, it creates a virtual network on the host and each container gets its own IP Address, used to talk to each other.
-The bridge network connects containers to each other while isolating them from containers on other networks and from the host itself.
-By default, it's 172.17.0.0/16 connected to a bridge device `docker0`.
-Communication with the outside world or the host requires explicit port mapping, e.g -p 8080:80, to expost a container's port to the host.
-
-Here's a simple example using the bridge network:
+Here's a simple example:
 
 ```bash
 docker run -p 8080:80 nginx
 ```
 
 The container is attached to Docker's default bridge network and port 8080 on the host is mapped to port 80 inside the container.
+
 You can access the web server by visiting http://localhost:8080 on your host machine.
 
-### To bridge without to host
+#### Host Network
+
+Now, imagine you're doing experiment in the building's main lobby, with no walls separating you from the rest of the building.
+Everyone in the building (host system) can interact directly, without separation.
+
+In this mode, the containers use the host network stack.
+The containers share your machine IP address, and also could directly listen on a port of the host machine.
+
+While this approach can offer better performance and simpler networking, it comes also with risks:
+This mode is less secure as the container running has direct access to the host network resources 😱
+
+### When Bridge isn't enough: Talking Back to the Host 🤔
 
 When a container runs on the bridge network, it's isolated from the host.
 If a container tries to connect to localhost (127.0.01), it talks to itself, not the host machine.
 
-In some cases, you need your container to talk to a service running on the host - like
-when running tests during development to let the container access services on host machine (like the PostgreSQL container)
-To allow this we need to set: `extra_hosts={DOCKER_HOST: "host-gateway"}`.
-This adds an entry inside the container's `/etc/hosts` and maps `DOCKER_HOST` to the bridge gateway address, to routes to the host.
+In some cases, you need a container to talk back to the host - for example,
+when running tests to let your containerized app to access services on your host machine (like the PostgreSQL container).
 
-The example test is provided at https://github.com/ricky-lim/pycontainer-demo
+To solve this, you can add a specia entry to the containers `/etc/hosts` file:
+
+```yaml
+extra_hosts:
+  - "DOCKER_HOST:host-gateway"
+```
+
+This maps `DOCKER_HOST` to the bridge gateway address, allowing the container to route traffic back to the host instead to itself.
+
+You can see an example of this setup in action at https://github.com/ricky-lim/pycontainer-demo
 
 ## Key takeways
 
 Choose your docker network mode based on your application's needs for isolation, performance, and host integration.
-Use `extra_hosts` to bridge without tro host, to enable controlled host access and reserve host network for cases where direct access is required.
+
+Bridge network offers private docker network isolation, and reserve host network for scenarios where direct access to the host netwrok is essential.
+
+Use `extra_hosts` to bridge without to host, this enables controlled access from containers to the host without sacrificing the benefits of bridge isolation.
