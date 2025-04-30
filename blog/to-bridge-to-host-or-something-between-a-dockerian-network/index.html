@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>To Bridge, to Host, or Something Between: A Dockerian Network — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">To Bridge, to Host, or Something Between: A Dockerian Network</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-04-26
+  </p>
+  <p>When it comes to Docker, understanding how containers communicate — both with each other and the outside world — is essential to building reliable applications.
+One of the most important pieces of that puzzle is Docker networking.</p>
+<p>In this post, we'll take a hands-on tour through the Docker CLI to learn how to manage networks effectively.
+Then, we'll dive into two essential network types you’ll encounter often: <strong>bridge</strong> and <strong>host</strong>. Let's get started!</p>
+<h3>Managing Docker Networking ♻️</h3>
+<p>Before diving deeper into the types of networks, it's important to know how to manage networks using Docker's CLI tools.</p>
+<p>Here's a quick tour of the essential commands:</p>
+<pre><code class="lang-bash"># Create network
+docker network create mynetwork
+
+# List network
+docker network ls
+
+# Inspect network
+docker inspect mynetwork
+
+# Connecting a container to a network
+docker network connect mynetwork &lt;container_id&gt;
+
+# Disconnecting a network
+docker network disconnect mynetwork &lt;container_id&gt;
+
+# Remove network
+docker network rm mynetwork
+</code></pre>
+<h3>To Bridge or To Host 🧩</h3>
+<p>Imagine a research building with many labs.</p>
+<h4>Bridge Network</h4>
+<p>In this type, each container is a separate lab room.
+Each lab has its own door and address.
+Scientists can move between labs in the same building (host system),
+but to reach the outside world (the internet), they must go through the main entrance - this is like <strong>port mapping</strong> in Docker.</p>
+<p>Each room is still separate, so what happens in one rooom stays there without affecting the rest of the building.
+Similarly, in bridge mode, each container is isolated yet connected within a private virtual network.</p>
+<p>By default, Docker uses a bridge network.
+It creates a virtual network (docker0) on the host and assigns an IP address (e.g 172.17.0.0/16) to each container.
+Containers on the same bridge can talk to each other directly.
+However, communicating with the host or the internet requires explicit port mapping.</p>
+<p>Here's a simple example:</p>
+<pre><code class="lang-bash">docker run -p 8080:80 nginx
+</code></pre>
+<p>The container is attached to Docker's default bridge network and port 8080 on the host is mapped to port 80 inside the container.</p>
+<p>Open your browser and go to <a href="http://localhost:8080">http://localhost:8080</a> to access the web server.</p>
+<h4>Host Network</h4>
+<p>Now, imagine you're doing experiment in the building's main lobby, with no walls separating you from the rest of the building.
+Everyone in the building (host system) can interact directly, without separation.</p>
+<p>In this mode, the containers use the host network stack.
+The containers share your machine IP address, and also could directly listen on a port of the host machine.</p>
+<p>While this approach can offer better performance and simpler networking, it comes also with risks:
+This mode is less secure as the container running has direct access to the host network resources 😱</p>
+<h3>When Bridge isn't enough: Talking Back to the Host 🤔</h3>
+<p>When a container runs on the bridge network, it's isolated from the host.
+If a container tries to connect to localhost (127.0.01), it talks to itself, not the host machine.</p>
+<p>In some cases, you need a container to talk back to the host - for example,
+when running tests to let your containerized app to access services on your host machine (like the PostgreSQL container).</p>
+<p>To solve this, you can add a specia entry to the containers <code>/etc/hosts</code> file:</p>
+<pre><code class="lang-yaml">extra_hosts:
+  - &quot;DOCKER_HOST:host-gateway&quot;
+</code></pre>
+<p>This maps <code>DOCKER_HOST</code> to the bridge gateway address, allowing the container to route traffic back to the host instead to itself.</p>
+<p>An example of this setup in action can be found at: <a href="https://github.com/ricky-lim/pycontainer-demo">https://github.com/ricky-lim/pycontainer-demo</a></p>
+<h2>Key takeways</h2>
+<p>Choose your docker network mode based on your application's needs for isolation, performance, and host integration.</p>
+<p>Bridge network offers private docker network isolation, and reserve host network for scenarios where direct access to the host netwrok is essential.</p>
+<p>Use <code>extra_hosts</code> to bridge without to host, this enables controlled access from containers to the host without sacrificing the benefits of bridge isolation.</p>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
