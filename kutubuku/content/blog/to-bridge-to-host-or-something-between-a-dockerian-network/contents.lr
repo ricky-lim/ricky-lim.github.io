@@ -65,7 +65,7 @@ docker run -p 8080:80 nginx
 
 The container is attached to Docker's default bridge network and port 8080 on the host is mapped to port 80 inside the container.
 
-You can access the web server by visiting http://localhost:8080 on your host machine.
+Open your browser and go to http://localhost:8080 to access the web server.
 
 #### Host Network
 
@@ -95,7 +95,7 @@ extra_hosts:
 
 This maps `DOCKER_HOST` to the bridge gateway address, allowing the container to route traffic back to the host instead to itself.
 
-You can see an example of this setup in action at https://github.com/ricky-lim/pycontainer-demo
+An example of this setup in action can be found at: https://github.com/ricky-lim/pycontainer-demo
 
 ## Key takeways
 
