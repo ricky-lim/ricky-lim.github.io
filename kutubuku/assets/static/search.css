@@ -1,0 +1,21 @@
+/* Mobile-first approach for search box */
+.pagefind-ui .pagefind-ui__search-input {
+    font-size: 1.4em;
+    padding: 20px;
+    height: 80px;
+    width: 100%;
+    border-radius: 12px;
+    margin: 1.5em 0;
+}
+
+/* Additional mobile enhancements */
+@media (max-width: 768px) {
+    .pagefind-ui {
+        padding: 15px;
+    }
+
+    .pagefind-ui .pagefind-ui__search-input {
+        -webkit-appearance: none; /* Better iOS rendering */
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+}

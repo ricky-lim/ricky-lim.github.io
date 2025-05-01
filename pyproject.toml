@@ -1,6 +1,6 @@
 [project]
 name = "ricky-lim-github-io"
-version = "0.1.0"
+version = "0.3.0"
 description = "Add your description here"
 authors = [
     { name = "rickylim", email = "rlim.email@gmail.com" }
@@ -15,10 +15,6 @@ requires-python = ">= 3.8"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = []
-
 [tool.hatch.metadata]
 allow-direct-references = true
 
@@ -27,5 +23,21 @@ packages = ["src/ricky_lim_github_io"]
 
 [dependency-groups]
 dev = [
+    "bump-my-version>=1.0.2",
     "pre-commit>=3.5.0",
+    "pytest>=8.3.5",
+    "python-slugify>=8.0.4",
 ]
+
+[tool.bumpversion]
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+tag_message = "Bump version: {current_version} → {new_version}"
+commit = true
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+allow_dirty = false
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"

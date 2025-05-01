@@ -32,4 +32,7 @@ $ ps aux | grep tech-stack
 > Cloud: AWS, Docker
 > Typescript: cdk
 > Database: PostgreSQL, MongoDB
+
+$ echo $CONTACT
+> Email: rlim.email@gmail.com
 ```
