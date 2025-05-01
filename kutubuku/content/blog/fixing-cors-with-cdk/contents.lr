@@ -1,51 +1,56 @@
-title:Understanding and Solving CORS Issues
+title: Fixing Cors with CDK
 ---
 author: Ricky Lim
 ---
-pub_date: 2025-03-05
+pub_date: 2025-05-01
 ---
 body:
 
 
-CORS (Cross-Origin Resource Sharing) is a security mechanism implemented by web browsers to prevent unauthorized requests from ***one origin to another***. 
-An origin is defined by its protocol, domain, and port. 
-For example, in `http://my-site.com`, the protocol is `http`, the domain is `my-site`, and the port is `80` for `http` and `443` for https.
+CORS (Cross-Origin Resource Sharing) is a security mechanism implemented by web browsers to prevent unauthorized requests from ***one origin to another***.
+An origin is defined by its protocol, domain, and port.
+
+For example, in `http://my-site.com`:
+
+- the protocol is `http`
+- the domain is `my-site`
+- the port is `80` for `http` and `443` for https.
 
 Web browsers handle two types of requests: same-origin requests and different-origin requests.
 
-A same-origin request occurs when the request is made within the same origin. 
-For instance, a request from `http://my-site.com/app1` to `http://my-site.com/app2` is considered a same-origin request. 
+A same-origin request occurs when the request is made within the same origin.
+For instance, a request from `http://my-site.com/app1` to `http://my-site.com/app2` is considered a same-origin request.
 Web browsers allow these requests without any issues.
 
-In contrast, a different-origin request happens when the request is made across different origins. 
-For example, a request from `http://my-site.com` to `http://another-site.com` is a different-origin request. 
-In such cases, the browser will **block** the request.
+The issue comes when a **different-origin** request happens when the request is made across different origins.
+For example, a request from `http://my-site.com` to `http://another-site.com` is a **different-origin** request.
+In this case, the browser will **block** the request.
 
-This blocking mechanism is essential for protecting users from malicious websites that attempt to access resources on different domains without permission. However, it can also pose challenges for developers who need to build applications that interact with APIs hosted on different domains.
+This blocking mechanism is essential for protecting users from malicious websites that attempt to access resources on different domains ***without*** permission. However, it can also pose challenges for developers who need to build applications that interact with APIs hosted on different domains.
 
-To overcome this, we must explicitly specify which cross-origins are allowed to communicate with one another.
+To overcome this, we must ***explicitly specify*** which cross-origins are allowed to communicate with one another.
 
 In this blog post, we'll walk through an example of a CORS issue and demonstrate how to resolve it effectively.
 
 ## The Problem
 
-Imagine you're hosting a party at your house (the front end at `http://localhost:8000`). 
+Imagine you're hosting a party at your house (the front end at `http://localhost:8000`).
 You want to order a cake from your favorite supplier in another city (the back end at `http://awesome-cake.amazonaws.com`).
 
-However, your house has a strict security guard who won't let you send messages to people outside without explicit permission. 
+However, your house has a strict security guard who won't let you send messages to people outside without explicit permission.
 This guard represents CORS (Cross-Origin Resource Sharing).
 
-To order the cake, you need the supplier to give you a special pass, telling the guard it's okay to send the request. 
+To order the cake, you need the supplier to give you a special pass, telling the guard it's okay to send the request.
 This pass is like the CORS headers that allow cross-origin requests.
 
-Once you have the pass, the guard lets your request through, and you can successfully order the cake. 
+Once you have the pass, the guard lets your request through, and you can successfully order the cake.
 This ensures secure and authorized communication between your web application and external APIs.
 
-In summary, CORS is like a security guard that protects your web application by only allowing trusted interactions with external resources.
+In summary, CORS is like a security guard that protects your web application by ***explicitly*** allowing trusted interactions with external resources.
 
 ### Demo Example
 
-In this repository: https://github.com/ricky-lim/cors-issue
+Explore the example project here: https://github.com/ricky-lim/cors-issue
 
 Without CORS enabled, when we attempt to call our API from the front end, we encounter the following error:
 
@@ -71,7 +76,7 @@ Here's a simple graph illustrating how CORS works using this example.
 +----------------+              +----------------------+
 |                |              |                      |
 |   Front End    |              |      Back End        |
-| (http://localhost:8000)       | (https://api.example.com) |
+| (http://localhost:8000)       | (https://api.example.com)
 |                |              |                      |
 +-------+--------+              +----------+-----------+
         |                                |
@@ -114,7 +119,7 @@ class ApiStack(Stack):
             allow_methods=["GET"],
         )
         hello_resource = api.root.add_resource(
-            "hello", 
+            "hello",
             default_cors_preflight_options=cors_options,
         )
 ```
@@ -139,3 +144,8 @@ def handler(event, context):
 ![cors_success](./success_cors.png)
 
 By following these steps, we have successfully enabled CORS support, allowing our front end to interact with the API without encountering CORS policy restrictions.
+
+### Key Takeaways
+
+- CORS must be ***explicitly*** configured to define allowed origins, methods, and headers
+- For development, you can use Cors.ALL_ORIGINS and Cors.ALL_METHODS, but in production, always be explicit
