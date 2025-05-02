@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>Fixing Cors with CDK — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">Fixing Cors with CDK</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-05-01
+  </p>
+  <p>CORS (Cross-Origin Resource Sharing) is a security mechanism implemented by web browsers to prevent unauthorized requests from <strong><em>one origin to another</em></strong>.
+An origin is defined by its protocol, domain, and port.</p>
+<p>For example, in <code>http://my-site.com</code>:</p>
+<ul>
+<li>the protocol is <code>http</code></li>
+<li>the domain is <code>my-site</code></li>
+<li>the port is <code>80</code> for <code>http</code> and <code>443</code> for https.</li>
+</ul>
+<p>Web browsers handle two types of requests: same-origin requests and different-origin requests.</p>
+<p>A same-origin request occurs when the request is made within the same origin.
+For instance, a request from <code>http://my-site.com/app1</code> to <code>http://my-site.com/app2</code> is considered a same-origin request.
+Web browsers allow these requests without any issues.</p>
+<p>The issue comes when a <strong>different-origin</strong> request happens when the request is made across different origins.
+For example, a request from <code>http://my-site.com</code> to <code>http://another-site.com</code> is a <strong>different-origin</strong> request.
+In this case, the browser will <strong>block</strong> the request.</p>
+<p>This blocking mechanism is essential for protecting users from malicious websites that attempt to access resources on different domains <strong><em>without</em></strong> permission. However, it can also pose challenges for developers who need to build applications that interact with APIs hosted on different domains.</p>
+<p>To overcome this, we must <strong><em>explicitly specify</em></strong> which cross-origins are allowed to communicate with one another.</p>
+<p>In this blog post, we'll walk through an example of a CORS issue and demonstrate how to resolve it effectively.</p>
+<h2>The Problem</h2>
+<p>Imagine you're hosting a party at your house (the front end at <code>http://localhost:8000</code>).
+You want to order a cake from your favorite supplier in another city (the back end at <code>http://awesome-cake.amazonaws.com</code>).</p>
+<p>However, your house has a strict security guard who won't let you send messages to people outside without explicit permission.
+This guard represents CORS (Cross-Origin Resource Sharing).</p>
+<p>To order the cake, you need the supplier to give you a special pass, telling the guard it's okay to send the request.
+This pass is like the CORS headers that allow cross-origin requests.</p>
+<p>Once you have the pass, the guard lets your request through, and you can successfully order the cake.
+This ensures secure and authorized communication between your web application and external APIs.</p>
+<p>In summary, CORS is like a security guard that protects your web application by <strong><em>explicitly</em></strong> allowing trusted interactions with external resources.</p>
+<h3>Demo Example</h3>
+<p>Explore the example project here: <a href="https://github.com/ricky-lim/cors-issue">https://github.com/ricky-lim/cors-issue</a></p>
+<p>Without CORS enabled, when we attempt to call our API from the front end, we encounter the following error:</p>
+<pre><code class="lang-bash">&quot;Error: Failed to fetch has been blocked by CORS policy&quot;
+</code></pre>
+<p><img src="failed_cors.png" alt="failed_cors"></p>
+<p>If you inspect the Developer Tools Console, a more detailed error message is shown:</p>
+<pre><code class="lang-bash">localhost/:1  Access to fetch at &#39;https://&lt;api-url&gt;/prod/&#39; from origin &#39;http://localhost:8000&#39; has been blocked by CORS policy: No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource. If an opaque response serves your needs, set the request&#39;s mode to &#39;no-cors&#39; to fetch the resource with CORS disabled.
+</code></pre>
+<p>This indicates that the API request is being blocked due to CORS policy restrictions, as the required <code>Access-Control-Allow-Origin</code> header is missing from the response.</p>
+<h3>How CORS Works</h3>
+<p>Here's a simple graph illustrating how CORS works using this example.</p>
+<pre><code class="lang-bash">+----------------+              +----------------------+
+|                |              |                      |
+|   Front End    |              |      Back End        |
+| (http://localhost:8000)       | (https://api.example.com)
+|                |              |                      |
++-------+--------+              +----------+-----------+
+        |                                |
+        |       1. Preflight Request     |
+        +--------------------------------&gt;
+        |                                |
+        |       2. Preflight Response    |
+        &lt;--------------------------------+  (Allowed origins: http://localhost:8000)
+        |                                |  (Allowed methods: GET)
+        |                                |
+        |       3. Actual Request        |
+        +--------------------------------&gt;
+        |                                |
+        |       4. Actual Response       |
+        &lt;--------------------------------+
+</code></pre>
+<ol>
+<li><p>Preflight Request: The browser sends a preflight request using the OPTIONS method to the server to check if the actual request is safe to send.</p>
+</li>
+<li><p>Preflight Response: The server responds with the allowed origins (<code>http://localhost:8000</code>) and allowed methods (GET).</p>
+</li>
+<li><p>Actual Request: If the preflight check is successful, the browser sends the actual request.</p>
+</li>
+<li><p>Actual Response: The server responds with the requested data, including the appropriate CORS headers.</p>
+</li>
+</ol>
+<h3>How to Solve This</h3>
+<p>To resolve this issue, we need to enable CORS support by configuring the API to allow access from our front end, which is currently running on localhost at port 8000.</p>
+<p>1. Add CORS options to our API resource.</p>
+<pre><code class="lang-typescript">class ApiStack(Stack):
+
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -&gt; None:
+        super().__init__(scope, construct_id, **kwargs)
+
+        cors_options = aws_apigateway.CorsOptions(
+            allow_origins=[&quot;localhost:8000&quot;],
+            allow_methods=[&quot;GET&quot;],
+        )
+        hello_resource = api.root.add_resource(
+            &quot;hello&quot;,
+            default_cors_preflight_options=cors_options,
+        )
+</code></pre>
+<p>2. Add CORS headers in our API lambda:</p>
+<pre><code class="lang-python">def handler(event, context):
+    return {
+        &quot;statusCode&quot;: 200,
+        &quot;body&quot;: &quot;Hello from API!&quot;,
+        # CORS headers
+        &quot;headers&quot;: {
+            &quot;Access-Control-Allow-Origin&quot;: &quot;http://localhost&quot;,
+            &quot;Access-Control-Allow-Methods&quot;: &quot;GET&quot;,
+        },
+    }
+</code></pre>
+<p>3. Check that the CORS issue is resolved:</p>
+<p><img src="success_cors.png" alt="cors_success"></p>
+<p>By following these steps, we have successfully enabled CORS support, allowing our front end to interact with the API without encountering CORS policy restrictions.</p>
+<h3>Key Takeaways</h3>
+<ul>
+<li>CORS must be <strong><em>explicitly</em></strong> configured to define allowed origins, methods, and headers</li>
+<li>For development, you can use Cors.ALL_ORIGINS and Cors.ALL_METHODS, but in production, always be explicit</li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
