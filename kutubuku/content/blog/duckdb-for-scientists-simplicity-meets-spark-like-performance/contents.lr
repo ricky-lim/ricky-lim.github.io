@@ -1,0 +1,188 @@
+title: DuckDb for Scientists: Simplicity Meets Spark-like Performance
+---
+author: Ricky Lim
+---
+pub_date: 2025-05-18
+---
+body:
+
+Scientists are working with ever-growing volumes of data with a variety of formats such as Excel, CSV, or JSON.
+These formats store data in rows, which well-suited for accessing or updating a single entry at a time.
+However, for analytical tasks like grouping totals (e.g annual rainfall), row-based formats are inefficient.
+They require scanning every row and reading all columns.
+This leads to unnecessary data processing and slower queries, especially as datasets grow larger.
+
+***What if we could read only the one or two columns needed for our analysis?***
+To make this possible, data engineers often convert data into columnar formats like Parquet.
+In Parquet, data is stored column-based, making it much faster to select only the relevant columns for our analysis.
+However, this shift to columnar storage raises a practical question for scientists:
+***How can they easily explore and analyze Parquet files, when many familiar tools are designed for row-based files?***
+
+In this blog post, we'll explore some practical ways to address this challenge.
+
+# What is Parquet file
+
+Imagine your data like lego bricks. In a traditional row-based system, like CSV or JSON,
+you'd store all different colors and shapes of lego bricks together in a single box.
+If you wanted to count how many green bricks you have, you'd have to look them inside your box.
+This will take you sometime ...
+
+Now, imagine Parquet as your lego box but with compartments.
+You store your green bricks into one compartment, all your blue bricks into another, and so on.
+If you want to know how many blue bricks you have, you look straight in the blue compartment - much faster and easier.
+The cool part is that Parquet also keeps track of how many bricks are in each compartment as its metadata.
+Since all the bricks in one compartment are the same color and shape, it can also stack them together - allowing for compression and reducing storage footprint.
+This makes finding your LEGO bricks—and building with them—much faster.
+
+However, Parquet files are stored in a **binary format**, that we can't simply open them with tools like unix-`less`.
+This is because the format was designed to be efficient for storage and analytics but not for human readability.
+In the big data ecosystem, Apache Spark is one of the most popular tools to analyze and explore Parquet data.
+
+Here's a simple example of how you can read, and analyze a Parquet file using PySpark:
+
+1\. Start a spark session
+
+```python
+import os
+
+from pyspark.sql import SparkSession
+
+import pyspark.sql.functions as F
+
+# Ensure JAVA environment variable is set
+java_home = os.path.expandvars("$HOME/.sdkman/candidates/java/11.0.11.hs-adpt")
+os.environ['JAVA_HOME'] = java_home
+os.environ['PATH'] = java_home + '/bin:' + os.environ['PATH']
+
+spark = SparkSession.builder.appName("Sparklie").getOrCreate()
+print(f"Spark version: {spark.version}")
+```
+
+2\. Analyze with spark
+
+```python
+# Check popular genres
+spark_result = (
+    spark.read.parquet(movie)
+        .select(F.split(F.col("Genre"), ",").alias("Genre"))
+        .select(F.explode(F.col("Genre")).alias("Genre"))
+        .select(F.trim(F.col("Genre")).alias("Genre"))
+        .select(F.lower(F.col("Genre")).alias("Genre"))
+        .groupBy("Genre")
+        .count()
+        .orderBy("count", ascending=False)
+        .limit(10)
+)
+
+spark_result.show()
+```
+
+```bash
+Spark version: 3.5.5
+
++---------+-----+
+|    Genre|count|
++---------+-----+
+|    drama| 3744|
+|   comedy| 3031|
+|   action| 2686|
+| thriller| 2488|
+|adventure| 1853|
+|  romance| 1476|
+|   horror| 1470|
+|animation| 1438|
+|   family| 1414|
+|  fantasy| 1308|
++---------+-----+
+
+4.97 s ± 5.62 s per loop (mean ± std. dev. of 3 runs, 1 loop each)
+```
+
+While Spark is a powerful tool for working with Parquet, it comes with a size of complexity.
+Spark requires Java and it's not a plug-and-play experience.
+Furthermore, its distributed computing model can be overkill for small to medium-sized datasets (like below 100 GB).
+
+This is where DuckDB offers an interesting alternative.
+It's easy to setup as simple as `pip install duckdb`, and well-suited for small to medium-sized analytical tasks.
+Below is the same analysis, now performed using DuckDB.
+
+```python
+print(f"DuckDB version: {duckdb.__version__}")
+
+duck_result = (
+    duckdb.from_parquet(movie)
+        .project("split(Genre, ',') AS genres")
+        .project("unnest(genres) AS genres")
+        .project("trim(lower(genres)) AS Genre")
+        .aggregate("Genre, COUNT(*) AS count")
+        .order("count DESC")
+        .limit(10)
+)
+
+duck_result.show()
+```
+
+```bash
+DuckDB version: 1.2.2
+┌───────────┬───────┐
+│   Genre   │ count │
+│  varchar  │ int64 │
+├───────────┼───────┤
+│ drama     │  3744 │
+│ comedy    │  3031 │
+│ action    │  2686 │
+│ thriller  │  2488 │
+│ adventure │  1853 │
+│ romance   │  1476 │
+│ horror    │  1470 │
+│ animation │  1438 │
+│ family    │  1414 │
+│ fantasy   │  1308 │
+├───────────┴───────┤
+│      10 rows      │
+└───────────────────┘
+
+56.9 ms ± 23.4 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
+```
+
+In my benchmarking experiment, [sparkling-duck](https://github.com/ricky-lim/sparkling-duck),
+I found that DuckDB provides a similarly expressive query API to Spark, while delivering performance that is often comparable and, in some cases, significantly faster.
+This advantage is largely due to DuckDB’s lightweight architecture and minimal setup requirements.
+
+Duckdb also comes with its CLI that allows us to explore Parquet using familiar SQL syntax - much like using `less` unix command, but with the power of SQL.
+
+Here are a few examples:
+
+```bash
+# Query what is the structure of a parquet file as follows:
+duckdb -c "DESCRIBE select * FROM 'data/movies.parquet'"
+┌───────────────────┬─────────────┬─────────┬─────────┬─────────┬─────────┐
+│    column_name    │ column_type │  null   │   key   │ default │  extra  │
+│      varchar      │   varchar   │ varchar │ varchar │ varchar │ varchar │
+├───────────────────┼─────────────┼─────────┼─────────┼─────────┼─────────┤
+│ Release_Date      │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Title             │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Overview          │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Popularity        │ DOUBLE      │ YES     │ NULL    │ NULL    │ NULL    │
+│ Vote_Count        │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Vote_Average      │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Original_Language │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Genre             │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Poster_Url        │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+└───────────────────┴─────────────┴─────────┴─────────┴─────────┴─────────┘
+
+# Count records
+duckdb -c "SELECT COUNT(*) FROM 'data/movies.parquet'"
+┌──────────────┐
+│ count_star() │
+│    int64     │
+├──────────────┤
+│     9837     │
+└──────────────┘
+```
+
+
+# Key takeaways
+
+- Spark is efficient at distributed analysis of columnar data like Parquet, but its startup time and operational complexity - resource management and logging, can be overkill for small to medium-sized datasets.
+- For these use cases, DuckDB offers a lightweight, efficient alternative that is easier to set up and use.
