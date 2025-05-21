@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <title>DuckDb for Scientists: Simplicity Meets Spark-like Performance — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="../../static/rlim.png"
+           alt="rlim"
+           class="logo-rlim">
+      kutubuku
+    </h1>
+    <nav>
+      <ul class="nav navbar-nav">
+        <li><a href="../../">Welcome</a></li>
+        
+          <li class="active"><a href="../">Blog</a></li>
+        
+          <li><a href="../../about/">About</a></li>
+        
+          <li><a href="../../search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h2 data-pagefind-meta="title">DuckDb for Scientists: Simplicity Meets Spark-like Performance</h2>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-05-18
+  </p>
+  <p>Scientists are working with increasing volumes of data with a variety of formats such as Excel, CSV, or JSON.
+These formats store data in rows, which well-suited for accessing or updating a single entry at a time.
+However, for analytical tasks like grouping totals (e.g annual rainfall), row-based formats are inefficient.
+They require scanning every row and reading all columns.
+This leads to unnecessary data processing and slower queries, especially as datasets grow larger.</p>
+<p><strong><em>What if we could read only the one or two columns needed for our analysis?</em></strong>
+To make this possible, data engineers often convert data into columnar formats like Parquet.
+In Parquet, data is stored column-based, making it much faster to select only the relevant columns for our analysis.
+However, this shift to columnar storage raises a practical question for scientists:
+<strong><em>How can they easily explore and analyze Parquet files, when many familiar tools are designed for row-based files?</em></strong></p>
+<p>In this blog post, we'll explore some practical ways to address this challenge.</p>
+<h1>What is Parquet file</h1>
+<p>Imagine your data like lego bricks. In a traditional row-based system, like CSV or JSON,
+you'd store all different colors and shapes of lego bricks together in a single box.
+If you wanted to count how many green bricks you have, you’d need to search through the entire box to find them.
+This process could take quite a bit of time.</p>
+<p>Now, imagine Parquet as a LEGO box organized with separate compartments for each color—much more efficient and organized.
+You store your green bricks into one compartment, all your blue bricks into another, and so on.
+If you want to know how many blue bricks you have, you look straight in the blue compartment - much faster and easier.
+The cool part is that Parquet also keeps track of how many bricks are in each compartment as its metadata.
+Since all the bricks in one compartment are the same color and shape, it can also stack them together - allowing for compression and reducing storage footprint.
+This makes finding your LEGO bricks—and building with them—much faster.</p>
+<p>However, Parquet files are stored in a <strong>binary format</strong>, that we can't simply open them with tools like unix-<code>less</code>.
+This is because the format was designed to be efficient for storage and analytics rather than for human readability.</p>
+<p>Apache Spark is one of the most widely used tools for analyzing and exploring Parquet data.
+Here's a basic example of how you can read, and analyze a Parquet file using PySpark:</p>
+<p>1. Start a spark session</p>
+<pre><code class="lang-python">import os
+
+from pyspark.sql import SparkSession
+
+import pyspark.sql.functions as F
+
+# Ensure JAVA environment variable is set
+# Note: Spark requires Java to run
+java_home = os.path.expandvars(&quot;$HOME/.sdkman/candidates/java/11.0.11.hs-adpt&quot;)
+os.environ[&#39;JAVA_HOME&#39;] = java_home
+os.environ[&#39;PATH&#39;] = java_home + &#39;/bin:&#39; + os.environ[&#39;PATH&#39;]
+
+spark = SparkSession.builder.appName(&quot;Sparklie&quot;).getOrCreate()
+print(f&quot;Spark version: {spark.version}&quot;)
+</code></pre>
+<p>2. Analyze with spark</p>
+<p>For our basic analysis, we want to identify the most popular movie genres by counting their occurrences.</p>
+<pre><code class="lang-python">spark_result = (
+    # Read the Parquet file into a Spark DataFrame
+    spark.read.parquet(movie)
+
+         # Split the &#39;Genre&#39; column by commas into arrays
+        .select(F.split(F.col(&quot;Genre&quot;), &quot;,&quot;).alias(&quot;Genre&quot;))
+
+        # Explode the arrays so that each genre has its own row
+        .select(F.explode(F.col(&quot;Genre&quot;)).alias(&quot;Genre&quot;))
+
+        # Remove leading/trailing whitespace from each genre
+        .select(F.trim(F.col(&quot;Genre&quot;)).alias(&quot;Genre&quot;))
+
+        # Lowercase all genres for consistent grouping
+        .select(F.lower(F.col(&quot;Genre&quot;)).alias(&quot;Genre&quot;))
+
+        # Group by genre and count the number of occurrences
+        .groupBy(&quot;Genre&quot;)
+        .count()
+
+        # Order the results by count in descending order
+        .orderBy(&quot;count&quot;, ascending=False)
+
+        # Limit to the top 10 most common genres
+        .limit(10)
+)
+
+spark_result.show()
+</code></pre>
+<pre><code class="lang-bash">Spark version: 3.5.5
+
++---------+-----+
+|    Genre|count|
++---------+-----+
+|    drama| 3744|
+|   comedy| 3031|
+|   action| 2686|
+| thriller| 2488|
+|adventure| 1853|
+|  romance| 1476|
+|   horror| 1470|
+|animation| 1438|
+|   family| 1414|
+|  fantasy| 1308|
++---------+-----+
+
+4.97 s ± 5.62 s per loop (mean ± std. dev. of 3 runs, 1 loop each)
+</code></pre>
+<p>As we can see from our dataset, drama is the most popular genre.</p>
+<p>While Spark is a powerful tool for working with Parquet, it comes with some complexity.
+Spark requires Java and it's not a plug-and-play experience.
+Furthermore, its distributed computing model can be overkill for small to medium-sized datasets (like below 100 GB).</p>
+<p>Without getting too dramatic - Spark is powerful, but sometimes a simpler tool can do the job just as well.</p>
+<p>This is where DuckDB offers an interesting alternative.
+It's easy to setup as simple as <code>pip install duckdb</code>, and well-suited for small to medium-sized analytical tasks.</p>
+<p>Below is the same analysis, now performed using DuckDB.</p>
+<pre><code class="lang-python">print(f&quot;DuckDB version: {duckdb.__version__}&quot;)
+
+duck_result = (
+    duckdb.from_parquet(movie)
+        .project(&quot;split(Genre, &#39;,&#39;) AS genres&quot;)
+        .project(&quot;unnest(genres) AS genres&quot;)
+        .project(&quot;trim(lower(genres)) AS Genre&quot;)
+        .aggregate(&quot;Genre, COUNT(*) AS count&quot;)
+        .order(&quot;count DESC&quot;)
+        .limit(10)
+)
+
+duck_result.show()
+</code></pre>
+<pre><code class="lang-bash">DuckDB version: 1.2.2
+┌───────────┬───────┐
+│   Genre   │ count │
+│  varchar  │ int64 │
+├───────────┼───────┤
+│ drama     │  3744 │
+│ comedy    │  3031 │
+│ action    │  2686 │
+│ thriller  │  2488 │
+│ adventure │  1853 │
+│ romance   │  1476 │
+│ horror    │  1470 │
+│ animation │  1438 │
+│ family    │  1414 │
+│ fantasy   │  1308 │
+├───────────┴───────┤
+│      10 rows      │
+└───────────────────┘
+
+56.9 ms ± 23.4 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
+</code></pre>
+<p>As you can see DuckDB offers a query API as expressive as Spark’s, while often matching—or even exceeding—its performance.
+If you'd like to explore further, you can find the code in the repository <a href="https://github.com/ricky-lim/sparkling-duck">sparkling-duck</a>
+Combining its simplicity with capability, DuckDB effectively supports most use cases for data scientists.</p>
+<p>Duckdb also comes with its CLI that allows us to explore Parquet using familiar SQL syntax - much like using <code>less</code> unix command, but with the power of SQL.</p>
+<p>Here are a few examples:</p>
+<pre><code class="lang-bash"># Query what is the structure of a parquet file
+duckdb -c &quot;DESCRIBE select * FROM &#39;data/movies.parquet&#39;&quot;
+┌───────────────────┬─────────────┬─────────┬─────────┬─────────┬─────────┐
+│    column_name    │ column_type │  null   │   key   │ default │  extra  │
+│      varchar      │   varchar   │ varchar │ varchar │ varchar │ varchar │
+├───────────────────┼─────────────┼─────────┼─────────┼─────────┼─────────┤
+│ Release_Date      │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Title             │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Overview          │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Popularity        │ DOUBLE      │ YES     │ NULL    │ NULL    │ NULL    │
+│ Vote_Count        │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Vote_Average      │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Original_Language │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Genre             │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+│ Poster_Url        │ VARCHAR     │ YES     │ NULL    │ NULL    │ NULL    │
+└───────────────────┴─────────────┴─────────┴─────────┴─────────┴─────────┘
+
+# Count records
+duckdb -c &quot;SELECT COUNT(*) FROM &#39;data/movies.parquet&#39;&quot;
+┌──────────────┐
+│ count_star() │
+│    int64     │
+├──────────────┤
+│     9837     │
+└──────────────┘
+</code></pre>
+<h1>Key takeaways</h1>
+<ul>
+<li>Spark is efficient at distributed analysis of columnar data like Parquet, but its startup time and operational complexity - resource management and logging, can be overkill for small to medium-sized datasets.</li>
+<li>For these use cases, DuckDB offers a lightweight, efficient alternative that is easier to set up and use.</li>
+</ul>
+
+  </div>
+
+
+  </div>
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built with ❤️ using <a href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+  
+</body>
+</html>
