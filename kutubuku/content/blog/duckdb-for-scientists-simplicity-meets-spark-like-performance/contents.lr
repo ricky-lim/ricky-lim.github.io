@@ -6,7 +6,7 @@ pub_date: 2025-05-18
 ---
 body:
 
-Scientists are working with ever-growing volumes of data with a variety of formats such as Excel, CSV, or JSON.
+Scientists are working with increasing volumes of data with a variety of formats such as Excel, CSV, or JSON.
 These formats store data in rows, which well-suited for accessing or updating a single entry at a time.
 However, for analytical tasks like grouping totals (e.g annual rainfall), row-based formats are inefficient.
 They require scanning every row and reading all columns.
@@ -24,10 +24,10 @@ In this blog post, we'll explore some practical ways to address this challenge.
 
 Imagine your data like lego bricks. In a traditional row-based system, like CSV or JSON,
 you'd store all different colors and shapes of lego bricks together in a single box.
-If you wanted to count how many green bricks you have, you'd have to look them inside your box.
-This will take you sometime ...
+If you wanted to count how many green bricks you have, you’d need to search through the entire box to find them.
+This process could take quite a bit of time.
 
-Now, imagine Parquet as your lego box but with compartments.
+Now, imagine Parquet as a LEGO box organized with separate compartments for each color—much more efficient and organized.
 You store your green bricks into one compartment, all your blue bricks into another, and so on.
 If you want to know how many blue bricks you have, you look straight in the blue compartment - much faster and easier.
 The cool part is that Parquet also keeps track of how many bricks are in each compartment as its metadata.
@@ -35,10 +35,10 @@ Since all the bricks in one compartment are the same color and shape, it can als
 This makes finding your LEGO bricks—and building with them—much faster.
 
 However, Parquet files are stored in a **binary format**, that we can't simply open them with tools like unix-`less`.
-This is because the format was designed to be efficient for storage and analytics but not for human readability.
-In the big data ecosystem, Apache Spark is one of the most popular tools to analyze and explore Parquet data.
+This is because the format was designed to be efficient for storage and analytics rather than for human readability.
 
-Here's a simple example of how you can read, and analyze a Parquet file using PySpark:
+Apache Spark is one of the most widely used tools for analyzing and exploring Parquet data.
+Here's a basic example of how you can read, and analyze a Parquet file using PySpark:
 
 1\. Start a spark session
 
@@ -50,6 +50,7 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 
 # Ensure JAVA environment variable is set
+# Note: Spark requires Java to run
 java_home = os.path.expandvars("$HOME/.sdkman/candidates/java/11.0.11.hs-adpt")
 os.environ['JAVA_HOME'] = java_home
 os.environ['PATH'] = java_home + '/bin:' + os.environ['PATH']
@@ -60,17 +61,33 @@ print(f"Spark version: {spark.version}")
 
 2\. Analyze with spark
 
+For our basic analysis, we want to identify the most popular movie genres by counting their occurrences.
+
 ```python
-# Check popular genres
 spark_result = (
+    # Read the Parquet file into a Spark DataFrame
     spark.read.parquet(movie)
+
+         # Split the 'Genre' column by commas into arrays
         .select(F.split(F.col("Genre"), ",").alias("Genre"))
+
+        # Explode the arrays so that each genre has its own row
         .select(F.explode(F.col("Genre")).alias("Genre"))
+
+        # Remove leading/trailing whitespace from each genre
         .select(F.trim(F.col("Genre")).alias("Genre"))
+
+        # Lowercase all genres for consistent grouping
         .select(F.lower(F.col("Genre")).alias("Genre"))
+
+        # Group by genre and count the number of occurrences
         .groupBy("Genre")
         .count()
+
+        # Order the results by count in descending order
         .orderBy("count", ascending=False)
+
+        # Limit to the top 10 most common genres
         .limit(10)
 )
 
@@ -98,12 +115,17 @@ Spark version: 3.5.5
 4.97 s ± 5.62 s per loop (mean ± std. dev. of 3 runs, 1 loop each)
 ```
 
-While Spark is a powerful tool for working with Parquet, it comes with a size of complexity.
+As we can see from our dataset, drama is the most popular genre.
+
+While Spark is a powerful tool for working with Parquet, it comes with some complexity.
 Spark requires Java and it's not a plug-and-play experience.
 Furthermore, its distributed computing model can be overkill for small to medium-sized datasets (like below 100 GB).
 
+Without getting too dramatic - Spark is powerful, but sometimes a simpler tool can do the job just as well.
+
 This is where DuckDB offers an interesting alternative.
 It's easy to setup as simple as `pip install duckdb`, and well-suited for small to medium-sized analytical tasks.
+
 Below is the same analysis, now performed using DuckDB.
 
 ```python
@@ -145,16 +167,16 @@ DuckDB version: 1.2.2
 56.9 ms ± 23.4 ms per loop (mean ± std. dev. of 3 runs, 1 loop each)
 ```
 
-In my benchmarking experiment, [sparkling-duck](https://github.com/ricky-lim/sparkling-duck),
-I found that DuckDB provides a similarly expressive query API to Spark, while delivering performance that is often comparable and, in some cases, significantly faster.
-This advantage is largely due to DuckDB’s lightweight architecture and minimal setup requirements.
+As you can see DuckDB offers a query API as expressive as Spark’s, while often matching—or even exceeding—its performance.
+If you'd like to explore further, you can find the code in the repository [sparkling-duck](https://github.com/ricky-lim/sparkling-duck)
+Combining its simplicity with capability, DuckDB effectively supports most use cases for data scientists.
 
 Duckdb also comes with its CLI that allows us to explore Parquet using familiar SQL syntax - much like using `less` unix command, but with the power of SQL.
 
 Here are a few examples:
 
 ```bash
-# Query what is the structure of a parquet file as follows:
+# Query what is the structure of a parquet file
 duckdb -c "DESCRIBE select * FROM 'data/movies.parquet'"
 ┌───────────────────┬─────────────┬─────────┬─────────┬─────────┬─────────┐
 │    column_name    │ column_type │  null   │   key   │ default │  extra  │
