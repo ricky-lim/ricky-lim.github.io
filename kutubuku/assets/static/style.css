@@ -11,33 +11,11 @@
 
 * {
     box-sizing: border-box;
+    font-family: 'Fira Code', monospace !important;
 }
 
-/* Base styles (mobile first) */
 html {
-    font-family: 'Fira Code', monospace;
     font-size: 21px;
-}
-
-.logo-rlim {
-    height: 1em;
-    width: 1em;
-    border-radius: 50%; /* Standard border radius */
-    object-fit: cover;
-    vertical-align: middle;
-    margin-left: 5px;
-
-    /* Safari-specific properties */
-    -webkit-border-radius: 50%;
-    -webkit-clip-path: circle(50%);
-    clip-path: circle(50%);
-
-     /* Additional Safari/iOS fixes */
-     -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
-     mask-image: radial-gradient(circle, white 100%, black 100%);
-
-    /* Ensure no distortion */
-    overflow: hidden;
 }
 
 body {
@@ -47,67 +25,10 @@ body {
     min-height: 100vh;
 }
 
-nav a {
-    color: var(--secondary-color);
-    text-decoration: none;
-}
-
-nav a:hover {
-    color: #FAFBFA;
-    text-decoration: underline;
-}
-
-nav a.active,
-nav li.active a {
-    text-decoration: underline;
-    color: var(--secondary-color);
-}
-
-a {
-    color: black;
-}
-
-a:hover {
-    color: black;
-}
-
+/* Header */
 header {
     background: var(--primary-color);
     padding: 20px 30px;
-}
-
-div.page {
-    flex: 1;
-    background: var(--primary-color);
-    padding: 20px 30px;
-}
-
-h2 a {
-    text-decoration: none;
-}
-
-h2 a:hover {
-    color: black;
-}
-
-footer {
-    text-align: right;
-    padding: 10px;
-    margin-top: auto;
-    background: var(--primary-color);
-    padding: 20px 30px;
-    color: var(--secondary-color);
-}
-
-footer a {
-    color: #8C1515;
-    /* A specific maroon shade */
-    text-decoration: none;
-    font-weight: bold;
-}
-
-footer a:hover {
-    text-decoration: underline;
 }
 
 header h1 {
@@ -117,20 +38,214 @@ header h1 {
     font-size: 42px;
 }
 
-header nav ul {
-    list-style: none;
+/* Logo */
+.logo-rlim {
+    height: 3em;
+    width: 3em;
+    border-radius: 50%;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+/* Navbar */
+.navbar-brand {
+    color: var(--secondary-color) !important;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.navbar-brand:hover {
+    color: var(--secondary-color) !important;
+}
+
+.navbar-toggler {
+    border: none;
+    background: transparent;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    width: 1.5em;
+    height: 1.5em;
+}
+
+/* Bootstrap Offcanvas Customization */
+.offcanvas {
+    background: var(--primary-color) !important;
+    width: 350px !important;
+    border: none !important;
+}
+
+.offcanvas-header {
+    background: var(--primary-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+}
+
+.offcanvas-title {
+    color: var(--secondary-color) !important;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
     margin: 0;
+}
+
+.offcanvas .btn-close {
+    background: none !important;
+    border: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    padding: 0.5rem !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.offcanvas .btn-close::before {
+    content: "✕";
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    font-weight: 300;
+    display: block;
+}
+
+.offcanvas .btn-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px;
+}
+
+.offcanvas-body {
     padding: 0;
 }
 
-header nav ul li {
-    display: inline;
-    margin: 0 8px 0 0;
-    padding: 0;
+/* Navigation Links in Offcanvas */
+.offcanvas .navbar-nav {
+    width: 100%;
+    padding: 1rem 0;
 }
 
-div.page {
-    background: var(--secondary-color)
+.offcanvas .nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0;
+}
+
+.offcanvas .nav-item:last-child {
+    border-bottom: none;
+}
+
+.offcanvas .nav-link {
+    color: var(--secondary-color) !important;
+    font-weight: 500;
+    padding: 1.25rem 1.5rem !important;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    margin: 0;
+    display: block;
+    position: relative;
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+.offcanvas .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--secondary-color) !important;
+    padding-left: 2rem !important;
+    transform: translateX(5px);
+}
+
+.offcanvas .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    font-weight: 600;
+    border-left: 4px solid var(--secondary-color);
+    padding-left: calc(1.5rem - 4px) !important;
+}
+
+.offcanvas .nav-link.active:hover {
+    padding-left: calc(2rem - 4px) !important;
+}
+
+/* Add subtle animation to the border lines */
+.offcanvas .nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.offcanvas .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    transition: width 0.3s ease;
+}
+
+.offcanvas .nav-item:hover::after {
+    width: 100%;
+}
+
+/* Custom backdrop */
+.offcanvas-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Page content */
+.page {
+    flex: 1;
+    background: var(--secondary-color);
+    padding: 20px 30px;
+}
+
+/* Footer */
+footer {
+    text-align: right;
+    background: var(--primary-color);
+    padding: 20px 30px;
+    color: var(--secondary-color);
+}
+
+footer a {
+    color: #c13636;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Links */
+a {
+    color: black;
+}
+
+h2 a {
+    text-decoration: none;
+}
+
+/* Blog posts */
+.blog-post {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.blog-post:hover {
+    transform: translateY(-2px);
 }
 
 .blog-post h2 {
@@ -139,15 +254,15 @@ div.page {
 }
 
 .blog-post a {
+    color: var(--primary-color);
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .blog-post a:hover {
-    color: var(--primary-color)
+    color: var(--primary-color);
 }
 
-/* Responsive image sizing for blog posts */
 .blog-post img {
     max-width: 100%;
     height: auto;
@@ -155,44 +270,14 @@ div.page {
     margin: 0 auto;
 }
 
-.pagination-bottom {
-    margin-bottom: 10px;
-    text-align: center;
-    border-top: 1px solid #eee;
-}
-
-.pagination .active {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-.pagination a {
-    padding: 5px 10px;
-    text-decoration: none;
-}
-
-.pagination a:hover {
-    background-color: #e9ecef;
-    border-radius: 4px;
-}
-
-.meta {
-    text-align: right;
-    margin-top: 10px;
-    color: #666;
-    font-style: italic;
-}
-
+/* Tables */
 table {
     border-collapse: collapse;
     width: 100%;
     margin: 20px 0;
 }
 
-th,
-td {
+th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
@@ -211,19 +296,84 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
-.blog-post {
-    background: white;
-    border-radius: 8px;
-    padding: 2rem;
-    margin: 1.5rem 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
+/* Pagination */
+.pagination-bottom {
+    margin: 2rem 0 1rem 0;
+    text-align: center;
+    border-top: 1px solid var(--border-light);
+    padding-top: 1.5rem;
 }
 
-.blog-post:hover {
-    transform: translateY(-2px);
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: wrap;
 }
 
+.pagination li {
+    margin: 0;
+    padding: 0;
+}
+
+.pagination .active {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+}
+
+.pagination a {
+    padding: 8px 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination a:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.pagination .disabled {
+    padding: 8px 12px;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Pagination navigation arrows */
+.pagination .prev a:before {
+    content: "← ";
+}
+
+.pagination .next a:after {
+    content: " →";
+}
+
+/* Meta info */
+.meta {
+    text-align: right;
+    margin-top: 10px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Page layouts */
 .page-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -261,6 +411,50 @@ tr:hover {
     font-size: 1.8rem;
 }
 
-.blog-post a {
-    color: var(--primary-color)
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .navbar-search-main {
+        max-width: 180px;
+        min-width: 150px;
+    }
+
+    .navbar-search-main .search-input {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+
+    .navbar-search-main .search-btn {
+        padding: 6px 10px;
+    }
+
+    .nav-link {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .nav-link:hover {
+        padding-left: 1.25rem !important;
+    }
+
+    .nav-link.active:hover {
+        padding-left: calc(1.25rem - 3px) !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .navbar-search-main {
+        max-width: 300px;
+        min-width: 250px;
+    }
+
+    .nav-link {
+        padding: 1.25rem 1rem !important;
+    }
+
+    .nav-link:hover {
+        padding-left: 1.75rem !important;
+    }
+
+    .nav-link.active:hover {
+        padding-left: calc(1.75rem - 3px) !important;
+    }
 }

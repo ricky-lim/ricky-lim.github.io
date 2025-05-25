@@ -3,32 +3,82 @@
 {% block title %}Search{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{{ '/static/search.css'|url }}">
 <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ '/static/search.css'|url }}">
 {% endblock %}
 
 {% block body %}
-<div id="search"></div>
+<div class="search-page">
+  <div class="search-container">
+    <div id="search"></div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="/pagefind/pagefind-ui.js"></script>
 <script>
     window.addEventListener('DOMContentLoaded', (event) => {
-        new PagefindUI({
-            element: "#search",
-            showSubResults: true ,
-            processResult: (result) => {
-                if (result?.meta?.image) {
-                    const resultBase = new URL(result.url, window.location);
-                    const remappedImage = new URL(result.meta.image, resultBase);
+        console.log('Search page loaded');
 
-                    result.meta.image = remappedImage.hostname !== window.location.hostname
-                        ? remappedImage.toString()
-                        : remappedImage.pathname;
+        // Get search query from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('q');
+        console.log('Search query from URL:', searchQuery);
+
+        try {
+            const pagefindUI = new PagefindUI({
+                element: "#search",
+                showSubResults: true,
+                processResult: (result) => {
+                    if (result?.meta?.image) {
+                        const resultBase = new URL(result.url, window.location);
+                        const remappedImage = new URL(result.meta.image, resultBase);
+
+                        result.meta.image = remappedImage.hostname !== window.location.hostname
+                            ? remappedImage.toString()
+                            : remappedImage.pathname;
+                    }
+                    return result;
                 }
+            });
+
+            console.log('Pagefind UI initialized');
+
+            // If there's a search query from URL, set it in the search input
+            if (searchQuery) {
+                console.log('Setting search query:', searchQuery);
+
+                // Wait for Pagefind UI to be fully rendered
+                const waitForSearchInput = () => {
+                    const searchInput = document.querySelector('#search input[type="search"]') ||
+                                      document.querySelector('.pagefind-ui__search-input');
+
+                    if (searchInput) {
+                        console.log('Found search input, setting value');
+                        searchInput.value = searchQuery;
+
+                        // Trigger search
+                        const inputEvent = new Event('input', { bubbles: true });
+                        searchInput.dispatchEvent(inputEvent);
+
+                        // Focus the input
+                        searchInput.focus();
+
+                        console.log('Search triggered with query:', searchQuery);
+                    } else {
+                        console.log('Search input not ready, retrying...');
+                        setTimeout(waitForSearchInput, 200);
+                    }
+                };
+
+                // Start checking for search input after a short delay
+                setTimeout(waitForSearchInput, 300);
             }
-        });
+
+        } catch (error) {
+            console.error('Error initializing Pagefind:', error);
+        }
     });
 </script>
 {% endblock %}
