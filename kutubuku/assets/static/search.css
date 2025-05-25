@@ -72,9 +72,8 @@
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
     color: var(--secondary-color, #F5F7F5) !important;
     font-size: 1rem;
-    padding: 12px 16px !important;
+    padding: 12px 50px 12px 40px !important;
     border-radius: 8px 0 0 8px !important;
-    padding-right: 50px !important;
 }
 
 .search-input::placeholder {
@@ -86,7 +85,7 @@
     border-color: rgba(255, 255, 255, 0.5) !important;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
     color: var(--secondary-color, #F5F7F5) !important;
-    padding-right: 50px !important;
+    padding: 12px 50px 12px 40px !important;
 }
 
 .search-btn {
@@ -119,27 +118,29 @@
 }
 
 .search-container {
-    background: white;
+    background: transparent !important;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: none !important;
 }
 
 .search-container .pagefind-ui__results {
     margin-top: 1rem !important;
-    background-color: transparent !important;
 }
 
 .search-container .pagefind-ui__result {
-    border: 1px solid #e0e0e0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 8px !important;
     padding: 1.5rem !important;
     margin-bottom: 1rem !important;
-    transition: box-shadow 0.2s ease !important;
-    background: white !important;
-}
+    transition: all 0.2s ease !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;}
 
 .search-container .pagefind-ui__result:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 .search-container .pagefind-ui__result-link {
@@ -151,18 +152,45 @@
 
 .search-container .pagefind-ui__result-link:hover {
     text-decoration: underline !important;
+    color: var(--accent-color, #6b8c70) !important;
 }
 
 .search-container .pagefind-ui__result-excerpt {
-    color: var(--text-secondary, #666) !important;
+    color: var(--text-primary, #333) !important;
     line-height: 1.5 !important;
     margin-top: 0.5rem !important;
+}
+
+/* Search input styling for search page */
+.search-container .pagefind-ui__search-input {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 2px solid var(--primary-color) !important;
+    color: var(--text-primary, #333) !important;
+    font-size: 1.2em !important;
+    padding: 16px 20px 16px 48px !important;
+    border-radius: 8px !important;
+    margin-bottom: 1.5rem !important;
+    width: 100% !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.search-container .pagefind-ui__search-input::placeholder {
+    color: rgba(51, 51, 51, 0.6) !important;
+}
+
+.search-container .pagefind-ui__search-input:focus {
+    border-color: var(--primary-color, #7da382) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(125, 163, 130, 0.1) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    padding: 16px 20px 16px 48px !important;
 }
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
     .navbar-search-main {
-        display: none; /* Hide main search on mobile */
+        display: none;
     }
 
     .navbar-search {
@@ -170,13 +198,12 @@
     }
 
     .search-input {
-        font-size: 16px !important; /* Prevents iOS zoom */
-        padding: 10px 14px !important;
-        padding-right: 45px !important;
+        font-size: 16px !important;
+        padding: 10px 45px 10px 32px !important;
     }
 
     .search-input:focus {
-        padding-right: 45px !important;
+        padding: 10px 45px 10px 32px !important;
     }
 
     .search-btn {
@@ -190,14 +217,27 @@
     }
 
     .search-container .pagefind-ui__search-input {
-        font-size: 16px !important; /* Prevents iOS zoom */
-        padding: 12px 16px !important;
+        font-size: 16px !important;
+        padding: 12px 16px 12px 36px !important;
+    }
+
+    .search-container .pagefind-ui__search-input:focus {
+        padding: 12px 16px 12px 36px !important;
+    }
+
+    .search-container .pagefind-ui__result {
+        padding: 1rem !important;
     }
 }
 
 /* Desktop optimizations */
 @media (min-width: 992px) {
     .navbar-search {
-        display: none; /* Hide collapsible search on desktop */
+        border-bottom: none;
+        margin-bottom: 0;
+        padding: 0;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: 1rem;
     }
 }
