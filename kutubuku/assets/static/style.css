@@ -11,33 +11,11 @@
 
 * {
     box-sizing: border-box;
+    font-family: 'Fira Code', monospace !important;
 }
 
-/* Base styles (mobile first) */
 html {
-    font-family: 'Fira Code', monospace;
-    font-size: 21px;
-}
-
-.logo-rlim {
-    height: 1em;
-    width: 1em;
-    border-radius: 50%; /* Standard border radius */
-    object-fit: cover;
-    vertical-align: middle;
-    margin-left: 5px;
-
-    /* Safari-specific properties */
-    -webkit-border-radius: 50%;
-    -webkit-clip-path: circle(50%);
-    clip-path: circle(50%);
-
-     /* Additional Safari/iOS fixes */
-     -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
-     mask-image: radial-gradient(circle, white 100%, black 100%);
-
-    /* Ensure no distortion */
-    overflow: hidden;
+    font-size: 24px; /* Increased base font size for mobile */
 }
 
 body {
@@ -47,61 +25,201 @@ body {
     min-height: 100vh;
 }
 
-nav a {
-    color: var(--secondary-color);
-    text-decoration: none;
-}
-
-nav a:hover {
-    color: #FAFBFA;
-    text-decoration: underline;
-}
-
-nav a.active,
-nav li.active a {
-    text-decoration: underline;
-    color: var(--secondary-color);
-}
-
-a {
-    color: black;
-}
-
-a:hover {
-    color: black;
-}
-
+/* Header */
 header {
     background: var(--primary-color);
     padding: 20px 30px;
 }
 
-div.page {
-    flex: 1;
-    background: var(--primary-color);
-    padding: 20px 30px;
+header h1 {
+    color: var(--secondary-color);
+    margin: 0;
+    font-weight: normal;
+    font-size: 2rem; /* Increased for mobile */
 }
 
-h2 a {
+/* Logo */
+.logo-rlim {
+    height: 2.5m;
+    width: 2.5em;
+    border-radius: 50%;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+/* Navbar */
+.navbar-brand {
+    color: var(--secondary-color) !important;
+    font-size: 1.8rem !important; /* Increased for mobile */
+    font-weight: 600;
     text-decoration: none;
 }
 
-h2 a:hover {
-    color: black;
+.navbar-brand:hover {
+    color: var(--secondary-color) !important;
 }
 
+.navbar-toggler {
+    border: none;
+    background: transparent;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    width: 1.8em; /* Increased for mobile */
+    height: 1.8em; /* Increased for mobile */
+}
+
+/* Bootstrap Offcanvas Customization */
+.offcanvas {
+    background: var(--primary-color) !important;
+    width: 350px !important;
+    border: none !important;
+}
+
+.offcanvas-header {
+    background: var(--primary-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+}
+
+.offcanvas-title {
+    color: var(--secondary-color) !important;
+    font-size: 1.8rem !important; /* Increased for mobile */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.offcanvas .btn-close {
+    background: none !important;
+    border: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    padding: 0.5rem !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.offcanvas .btn-close::before {
+    content: "✕";
+    color: var(--secondary-color);
+    font-size: 1.8rem; /* Increased for mobile */
+    font-weight: 300;
+    display: block;
+}
+
+.offcanvas .btn-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px;
+}
+
+.offcanvas-body {
+    padding: 0;
+}
+
+/* Navigation Links in Offcanvas */
+.offcanvas .navbar-nav {
+    width: 100%;
+    padding: 1rem 0;
+}
+
+.offcanvas .nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0;
+}
+
+.offcanvas .nav-item:last-child {
+    border-bottom: none;
+}
+
+.offcanvas .nav-link {
+    color: var(--secondary-color) !important;
+    font-weight: 500;
+    padding: 1.5rem 1.5rem !important; /* Increased padding for mobile */
+    border-radius: 0;
+    transition: all 0.3s ease;
+    margin: 0;
+    display: block;
+    position: relative;
+    font-size: 1.3rem !important; /* Increased for mobile */
+    text-decoration: none;
+}
+
+.offcanvas .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--secondary-color) !important;
+    padding-left: 2rem !important;
+    transform: translateX(5px);
+}
+
+.offcanvas .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    font-weight: 600;
+    border-left: 4px solid var(--secondary-color);
+    padding-left: calc(1.5rem - 4px) !important;
+}
+
+.offcanvas .nav-link.active:hover {
+    padding-left: calc(2rem - 4px) !important;
+}
+
+/* Add subtle animation to the border lines */
+.offcanvas .nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.offcanvas .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    transition: width 0.3s ease;
+}
+
+.offcanvas .nav-item:hover::after {
+    width: 100%;
+}
+
+/* Custom backdrop */
+.offcanvas-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Page content */
+.page {
+    flex: 1;
+    background: var(--secondary-color);
+    padding: 20px 30px;
+    font-size: 1.1rem; /* Increased for mobile */
+    line-height: 1.6; /* Better readability */
+}
+
+/* Footer */
 footer {
     text-align: right;
-    padding: 10px;
-    margin-top: auto;
     background: var(--primary-color);
     padding: 20px 30px;
     color: var(--secondary-color);
+    font-size: 1rem; /* Increased for mobile */
 }
 
 footer a {
-    color: #8C1515;
-    /* A specific maroon shade */
+    color: #c13636;
     text-decoration: none;
     font-weight: bold;
 }
@@ -110,44 +228,45 @@ footer a:hover {
     text-decoration: underline;
 }
 
-header h1 {
-    color: var(--secondary-color);
-    margin: 0;
-    font-weight: normal;
-    font-size: 42px;
+/* Links */
+a {
+    color: black;
 }
 
-header nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+h2 a {
+    text-decoration: none;
 }
 
-header nav ul li {
-    display: inline;
-    margin: 0 8px 0 0;
-    padding: 0;
+/* Blog posts */
+.blog-post {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
 }
 
-div.page {
-    background: var(--secondary-color)
+.blog-post:hover {
+    transform: translateY(-2px);
 }
 
 .blog-post h2 {
-    font-size: 1.5em;
+    font-size: 1.8em; /* Increased for mobile */
     font-weight: bold;
+    line-height: 1.3;
 }
 
 .blog-post a {
+    color: var(--primary-color);
     text-decoration: none;
     transition: color 0.2s ease;
 }
 
 .blog-post a:hover {
-    color: var(--primary-color)
+    color: var(--primary-color);
 }
 
-/* Responsive image sizing for blog posts */
 .blog-post img {
     max-width: 100%;
     height: auto;
@@ -155,46 +274,23 @@ div.page {
     margin: 0 auto;
 }
 
-.pagination-bottom {
-    margin-bottom: 10px;
-    text-align: center;
-    border-top: 1px solid #eee;
+.blog-post p {
+    font-size: 1.1rem; /* Increased for mobile */
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
 }
 
-.pagination .active {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-.pagination a {
-    padding: 5px 10px;
-    text-decoration: none;
-}
-
-.pagination a:hover {
-    background-color: #e9ecef;
-    border-radius: 4px;
-}
-
-.meta {
-    text-align: right;
-    margin-top: 10px;
-    color: #666;
-    font-style: italic;
-}
-
+/* Tables */
 table {
     border-collapse: collapse;
     width: 100%;
     margin: 20px 0;
+    font-size: 1rem; /* Increased for mobile */
 }
 
-th,
-td {
+th, td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 12px 8px; /* Increased padding for mobile */
     text-align: left;
 }
 
@@ -211,19 +307,68 @@ tr:hover {
     background-color: #f5f5f5;
 }
 
-.blog-post {
-    background: white;
-    border-radius: 8px;
-    padding: 2rem;
-    margin: 1.5rem 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
+/* Pagination */
+.pagination-bottom {
+    margin: 2rem 0 1rem 0;
+    text-align: center;
+    border-top: 1px solid var(--border-light);
+    padding-top: 1.5rem;
 }
 
-.blog-post:hover {
-    transform: translateY(-2px);
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: wrap;
 }
 
+.pagination li {
+    margin: 0;
+    padding: 0;
+}
+
+.pagination .active {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 16px; /* Increased for mobile */
+    border-radius: 6px;
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    font-size: 1.1rem; /* Increased for mobile */
+}
+
+.pagination a {
+    padding: 12px 16px; /* Increased for mobile */
+    text-decoration: none;
+    color: var(--text-primary);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 48px; /* Increased for mobile */
+    text-align: center;
+    font-size: 1.1rem; /* Increased for mobile */
+}
+
+.pagination a:hover {
+    background-color: #e9ecef;
+    border-color: var(--primary-color);
+}
+
+/* Meta info */
+.meta {
+    text-align: right;
+    margin-top: 10px;
+    color: #666;
+    font-style: italic;
+    font-size: 1rem; /* Increased for mobile */
+}
+
+/* Page layouts */
 .page-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -238,8 +383,9 @@ tr:hover {
 
 .page-header h1 {
     color: var(--primary-color);
-    font-size: 2.5rem;
+    font-size: 2.8rem; /* Increased for mobile */
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .page-content {
@@ -249,18 +395,98 @@ tr:hover {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     line-height: 1.8;
     width: 100%;
+    font-size: 1.1rem; /* Increased for mobile */
 }
 
 .page-content p {
     margin-bottom: 1.5rem;
+    font-size: 1.1rem; /* Increased for mobile */
 }
 
 .page-content h2 {
     color: var(--text-primary);
     margin: 2rem 0 1rem;
-    font-size: 1.8rem;
+    font-size: 2.2rem; /* Increased for mobile */
+    line-height: 1.3;
 }
 
-.blog-post a {
-    color: var(--primary-color)
+.page-content h3 {
+    font-size: 1.8rem; /* Increased for mobile */
+    line-height: 1.3;
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+    html {
+        font-size: 21px; /* Original size for desktop */
+    }
+
+    header h1 {
+        font-size: 42px; /* Original size for desktop */
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem !important; /* Original size for desktop */
+    }
+
+    .navbar-toggler-icon {
+        width: 1.5em; /* Original size for desktop */
+        height: 1.5em; /* Original size for desktop */
+    }
+
+    .offcanvas-title {
+        font-size: 1.5rem !important; /* Original size for desktop */
+    }
+
+    .offcanvas .btn-close::before {
+        font-size: 1.5rem; /* Original size for desktop */
+    }
+
+    .offcanvas .nav-link {
+        font-size: 1.1rem !important; /* Original size for desktop */
+        padding: 1.25rem 1.5rem !important; /* Original padding for desktop */
+    }
+
+    .page {
+        font-size: 1rem; /* Original size for desktop */
+    }
+
+    .blog-post h2 {
+        font-size: 1.5em; /* Original size for desktop */
+    }
+
+    .blog-post p {
+        font-size: 1rem; /* Original size for desktop */
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem; /* Original size for desktop */
+    }
+
+    .page-content {
+        font-size: 1rem; /* Original size for desktop */
+    }
+
+    .page-content h2 {
+        font-size: 1.8rem; /* Original size for desktop */
+    }
+
+    .page-content h3 {
+        font-size: 1.4rem; /* Original size for desktop */
+    }
+
+    .pagination .active,
+    .pagination a {
+        padding: 8px 12px; /* Original padding for desktop */
+        font-size: 1rem; /* Original size for desktop */
+        min-width: 40px; /* Original size for desktop */
+    }
+
+    table {
+        font-size: 0.9rem; /* Original size for desktop */
+    }
+
+    th, td {
+        padding: 8px; /* Original padding for desktop */
+    }
 }
