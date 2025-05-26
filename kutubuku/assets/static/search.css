@@ -135,7 +135,9 @@
     transition: all 0.2s ease !important;
     background: rgba(255, 255, 255, 0.1) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    backdrop-filter: blur(10px) !important;}
+    backdrop-filter: blur(10px) !important;
+    position: relative !important;
+}
 
 .search-container .pagefind-ui__result:hover {
     background: rgba(255, 255, 255, 0.15) !important;
@@ -185,6 +187,17 @@
     box-shadow: 0 0 0 3px rgba(125, 163, 130, 0.1) !important;
     background: rgba(255, 255, 255, 0.15) !important;
     padding: 16px 20px 16px 48px !important;
+}
+
+/* Add dividing line between results */
+.search-container .pagefind-ui__result:not(:last-child)::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -0.5rem !important;
+    left: 10% !important;
+    right: 10% !important;
+    height: 1px !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Mobile optimizations */
