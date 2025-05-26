@@ -38,7 +38,7 @@ table,
 .pagination a,
 footer,
 .page {
-    font-size: 1rem;  /* Use consistent size */
+    font-size: 1rem;
 }
 
 /* Increase headings for mobile */
@@ -49,11 +49,11 @@ header h1 {
 
 .page-content h2,
 .blog-post h2 {
-    font-size: 1rem;
+    font-size: 1.25rem;
 }
 
 .page-content h3 {
-    font-size: 1.25rem;
+    font-size: 1rem;
 }
 
 /* Header */
@@ -66,7 +66,7 @@ header h1 {
     color: var(--secondary-color);
     margin: 0;
     font-weight: normal;
-    font-size: 2rem; /* Increased for mobile */
+    font-size: 2rem;
 }
 
 /* Logo */
@@ -296,14 +296,32 @@ h2 a {
     margin: 1.5rem 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .blog-post:hover {
     transform: translateY(-2px);
 }
 
+/* Blog post headings */
+.blog-post h1 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    line-height: 1.3;
+    margin: 2rem 0 1.5rem;
+}
+
 .blog-post h2 {
-    font-size: 1.8em;
+    font-size: 1.8rem;
+    font-weight: bold;
+    line-height: 1.3;
+}
+
+.blog-post h3 {
+    font-size: 1.4rem;
     font-weight: bold;
     line-height: 1.3;
 }
@@ -318,11 +336,34 @@ h2 a {
     color: var(--primary-color);
 }
 
-.blog-post img {
+.blog-post img,
+.blog-post video,
+.blog-post iframe {
     max-width: 100%;
     height: auto;
-    display: block;
-    margin: 0 auto;
+}
+
+.blog-post pre {
+    overflow-x: auto;
+    white-space: pre;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+
+    /* Webkit scrollbar styles for Chrome, Safari, Edge */
+    &::-webkit-scrollbar {
+        height: 8px;
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-color);
+    }
 }
 
 .blog-post p {
@@ -339,26 +380,36 @@ table {
     font-size: 0.95rem;
     display: block;
     overflow-x: auto;
-    --webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
-th, td {
+/* Table container to prevent stretching */
+.page-content table,
+.blog-post table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    display: block;
+    overflow-x: auto;
+}
+
+/* Reset display for table elements */
+table tbody,
+table thead,
+table tr,
+table td,
+table th {
+    display: revert;
+    width: auto;
+}
+
+th,
+td {
     border: 1px solid #ddd;
-    padding: 0.5em;
+    padding: 0.8em;
     text-align: left;
-}
-
-th {
-    background-color: #f5f5f5;
-    font-weight: bold;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f5f5f5;
+    min-width: 100px;
 }
 
 /* Pagination */
@@ -422,6 +473,8 @@ tr:hover {
     margin-bottom: 2rem;
     border-bottom: 3px solid var(--primary-color);
     padding-bottom: 1rem;
+    text-align: center;
+    /* Center align the header */
 }
 
 .page-header h1 {
@@ -429,6 +482,9 @@ tr:hover {
     font-size: 2rem;
     font-weight: 700;
     line-height: 1.2;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Heading spacing */
@@ -444,14 +500,14 @@ header h1:first-child {
 }
 
 /* Ensure proper spacing between consecutive h1s */
-h1 + h1 {
+h1+h1 {
     margin-top: 3rem;
 }
 
 /* Adjust spacing after h1 when followed by other elements */
-h1 + p,
-h1 + div,
-h1 + section {
+h1+p,
+h1+div,
+h1+section {
     margin-top: 1.5rem;
 }
 
@@ -470,73 +526,109 @@ h1 + section {
     font-size: 1rem;
 }
 
-.page-content h2 {
+.page-content h1 {
     color: var(--text-primary);
     margin: 2rem 0 1rem;
+    font-size: 2.0rem;
+    line-height: 1.3;
+}
+
+.page-content h2 {
     font-size: 1.8rem;
+    margin: 1.8rem 0 1rem;
     line-height: 1.3;
 }
 
 .page-content h3 {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+    margin: 1.5rem 0 1rem;
     line-height: 1.3;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
 }
 
 /* Desktop adjustments */
 @media (min-width: 768px) {
     .offcanvas-title {
-        font-size: 1.5rem !important; /* Original size for desktop */
+        font-size: 1.5rem !important;
     }
 
     .offcanvas .btn-close::before {
-        font-size: 1.5rem; /* Original size for desktop */
+        font-size: 1.5rem;
     }
 
     .offcanvas .nav-link {
-        font-size: 1.1rem !important; /* Original size for desktop */
-        padding: 1.25rem 1.5rem !important; /* Original padding for desktop */
+        font-size: 1.1rem !important;
+        padding: 1.25rem 1.5rem !important;
     }
 
     .page {
-        font-size: 1rem; /* Original size for desktop */
+        font-size: 1rem;
+    }
+
+    .blog-post h1 {
+        font-size: 2.5rem;
     }
 
     .blog-post h2 {
-        font-size: 1.5em; /* Original size for desktop */
+        font-size: 2rem;
+    }
+
+    .blog-post h3 {
+        font-size: 1.6rem;
     }
 
     .blog-post p {
-        font-size: 1rem; /* Original size for desktop */
+        font-size: 1rem;
     }
 
     .page-header h1 {
-        font-size: 2.5rem; /* Original size for desktop */
+        font-size: 2.5rem;
     }
 
     .page-content {
-        font-size: 1rem; /* Original size for desktop */
+        font-size: 1rem;
+    }
+
+    .page-content h1 {
+        font-size: 2.5rem;
     }
 
     .page-content h2 {
-        font-size: 1.8rem; /* Original size for desktop */
+        font-size: 2rem;
     }
 
     .page-content h3 {
-        font-size: 1.4rem; /* Original size for desktop */
+        font-size: 1.6rem;
     }
 
     .pagination .active,
     .pagination a {
-        padding: 8px 12px; /* Original padding for desktop */
-        font-size: 1rem; /* Original size for desktop */
-        min-width: 40px; /* Original size for desktop */
+        padding: 8px 12px;
+        font-size: 1rem;
+        min-width: 40px;
     }
 
     table {
-        font-size: 0.9rem; /* Original size for desktop */
+        font-size: 0.9rem;
     }
 
-    th, td {
-        padding: 8px; /* Original padding for desktop */
+    th,
+    td {
+        padding: 8px;
     }
 }
