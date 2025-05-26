@@ -1,6 +1,14 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
+## NEXT
+
+### Changed
+- Improved mobile font sizing and readability
+- Enhanced table responsiveness with horizontal scrolling
+- Updated Lektor link styling in footer with brand colors (#5390aa)
+- Added dividing lines between search results for better visual separation
+
 ## [0.4.0] - 2025-05-25
 
 ### Added

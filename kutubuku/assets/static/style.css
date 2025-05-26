@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
 
+/* Base font settings */
 :root {
     --primary-color: #7da382;
     --secondary-color: #F5F7F5;
@@ -7,6 +8,7 @@
     --text-primary: #333;
     --text-secondary: #666;
     --border-light: #eee;
+    --base-font-size: 18px;
 }
 
 * {
@@ -14,8 +16,9 @@
     font-family: 'Fira Code', monospace !important;
 }
 
+/* Mobile-first font sizing */
 html {
-    font-size: 24px; /* Increased base font size for mobile */
+    font-size: var(--base-font-size);
 }
 
 body {
@@ -23,6 +26,34 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Content sizing for all devices */
+.page-content p,
+.blog-post p,
+.meta,
+table,
+.pagination a,
+footer,
+.page {
+    font-size: 1rem;  /* Use consistent size */
+}
+
+/* Increase headings for mobile */
+.page-header h1,
+header h1 {
+    font-size: 2rem;
+}
+
+.page-content h2,
+.blog-post h2 {
+    font-size: 1rem;
+}
+
+.page-content h3 {
+    font-size: 1.25rem;
 }
 
 /* Header */
@@ -50,7 +81,7 @@ header h1 {
 /* Navbar */
 .navbar-brand {
     color: var(--secondary-color) !important;
-    font-size: 1.8rem !important; /* Increased for mobile */
+    font-size: 2rem !important;
     font-weight: 600;
     text-decoration: none;
 }
@@ -74,8 +105,27 @@ header h1 {
 
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-    width: 1.8em; /* Increased for mobile */
-    height: 1.8em; /* Increased for mobile */
+    width: 1.8em;
+    height: 1.8em;
+}
+
+/* Navbar search responsive styles */
+.navbar-search-main {
+    display: flex !important;
+    flex: 1;
+    margin: 0 1rem;
+    max-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .navbar-search-main {
+        max-width: 200px;
+        margin: 0 0.5rem;
+    }
+
+    .search-input {
+        font-size: 0.875rem;
+    }
 }
 
 /* Bootstrap Offcanvas Customization */
@@ -93,7 +143,7 @@ header h1 {
 
 .offcanvas-title {
     color: var(--secondary-color) !important;
-    font-size: 1.8rem !important; /* Increased for mobile */
+    font-size: 2rem !important;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -114,7 +164,7 @@ header h1 {
 .offcanvas .btn-close::before {
     content: "✕";
     color: var(--secondary-color);
-    font-size: 1.8rem; /* Increased for mobile */
+    font-size: 1.8rem;
     font-weight: 300;
     display: block;
 }
@@ -146,13 +196,13 @@ header h1 {
 .offcanvas .nav-link {
     color: var(--secondary-color) !important;
     font-weight: 500;
-    padding: 1.5rem 1.5rem !important; /* Increased padding for mobile */
+    padding: 1.5rem 1.5rem !important;
     border-radius: 0;
     transition: all 0.3s ease;
     margin: 0;
     display: block;
     position: relative;
-    font-size: 1.3rem !important; /* Increased for mobile */
+    font-size: 1.6rem !important;
     text-decoration: none;
 }
 
@@ -205,8 +255,8 @@ header h1 {
     flex: 1;
     background: var(--secondary-color);
     padding: 20px 30px;
-    font-size: 1.1rem; /* Increased for mobile */
-    line-height: 1.6; /* Better readability */
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 /* Footer */
@@ -215,16 +265,17 @@ footer {
     background: var(--primary-color);
     padding: 20px 30px;
     color: var(--secondary-color);
-    font-size: 1rem; /* Increased for mobile */
+    font-size: 1rem;
 }
 
-footer a {
-    color: #c13636;
+footer a.lektor-link {
+    color: #77304c;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 600;
+    transition: color 0.2s ease;
 }
 
-footer a:hover {
+footer a.lektor-link:hover {
     text-decoration: underline;
 }
 
@@ -252,7 +303,7 @@ h2 a {
 }
 
 .blog-post h2 {
-    font-size: 1.8em; /* Increased for mobile */
+    font-size: 1.8em;
     font-weight: bold;
     line-height: 1.3;
 }
@@ -275,7 +326,7 @@ h2 a {
 }
 
 .blog-post p {
-    font-size: 1.1rem; /* Increased for mobile */
+    font-size: 1rem;
     line-height: 1.6;
     margin-bottom: 1.2rem;
 }
@@ -285,12 +336,15 @@ table {
     border-collapse: collapse;
     width: 100%;
     margin: 20px 0;
-    font-size: 1rem; /* Increased for mobile */
+    font-size: 0.95rem;
+    display: block;
+    overflow-x: auto;
+    --webkit-overflow-scrolling: touch;
 }
 
 th, td {
     border: 1px solid #ddd;
-    padding: 12px 8px; /* Increased padding for mobile */
+    padding: 0.5em;
     text-align: left;
 }
 
@@ -334,24 +388,24 @@ tr:hover {
 .pagination .active {
     background-color: var(--primary-color);
     color: white;
-    padding: 12px 16px; /* Increased for mobile */
+    padding: 12px 16px;
     border-radius: 6px;
     font-weight: 600;
     border: 2px solid var(--primary-color);
-    font-size: 1.1rem; /* Increased for mobile */
+    font-size: 1rem;
 }
 
 .pagination a {
-    padding: 12px 16px; /* Increased for mobile */
+    padding: 12px 16px;
     text-decoration: none;
     color: var(--text-primary);
     border-radius: 6px;
     border: 2px solid transparent;
     transition: all 0.2s ease;
     display: inline-block;
-    min-width: 48px; /* Increased for mobile */
+    min-width: 48px;
     text-align: center;
-    font-size: 1.1rem; /* Increased for mobile */
+    font-size: 1rem;
 }
 
 .pagination a:hover {
@@ -362,17 +416,6 @@ tr:hover {
 /* Meta info */
 .meta {
     text-align: right;
-    margin-top: 10px;
-    color: #666;
-    font-style: italic;
-    font-size: 1rem; /* Increased for mobile */
-}
-
-/* Page layouts */
-.page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
 }
 
 .page-header {
@@ -383,9 +426,33 @@ tr:hover {
 
 .page-header h1 {
     color: var(--primary-color);
-    font-size: 2.8rem; /* Increased for mobile */
+    font-size: 2rem;
     font-weight: 700;
     line-height: 1.2;
+}
+
+/* Heading spacing */
+h1 {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* First h1 in a section shouldn't have top margin */
+.page-header h1:first-child,
+header h1:first-child {
+    margin-top: 0;
+}
+
+/* Ensure proper spacing between consecutive h1s */
+h1 + h1 {
+    margin-top: 3rem;
+}
+
+/* Adjust spacing after h1 when followed by other elements */
+h1 + p,
+h1 + div,
+h1 + section {
+    margin-top: 1.5rem;
 }
 
 .page-content {
@@ -395,45 +462,28 @@ tr:hover {
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     line-height: 1.8;
     width: 100%;
-    font-size: 1.1rem; /* Increased for mobile */
+    font-size: 1rem;
 }
 
 .page-content p {
     margin-bottom: 1.5rem;
-    font-size: 1.1rem; /* Increased for mobile */
+    font-size: 1rem;
 }
 
 .page-content h2 {
     color: var(--text-primary);
     margin: 2rem 0 1rem;
-    font-size: 2.2rem; /* Increased for mobile */
+    font-size: 1.8rem;
     line-height: 1.3;
 }
 
 .page-content h3 {
-    font-size: 1.8rem; /* Increased for mobile */
+    font-size: 1.6rem;
     line-height: 1.3;
 }
 
 /* Desktop adjustments */
 @media (min-width: 768px) {
-    html {
-        font-size: 21px; /* Original size for desktop */
-    }
-
-    header h1 {
-        font-size: 42px; /* Original size for desktop */
-    }
-
-    .navbar-brand {
-        font-size: 1.5rem !important; /* Original size for desktop */
-    }
-
-    .navbar-toggler-icon {
-        width: 1.5em; /* Original size for desktop */
-        height: 1.5em; /* Original size for desktop */
-    }
-
     .offcanvas-title {
         font-size: 1.5rem !important; /* Original size for desktop */
     }
