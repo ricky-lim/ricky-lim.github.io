@@ -1,6 +1,15 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
+## NEXT
+
+### Changed
+
+- Improve style for heading
+- Enhanced scrollbar visibility and styling for better horizontal scrolling
+- Added custom scrollbar styling with themed colors
+- Improved scrollbar support for Firefox and Webkit browsers
+
 ## [0.5.0] - 2025-05-26
 
 ### Changed

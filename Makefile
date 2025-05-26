@@ -78,7 +78,7 @@ index: ## Index pages with pagefind
 .PHONY: serve
 serve: ## Serve development server
 	@echo "Serving development server..."
-	@python -m http.server --directory $(PUBLIC_DIR)
+	@python -m http.server --directory $(PUBLIC_DIR) --bind 0.0.0.0
 
 .PHONY: watch
 watch: ## Watch for changes and rebuild
