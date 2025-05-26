@@ -1,7 +1,7 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
-## NEXT
+## [0.5.0] - 2025-05-26
 
 ### Changed
 - Improved mobile font sizing and readability
