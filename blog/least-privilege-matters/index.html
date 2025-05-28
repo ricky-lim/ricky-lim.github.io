@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Least Privilege Matters — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Least Privilege Matters</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-05-27
+  </p>
+  <p>Ever wondered why some installations require sudo while others don't? Or why Docker containers might create files owned by root?
+This guide explains the principle of least privilege and shows practical examples for safer practices not only when using tools but also during development.</p>
+<h3>sudo vs su: What's the Difference?</h3>
+<p>In our daily work, we often depend on external tools, which frequently require the use of <code>sudo</code> or <code>su</code> to install.
+Both are commonly used to elevate privileges — but they operate differently with distinct security implications:</p>
+<p><code>sudo</code> lets a user to run specific commands with elevated (root) privileges. It’s temporary — typically only for about 5 minutes — and is ideal for one-off commands like <code>sudo apt update</code>.
+Watch out with <code>su</code>, because it switches your session to another user (usually root), giving you a full shell with root privileges that persist until you manually kill it. There’s no timeout.</p>
+<p>For most installation tasks, <code>sudo</code> is your safer choice. It limits the duration and scope of elevated access, reducing your risk of accidental or unauthorized system changes.</p>
+<p>However, before installing external tools with <code>sudo</code>, <strong>pause</strong> and ask yourself:</p>
+<p><strong>Is it really necessary? Could this be done with user-level permissions instead of root access?</strong></p>
+<p>Often, there are safer alternatives:</p>
+<ul>
+<li>For Python, use a virtual environment <code>python -m venv .venv</code> instead of installing packages system-wide.</li>
+<li>For Node.js, use <code>nvm</code> (Node Version Manager) to manage versions and install without sudo.</li>
+<li>For Java, use <code>sdkman</code> to install and switch between versions in user space.</li>
+</ul>
+<h3>Why Least Privilege for Tool Installation ?</h3>
+<p><strong>The principal of least privilege</strong> means granting only the minimum permissions necessary to perform a task - and no more.</p>
+<p>Imagine you're staying at a hotel. Every guest is given a key that opens only their own room - not every room in the hotel.
+Then, the cleaning staffs may have different keys that can open a limited set of guest rooms.
+Only the hotel owner has a master key that can open every door.</p>
+<p>If our guest loses their key, then a potential thief can <strong>only</strong> enter a room and <strong>not</strong> the whole hotel.
+But if everyone was given the master key, losing just one would set the entire hotel at risk.</p>
+<p>In the same way, <strong>the principle of least privilege</strong> should inspire our interactions with tools by limiting access to what the tools need.
+This reduces potential damage if something goes wrong.
+In case our system is compromised, the attacker can not easily gain full control without further exploitation.</p>
+<p>Therefore, wehenever possible, tools should be installed and run with the least permissions required.</p>
+<h3>Privilege Levels Visualized</h3>
+<p>To better understand this concept, it's helpful to visualize the different privilege levels typically used in a Unix-like environment:</p>
+<pre><code class="lang-shell">🔑 Regular User
+└── Limited access to user&#39;s files
+
+🔐 sudo User
+└── Temporary elevated access
+
+👑 Root User (su)
+└── Complete system access
+</code></pre>
+<h3>Docker: Why User Privilege Matter ?</h3>
+<p>Docker is one of the widely adopted tool among researchers and developers, especially in data science.
+However, it's essential to understand that Docker has unique security implications.
+Mainly because the Docker daemon runs as root by default.</p>
+<p>When you run a docker container, it interacts directly with the docker daemon.
+As a result, the container can execute commands with root-level priveleges on the host - <strong>even without typing <code>sudo</code> or <code>su</code></strong>.</p>
+<p>This behavior can have serious security implications, especially if your workloads are later deployed on a bare Linux environment.
+In such cases, actions carried as root inside containers can potentially harm your linux host.</p>
+<p>For example, on a Linux system running the native Docker Engine (not Docker Desktop), you can easily create root-owned files on your host from inside a container:</p>
+<pre><code class="lang-Dockerfile"># Dockerfile
+FROM ubuntu:22.04
+</code></pre>
+<p>Build the Image:</p>
+<pre><code class="lang-bash">$ docker build -t ubuntu:root .
+</code></pre>
+<p>Then run a container that creates a file in your current directory:</p>
+<pre><code class="lang-bash">$ docker run --rm -v &quot;$(pwd):/app&quot; ubuntu:root touch /app/root.txt
+$ ls -lh root.txt
+</code></pre>
+<p>Output:</p>
+<pre><code class="lang-bash">-rw-r--r-- 1 root root 0 May 27 19:00 root.txt
+</code></pre>
+<p>Here, root.txt is owned by root on your host, which can cause permission issues and represents a security risk 😱 .</p>
+<h4>How to make it safer.</h4>
+<p>To avoid these problems, you can explicitly create and use a non-root user inside your Docker container. Here’s an improved Dockerfile:</p>
+<pre><code class="lang-Dockerfile">FROM ubuntu:22.04
+
+ARG username=appuser
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g ${GID} ${USERNAME} \
+    &amp;&amp; useradd -m -u ${UID} -g ${GID} ${USERNAME}
+
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+</code></pre>
+<p>Build the safer image, by explicitly set your host user's UID and GID:</p>
+<pre><code class="lang-bash">$ docker build -t ubuntu:safe -f Dockerfile-safe --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg USERNAME=$(whoami) .
+</code></pre>
+<p>Now, when you run the container and create a file:</p>
+<pre><code class="lang-bash">$ docker run --rm -v &quot;$(pwd):/app&quot; ubuntu:safe touch /app/safe.txt
+$ ls -lh safe.txt
+</code></pre>
+<p>Output:</p>
+<pre><code class="lang-bash">-rw-r--r-- 1 rlim rlim 0 May 27 19:05 safe.txt
+</code></pre>
+<p>The file is now owned by a regular user <code>rlim</code>, not root. This is safer and also easier to manage.</p>
+<p>Note: Docker Desktop for MacOS uses a Linux VM and a special filesystem to map file ownership.
+Therefore even if the container runs as root, files created in mounted directories are owned by a MacOS user.
+That being said, it's still important to be mindful that containers can run as root by default, especially when deploying on bare Linux host.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Avoid installing tools with <code>sudo</code>; always prefer user-level installations when possible.</li>
+<li>Be mindful of the privilege level your containers run with, and choose to run them as non-root users to minimize security risks and permission issues.</li>
+</ul>
+<blockquote><p>Be least in privilege but abundant in curiosity — while your tools should never run as root, your mind should always be rooting new ideas!</p>
+</blockquote>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
