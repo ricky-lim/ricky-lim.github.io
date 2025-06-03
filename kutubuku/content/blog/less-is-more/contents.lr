@@ -1,0 +1,110 @@
+title: Less is More
+---
+author: Ricky Lim
+---
+pub_date: 2025-06-02
+---
+body:
+
+In everyday data science work, we'll often encounter files so large that opening them in our spreadsheet or text editor becomes impractical.
+That's where `less` command shines - it's a simple yet powerful tool to efficiently handle large files right from the command line.
+
+In this post, I'll share `less` **options** that make it easy to explore, search, and navigate through large files - whether you're working with CSVs, JSON, or even XMLs.
+
+## Why `less` is  `more` ?
+
+The literal phrase is related to Unix history.
+The original `more` command was an early Unix tool to view text files one screent at a time.
+Later, `less` was introduced, ironically, as a more powerful alternative to `more`.
+So literally, `less is more` because it does more than `more`.
+
+This idea also roots into the Unix philosophy:
+
+> do one thing and do it well.
+
+I believe that this principle is valuable not just in Unix, but in our life.
+Embracing a "less is more' mindset helps us focus on what's essential and avoid distractions.
+
+### What makes `less` special ?
+
+- Efficient loading: `less` loads only what's needed into memory, so we can view even huge datasets instantly - much faster than commands that read the entire file into memory.
+- Powerful search: quickly find patterns, column names, or values with `/pattern` to search forward or `?pattern` to search backward.
+- Bidirectional navigation: going up and down the file with `j` and `k`, respectively.
+- Cooperative pipelines: designed to work well with other tools in the Unix pipe, e.g `cat data.csv | less` or `grep pattern data.csv | less`
+
+## Example usage with `less`
+
+1\. Explore a large CSV file:
+
+```bash
+# -N: show line numbers
+# -S: prevents line wrapping - useful for wide tables
+$ less -N -S winequality-red.csv
+1 "fixed acidity";"volatile acidity";"citric acid";"residual sugar";"chlorides";"free sulfur dioxide";"total sulfur dioxide";"density";"pH";"sulphates";"alcohol";"quality"
+2 7.4;0.7;0;1.9;0.076;11;34;0.9978;3.51;0.56;9.4;5
+3 7.8;0.88;0;2.6;0.098;25;67;0.9968;3.2;0.68;9.8;5
+4 7.8;0.76;0.04;2.3;0.092;15;54;0.997;3.26;0.65;9.8;5
+5 11.2;0.28;0.56;1.9;0.075;17;60;0.998;3.16;0.58;9.8;6
+6 7.4;0.7;0;1.9;0.076;11;34;0.9978;3.51;0.56;9.4;5
+7 7.4;0.66;0;1.8;0.075;13;40;0.9978;3.51;0.56;9.4;5
+8 7.9;0.6;0.06;1.6;0.069;15;59;0.9964;3.3;0.46;9.4;5
+9 7.3;0.65;0;1.2;0.065;15;21;0.9946;3.39;0.47;10;7
+10 7.8;0.58;0.02;2;0.073;9;18;0.9968;3.36;0.57;9.5;7
+11 7.5;0.5;0.36;6.1;0.071;17;102;0.9978;3.35;0.8;10.5;5
+12 6.7;0.58;0.08;1.8;0.097;15;65;0.9959;3.28;0.54;9.2;5
+13 7.5;0.5;0.36;6.1;0.071;17;102;0.9978;3.35;0.8;10.5;5
+14 5.6;0.615;0;1.6;0.089;16;59;0.9943;3.58;0.52;9.9;5
+15 7.8;0.61;0.29;1.6;0.114;9;29;0.9974;3.26;1.56;9.1;5
+```
+
+2\. View with pretty format using `column`
+
+```bash
+# -s: specify delimiter, example here with semicolon
+# -t: output as a tables
+# < : redirect from stdin
+$ column -s\; -t < winequality-red.csv| less -S -N
+ 1 "fixed acidity"  "volatile acidity"  "citric acid"  "residual sugar"  "chlorides"  "free sulfur dioxide"  "total sulfur dioxide"  "density"  "pH"  "sulphates"  "alcohol"         "quality"
+ 2 7.4              0.7                 0              1.9               0.076        11                     34                      0.9978     3.51  0.56         9.4               5
+ 3 7.8              0.88                0              2.6               0.098        25                     67                      0.9968     3.2   0.68         9.8               5
+ 4 7.8              0.76                0.04           2.3               0.092        15                     54                      0.997      3.26  0.65         9.8               5
+ 5 11.2             0.28                0.56           1.9               0.075        17                     60                      0.998      3.16  0.58         9.8               6
+ 6 7.4              0.7                 0              1.9               0.076        11                     34                      0.9978     3.51  0.56         9.4               5
+ 7 7.4              0.66                0              1.8               0.075        13                     40                      0.9978     3.51  0.56         9.4               5
+ 8 7.9              0.6                 0.06           1.6               0.069        15                     59                      0.9964     3.3   0.46         9.4               5
+ 9 7.3              0.65                0              1.2               0.065        15                     21                      0.9946     3.39  0.47         10                7
+10 7.8              0.58                0.02           2                 0.073        9                      18                      0.9968     3.36  0.57         9.5               7
+11 7.5              0.5                 0.36           6.1               0.071        17                     102                     0.9978     3.35  0.8          10.5              5
+12 6.7              0.58                0.08           1.8               0.097        15                     65                      0.9959     3.28  0.54         9.2               5
+13 7.5              0.5                 0.36           6.1               0.071        17                     102                     0.9978     3.35  0.8          10.5              5
+14 5.6              0.615               0              1.6               0.089        16                     59                      0.9943     3.58  0.52         9.9               5
+15 7.8              0.61                0.29           1.6               0.114        9                      29                      0.9974     3.26  1.56         9.1               5
+```
+
+3\. Open at a specific pattern:
+
+```bash
+# +/: search for a pattern, e.g here with a timestamp
+less +/03:00:00 sensor.xml
+```
+
+4\. Search for a pattern:
+
+```bash
+# /: search for a pattern, e.g here with a timestamp
+less /03:00:00 sensor.xml
+# ?: search for a pattern in reverse
+less ?03:00:00 sensor.xml
+```
+
+5\. Monitor a growing log file:
+
+```bash
+less +F /var/log/syslog
+```
+
+## Key takeaways
+
+- `less` is a simple yet powerful tool for data scientists to explore, search, and navigate large or complex files
+- Enhance its functionaliy by combining it with other unix tools like `column`, `grep`, `awk`, `sed`, etc. to get the most out of your data
+- Options like, `-N`, `-S`, `+F`, `/`, `?`, make it especially effective for data exploration
