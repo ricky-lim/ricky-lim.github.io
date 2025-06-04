@@ -472,10 +472,9 @@ td {
 
 .page-header {
     margin-bottom: 2rem;
-    border-bottom: 3px solid var(--primary-color);
+    margin-top: 2rem;
     padding-bottom: 1rem;
     text-align: center;
-    /* Center align the header */
 }
 
 .page-header h1 {
@@ -518,7 +517,8 @@ h1+section {
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     line-height: 1.8;
-    width: 100%;
+    width: 90%;
+    margin: 0 auto;
     font-size: 1rem;
 }
 
