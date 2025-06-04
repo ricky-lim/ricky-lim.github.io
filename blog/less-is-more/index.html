@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Less is More — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Less is More</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-06-02
+  </p>
+  <p>In everyday data science work, we'll often encounter files so large that opening them in our spreadsheet or text editor becomes impractical.
+That's where <code>less</code> command comes to the rescue - it's a simple yet powerful tool to efficiently handle large files right from your command line.</p>
+<p>If you haven’t heard of it, please open your terminal and type <code>less</code> (Yes, ironically, it gives you more).
+And if you’re already familiar with it, please stick around! There may still be some useful options you haven’t seen. I definitely had!</p>
+<p>In this post, I'll share <code>less</code> <strong>options</strong> that make it easy to explore, search, and navigate through large files - whether you're working with CSVs, JSON, or even XMLs.</p>
+<h2>Why <code>less</code> is  <code>more</code> ?</h2>
+<p>The literal phrase is related to Unix history.
+The original <code>more</code> command was an early Unix tool to view text files one screen at a time.
+Later, <code>less</code> was introduced, as a more powerful alternative to <code>more</code>.
+So literally, <code>less is more</code> because it does more than <code>more</code>.</p>
+<p>This idea also roots into the Unix philosophy: "do one thing and do it well."</p>
+<p>I believe that this principle is valuable not just in Unix, but in our life.
+Embracing a "less is more' mindset helps us focus on what's essential and avoid unnessary complexity.</p>
+<h3>What makes <code>less</code> special ?</h3>
+<ul>
+<li>Efficient loading: <code>less</code> loads only what's needed into memory, so we can view even huge datasets instantly - much faster than commands that read the entire file into memory.</li>
+<li>Powerful search: quickly find patterns, column names, or values with <code>/pattern</code> to search forward or <code>?pattern</code> to search backward.</li>
+<li>Bidirectional navigation: going up and down the file with <code>j</code> and <code>k</code>, respectively.</li>
+<li>Cooperative pipelines: designed to work well with other tools in the Unix pipe, e.g <code>cat data.csv | less</code> or <code>grep pattern data.csv | less</code></li>
+</ul>
+<h2>Example usage with <code>less</code></h2>
+<p>1. Explore a large CSV file:</p>
+<pre><code class="lang-bash"># -N: show line numbers
+# -S: prevents line wrapping - useful for wide tables
+$ less -N -S winequality-red.csv
+1 &quot;fixed acidity&quot;;&quot;volatile acidity&quot;;&quot;citric acid&quot;;&quot;residual sugar&quot;;&quot;chlorides&quot;;&quot;free sulfur dioxide&quot;;&quot;total sulfur dioxide&quot;;&quot;density&quot;;&quot;pH&quot;;&quot;sulphates&quot;;&quot;alcohol&quot;;&quot;quality&quot;
+2 7.4;0.7;0;1.9;0.076;11;34;0.9978;3.51;0.56;9.4;5
+3 7.8;0.88;0;2.6;0.098;25;67;0.9968;3.2;0.68;9.8;5
+4 7.8;0.76;0.04;2.3;0.092;15;54;0.997;3.26;0.65;9.8;5
+5 11.2;0.28;0.56;1.9;0.075;17;60;0.998;3.16;0.58;9.8;6
+6 7.4;0.7;0;1.9;0.076;11;34;0.9978;3.51;0.56;9.4;5
+7 7.4;0.66;0;1.8;0.075;13;40;0.9978;3.51;0.56;9.4;5
+8 7.9;0.6;0.06;1.6;0.069;15;59;0.9964;3.3;0.46;9.4;5
+9 7.3;0.65;0;1.2;0.065;15;21;0.9946;3.39;0.47;10;7
+10 7.8;0.58;0.02;2;0.073;9;18;0.9968;3.36;0.57;9.5;7
+11 7.5;0.5;0.36;6.1;0.071;17;102;0.9978;3.35;0.8;10.5;5
+12 6.7;0.58;0.08;1.8;0.097;15;65;0.9959;3.28;0.54;9.2;5
+13 7.5;0.5;0.36;6.1;0.071;17;102;0.9978;3.35;0.8;10.5;5
+14 5.6;0.615;0;1.6;0.089;16;59;0.9943;3.58;0.52;9.9;5
+15 7.8;0.61;0.29;1.6;0.114;9;29;0.9974;3.26;1.56;9.1;5
+</code></pre>
+<p>2. View with pretty format using <code>column</code></p>
+<pre><code class="lang-bash"># -s: specify delimiter, example here with semicolon
+# -t: output as a tables
+# &lt; : redirect from stdin
+$ column -s\; -t &lt; winequality-red.csv| less -S -N
+ 1 &quot;fixed acidity&quot;  &quot;volatile acidity&quot;  &quot;citric acid&quot;  &quot;residual sugar&quot;  &quot;chlorides&quot;  &quot;free sulfur dioxide&quot;  &quot;total sulfur dioxide&quot;  &quot;density&quot;  &quot;pH&quot;  &quot;sulphates&quot;  &quot;alcohol&quot;         &quot;quality&quot;
+ 2 7.4              0.7                 0              1.9               0.076        11                     34                      0.9978     3.51  0.56         9.4               5
+ 3 7.8              0.88                0              2.6               0.098        25                     67                      0.9968     3.2   0.68         9.8               5
+ 4 7.8              0.76                0.04           2.3               0.092        15                     54                      0.997      3.26  0.65         9.8               5
+ 5 11.2             0.28                0.56           1.9               0.075        17                     60                      0.998      3.16  0.58         9.8               6
+ 6 7.4              0.7                 0              1.9               0.076        11                     34                      0.9978     3.51  0.56         9.4               5
+ 7 7.4              0.66                0              1.8               0.075        13                     40                      0.9978     3.51  0.56         9.4               5
+ 8 7.9              0.6                 0.06           1.6               0.069        15                     59                      0.9964     3.3   0.46         9.4               5
+ 9 7.3              0.65                0              1.2               0.065        15                     21                      0.9946     3.39  0.47         10                7
+10 7.8              0.58                0.02           2                 0.073        9                      18                      0.9968     3.36  0.57         9.5               7
+11 7.5              0.5                 0.36           6.1               0.071        17                     102                     0.9978     3.35  0.8          10.5              5
+12 6.7              0.58                0.08           1.8               0.097        15                     65                      0.9959     3.28  0.54         9.2               5
+13 7.5              0.5                 0.36           6.1               0.071        17                     102                     0.9978     3.35  0.8          10.5              5
+14 5.6              0.615               0              1.6               0.089        16                     59                      0.9943     3.58  0.52         9.9               5
+15 7.8              0.61                0.29           1.6               0.114        9                      29                      0.9974     3.26  1.56         9.1               5
+</code></pre>
+<p>3. Navigate directly to a specific pattern:</p>
+<pre><code class="lang-bash"># +/: search for a pattern, e.g here with a timestamp
+less +/03:00:00 sensor.xml
+</code></pre>
+<p>4. Search for a pattern:</p>
+<pre><code class="lang-bash"># /: search for a pattern, e.g here with a timestamp
+less /03:00:00 sensor.xml
+# ?: search for a pattern in reverse
+less ?03:00:00 sensor.xml
+</code></pre>
+<p>5. Monitor a growing log file:</p>
+<pre><code class="lang-bash">less +F /var/log/syslog
+</code></pre>
+<h2>Key takeaways</h2>
+<ul>
+<li><code>less</code> is a simple yet powerful tool to explore, search, and navigate large or complex files</li>
+<li>Enhance its functionaliy by combining it with other unix tools like <code>column</code>, <code>grep</code>, <code>awk</code>, <code>sed</code>, etc. to get the most out of your data</li>
+<li>Options like, <code>-N</code>, <code>-S</code>, <code>+F</code>, <code>/</code>, <code>?</code>, make it especially effective for data exploration</li>
+</ul>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
