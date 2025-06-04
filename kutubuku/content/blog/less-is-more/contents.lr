@@ -7,23 +7,24 @@ pub_date: 2025-06-02
 body:
 
 In everyday data science work, we'll often encounter files so large that opening them in our spreadsheet or text editor becomes impractical.
-That's where `less` command shines - it's a simple yet powerful tool to efficiently handle large files right from the command line.
+That's where `less` command comes to the rescue - it's a simple yet powerful tool to efficiently handle large files right from your command line.
+
+If you haven’t heard of it, please open your terminal and type `less` (Yes, ironically, it gives you more).
+And if you’re already familiar with it, please stick around! There may still be some useful options you haven’t seen. I definitely had!
 
 In this post, I'll share `less` **options** that make it easy to explore, search, and navigate through large files - whether you're working with CSVs, JSON, or even XMLs.
 
 ## Why `less` is  `more` ?
 
 The literal phrase is related to Unix history.
-The original `more` command was an early Unix tool to view text files one screent at a time.
-Later, `less` was introduced, ironically, as a more powerful alternative to `more`.
+The original `more` command was an early Unix tool to view text files one screen at a time.
+Later, `less` was introduced, as a more powerful alternative to `more`.
 So literally, `less is more` because it does more than `more`.
 
-This idea also roots into the Unix philosophy:
-
-> do one thing and do it well.
+This idea also roots into the Unix philosophy: "do one thing and do it well."
 
 I believe that this principle is valuable not just in Unix, but in our life.
-Embracing a "less is more' mindset helps us focus on what's essential and avoid distractions.
+Embracing a "less is more' mindset helps us focus on what's essential and avoid unnessary complexity.
 
 ### What makes `less` special ?
 
@@ -81,7 +82,7 @@ $ column -s\; -t < winequality-red.csv| less -S -N
 15 7.8              0.61                0.29           1.6               0.114        9                      29                      0.9974     3.26  1.56         9.1               5
 ```
 
-3\. Open at a specific pattern:
+3\. Navigate directly to a specific pattern:
 
 ```bash
 # +/: search for a pattern, e.g here with a timestamp
@@ -105,6 +106,6 @@ less +F /var/log/syslog
 
 ## Key takeaways
 
-- `less` is a simple yet powerful tool for data scientists to explore, search, and navigate large or complex files
+- `less` is a simple yet powerful tool to explore, search, and navigate large or complex files
 - Enhance its functionaliy by combining it with other unix tools like `column`, `grep`, `awk`, `sed`, etc. to get the most out of your data
 - Options like, `-N`, `-S`, `+F`, `/`, `?`, make it especially effective for data exploration
