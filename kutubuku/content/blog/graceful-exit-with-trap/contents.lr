@@ -1,0 +1,95 @@
+title: Graceful Exit with trap
+---
+author: Ricky Lim
+---
+pub_date: 2025-06-08
+---
+body:
+
+When working with automation, data pipelines, or any processing scripts in Unix-based environment, it's essential to ensure that they exit gracefully, even when unexpected errors occur.
+This is where `trap` comes to the rescue handling tasks like cleaning up temporary files, logging errors, also preventing interruption during a critical operation.
+
+## What is `trap` ?
+
+A shell built-in command that lets you set up a sequence of commands to execute when the shell receives certain signals.
+Signals are events sent to processes by the operating system or users like us when we press `Ctrl + C` to tell the process to terminate.
+When we press `Ctrl + C`, it sends a `SIGINT` for **Sig**nal **Int**errupt.
+
+Syntax of `trap` is:
+
+```bash
+trap [commands] [signals]
+```
+
+### Tips for using `trap`
+
+- Set trap before any command you want to protect.
+
+- Ensure the `[commands]` in `trap` is protected by a single quote.
+
+Since the `[commands]` will be read twice by the shell: once when the trap is set and again when the signal is received.
+By enclosing the command in single quotes, we ensure variables are evaluated only when the trap is executed, not when it's set.
+
+
+### Commanly used signals are:
+
+- `SIGINT`: Interrupt from keyboard (Ctrl + C)
+- `SIGTERM`: Termination signal
+- `SIGQUIT`: Quit from keyboard (Ctrl + D)
+- `EXIT`: Scrip is exiting
+- `ERR`: Error occurred
+
+## Example common usage with `trap`
+
+1\. Cleaning up temporary files:
+
+During deployment for database migration, we often create a backup file as a temporary file and remove it after a successful migration.
+Only if the migration is failing then we will use the backup file to restore the database.
+Regardless of the outcome, we always want to ensure the backup file is properly cleaned up — and that’s where the trap command comes in handy.
+
+```bash
+# Create a temporary file
+temp_file=$(mktemp)
+
+# Trap the EXIT signal and remove the temporary file
+trap 'rm -f "$temp_file"; exit 1' EXIT
+```
+
+The command sequence is executed immediately after the signal is caught.
+Once it completes, the original program continues - unless the signal terminated it.
+In this example we explicitly call `exit 1` to prevent the script from continuing to run.
+
+2\. Logging errors:
+
+For our long-running data processing scripts, we want to log any errors that occur.
+
+```bash
+LOG_FILE=myprogram.log
+
+# Trap the ERR signal and log errors
+trap 'echo "$(date)": Error on line $LINENO: "$BASH_COMMAND" >> $LOG_FILE' ERR
+
+# Command to monitor
+mycommand
+```
+
+3\. Preventing interruption during critical operations:
+
+This is useful when you want to prevent corruption such as incomplete file saves.
+
+```bash
+echo "Entering critical section. Interruption signal will be ignored here."
+(
+    # Ignore SIGINT in this subshell
+    trap '' SIGINT
+
+    # Simulate critical file save
+    echo "Saving critical file..."
+    sleep 5
+    echo "Critical file saved."
+)
+```
+
+## Key takeaways
+
+> Think of `trap` like a safety net - it helps you clean up messes, log errors, and even blocks interruptions during critical operations.
