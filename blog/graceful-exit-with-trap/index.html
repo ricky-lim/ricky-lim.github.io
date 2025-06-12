@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Graceful Exit with trap — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Graceful Exit with trap</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-06-08
+  </p>
+  <p>When working with automation, data pipelines, or any processing scripts in Unix-based environment, it's essential to ensure that they exit gracefully, even when unexpected errors occur.
+This is where <code>trap</code> comes to the rescue handling tasks like cleaning up temporary files, logging errors, but also preventing interruption during a critical operation.</p>
+<h2>What is <code>trap</code> ?</h2>
+<p>A shell built-in command that lets you set up a sequence of commands to execute when the shell receives certain signals.
+Signals are events sent to processes by the operating system or users like us when we press <code>Ctrl + C</code> to kill the process.
+When we press <code>Ctrl + C</code>, it sends a <code>SIGINT</code> for <strong>Sig</strong>nal <strong>Int</strong>errupt.</p>
+<p>Syntax of <code>trap</code> is:</p>
+<pre><code class="lang-bash">trap [commands] [signals]
+</code></pre>
+<h3>Tips for using <code>trap</code></h3>
+<ul>
+<li><p>Set trap before any command you want to protect.</p>
+</li>
+<li><p>Ensure <code>[commands]</code> in <code>trap</code> is protected by a single quote.</p>
+</li>
+</ul>
+<p>Since <code>[commands]</code> will be read twice by the shell: once when the trap is set and again when the signal is received.
+By enclosing the command in single quotes, we ensure variables are evaluated only when the trap is executed, not when it's set.</p>
+<h3>Commanly used signals are:</h3>
+<ul>
+<li><code>SIGINT</code>: Interrupt from keyboard (Ctrl + C)</li>
+<li><code>SIGTERM</code>: Termination signal</li>
+<li><code>SIGQUIT</code>: Quit from keyboard (Ctrl + D)</li>
+<li><code>EXIT</code>: Scrip is exiting</li>
+<li><code>ERR</code>: Error occurred</li>
+</ul>
+<h2>Example common usage with <code>trap</code></h2>
+<p>1. Cleaning up temporary files:</p>
+<p>During deployment for database migration, we often create a backup file as a temporary file and remove it after a successful migration.
+Only if the migration is failing then we will use the backup file to restore the database.
+Regardless of the outcome, we always want to ensure the backup file is properly cleaned up — and that’s where the trap command comes to the rescue.</p>
+<pre><code class="lang-bash"># Create a temporary file
+temp_file=$(mktemp)
+
+# Trap the EXIT signal and remove the temporary file
+trap &#39;rm -f $temp_file; exit 1&#39; EXIT
+</code></pre>
+<p>The command sequence is executed immediately after the signal is caught.
+Once it completes, the original program continues - unless the signal terminated it.
+In this example we explicitly call <code>exit 1</code> to prevent the script from continuing to run.</p>
+<p>2. Logging errors:</p>
+<p>For our long-running data processing scripts, we want to log any errors that occur.</p>
+<pre><code class="lang-bash">LOG_FILE=myprogram.log
+
+# Trap the ERR signal and log errors
+trap &#39;echo &quot;$(date)&quot;: Error on line $LINENO: &quot;$BASH_COMMAND&quot; &gt;&gt; $LOG_FILE&#39; ERR
+
+# Command to monitor
+mycommand
+</code></pre>
+<p>3. Preventing interruption during critical operations:</p>
+<p>This is useful when you want to prevent file corruption such as incomplete file saves.</p>
+<pre><code class="lang-bash">echo &quot;Entering critical section. Interruption signal will be ignored here.&quot;
+(
+    # Ignore SIGINT in this subshell
+    trap &#39;&#39; SIGINT
+
+    # Simulate critical file save
+    echo &quot;Saving critical file...&quot;
+    sleep 5
+    echo &quot;Critical file saved.&quot;
+)
+</code></pre>
+<h2>Key takeaways</h2>
+<p>Think of <code>trap</code> like a safety net - it helps you clean up messes, log errors, and even blocks interruptions during critical operations.</p>
+<blockquote><p>Trap — catching the crap before your script snaps.</p>
+</blockquote>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
