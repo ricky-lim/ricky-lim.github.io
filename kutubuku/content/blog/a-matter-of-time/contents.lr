@@ -1,0 +1,96 @@
+title: A Matter of Time
+---
+author: Ricky Lim
+---
+pub_date: 2025-06-15
+---
+body:
+
+A common approach for serverless deployment is to run Python scripts as AWS lambda functions.
+While Lambda simplifies deployment, it also comes with limits: a maximum execution time of 15 minutes and a memory allocation from 128 MB to 10 GB.
+
+To ensure your script will run successfully within these limits, it's essential to measure it's runtime and memory usage limits before deployment.
+It's a matter of `time` to measure those limits for your Lambda deployment.
+This information is critical to set appropriate Lambda timeout and memory settings, helping to avoid failures and optimize resource allocation.
+
+## What is `time` ?
+
+There are a few different ways to use `time` in our terminal.
+`time` when it comes as a shell keyword is designed to measure only how long a command takes to run.
+
+In contrast, `usr/bin/time` also known as GNU time program provides additional information, such as detailed resource usage.
+
+On most Linux systems, GNU time is available at `usr/bin/time`. On macOS, you can install it using Homebrew:
+
+```
+# Installed as gtime
+brew install gnu-time
+```
+
+**Tip:** To avoid confusion, between the shell builtin and the GNU time, you can create an alias in your shell configuration file (like`bashrc` or `zshrc`). For example:
+
+```bash
+alias gtime=/usr/bin/time
+```
+
+This way, you can always use `gtime` to access the full-featured GNU time.
+
+## Basic usage
+
+Run with `/usr/bin/time` in front of your script command. For example:
+
+```bash
+# -v to give a detailed resource usage report, such as maximum resident set size (memory)
+gtime -v python popular_words.py
+```
+
+The example output:
+
+```bash
+Command being timed: "python popular_words.py"
+User time (seconds): 0.81
+System time (seconds): 0.31
+Percent of CPU this job got: 3%
+Elapsed (wall clock) time (h:mm:ss or m:ss): 0:32.84
+Average shared text size (kbytes): 0
+Average unshared data size (kbytes): 0
+Average stack size (kbytes): 0
+Average total size (kbytes): 0
+Maximum resident set size (kbytes): 54364
+Average resident set size (kbytes): 0
+Major (requiring I/O) page faults: 117
+Minor (reclaiming a frame) page faults: 23067
+Voluntary context switches: 1593
+Involuntary context switches: 3235
+Swaps: 0
+File system inputs: 0
+File system outputs: 0
+Socket messages sent: 479
+Socket messages received: 479
+Signals delivered: 0
+Page size (bytes): 4096
+Exit status: 0
+```
+
+For Lambda deployment, it's important to focus on two key metrics:
+
+1\. Elapsed (wall clock) time (h:mm:ss or m:ss): 0:32.84.
+
+In this example, the script took about 32.84 seconds to complete.
+To ensure reliability and allow for possible cold starts, I recommend setting the Lambda timeout to 60 seconds.
+This provides a safe buffer above the observed runtime.
+
+2\. Maximum resident set size (kbytes): 54364
+
+This value represents the peak memory usage during script execution.
+Memory usage varies during execution, but the peak is critical.
+Because if the peak ever exceeds the Lambda memory allocation, it will trigger an `OutOfMemory` error.
+
+In this case, the script's peak usage was 54,364 kB (about 53.1 MB), which sits comfortably within Lambda's default 128 MB memory setting.
+
+
+## Key takeaways
+
+- Use GNU time to measure your script's execution time and resource usage before Lambda deployment.
+- These measurements helps you get the idea of your script's performance and identify opportunities for optimization.
+- Once your script's performance is acceptable, configure your Lambda function's timeout and memory settings based on the measured values, also with a buffer for safety as cloud environment has variability.
