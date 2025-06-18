@@ -6,7 +6,8 @@ pub_date: 2025-06-15
 ---
 body:
 
-A common approach for serverless deployment is to run Python scripts as AWS lambda functions.
+One popular and efficient way to go serverless is by running your Python scripts as AWS Lambda functions.
+Lambda lets your script run effortlessly without managing servers.
 While Lambda simplifies deployment, it also comes with limits: a maximum execution time of 15 minutes and a memory allocation from 128 MB to 10 GB.
 
 To ensure your script will run successfully within these limits, it's essential to measure it's runtime and memory usage limits before deployment.
@@ -77,7 +78,7 @@ For Lambda deployment, it's important to focus on two key metrics:
 1\. Elapsed (wall clock) time (h:mm:ss or m:ss): 0:32.84.
 
 In this example, the script took about 32.84 seconds to complete.
-To ensure reliability and allow for possible cold starts, I recommend setting the Lambda timeout to 60 seconds.
+To ensure reliability and allow for possible cold starts, I recommend setting the Lambda timeout to 2x, i.e 1 minute
 This provides a safe buffer above the observed runtime.
 
 2\. Maximum resident set size (kbytes): 54364
