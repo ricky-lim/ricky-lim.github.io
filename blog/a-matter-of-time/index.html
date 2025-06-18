@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>A Matter of Time — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">A Matter of Time</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-06-15
+  </p>
+  <p>One popular and efficient way to go serverless is by running your Python scripts as AWS Lambda functions.
+Lambda lets your script run effortlessly without managing servers.
+While Lambda simplifies deployment, it also comes with limits: a maximum execution time of 15 minutes and a memory allocation from 128 MB to 10 GB.</p>
+<p>To ensure your script will run successfully within these limits, it's essential to measure it's runtime and memory usage limits before deployment.
+It's a matter of <code>time</code> to measure those limits for your Lambda deployment.
+This information is critical to set appropriate Lambda timeout and memory settings, helping to avoid failures and optimize resource allocation.</p>
+<h2>What is <code>time</code> ?</h2>
+<p>There are a few different ways to use <code>time</code> in our terminal.
+<code>time</code> when it comes as a shell keyword is designed to measure only how long a command takes to run.</p>
+<p>In contrast, <code>usr/bin/time</code> also known as GNU time program provides additional information, such as detailed resource usage.</p>
+<p>On most Linux systems, GNU time is available at <code>usr/bin/time</code>. On macOS, you can install it using Homebrew:</p>
+<pre><code># Installed as gtime
+brew install gnu-time
+</code></pre>
+<p><strong>Tip:</strong> To avoid confusion, between the shell builtin and the GNU time, you can create an alias in your shell configuration file (like<code>bashrc</code> or <code>zshrc</code>). For example:</p>
+<pre><code class="lang-bash">alias gtime=/usr/bin/time
+</code></pre>
+<p>This way, you can always use <code>gtime</code> to access the full-featured GNU time.</p>
+<h2>Basic usage</h2>
+<p>Run with <code>/usr/bin/time</code> in front of your script command. For example:</p>
+<pre><code class="lang-bash"># -v to give a detailed resource usage report, such as maximum resident set size (memory)
+gtime -v python popular_words.py
+</code></pre>
+<p>The example output:</p>
+<pre><code class="lang-bash">Command being timed: &quot;python popular_words.py&quot;
+User time (seconds): 0.81
+System time (seconds): 0.31
+Percent of CPU this job got: 3%
+Elapsed (wall clock) time (h:mm:ss or m:ss): 0:32.84
+Average shared text size (kbytes): 0
+Average unshared data size (kbytes): 0
+Average stack size (kbytes): 0
+Average total size (kbytes): 0
+Maximum resident set size (kbytes): 54364
+Average resident set size (kbytes): 0
+Major (requiring I/O) page faults: 117
+Minor (reclaiming a frame) page faults: 23067
+Voluntary context switches: 1593
+Involuntary context switches: 3235
+Swaps: 0
+File system inputs: 0
+File system outputs: 0
+Socket messages sent: 479
+Socket messages received: 479
+Signals delivered: 0
+Page size (bytes): 4096
+Exit status: 0
+</code></pre>
+<p>For Lambda deployment, it's important to focus on two key metrics:</p>
+<p>1. Elapsed (wall clock) time (h:mm:ss or m:ss): 0:32.84.</p>
+<p>In this example, the script took about 32.84 seconds to complete.
+To ensure reliability and allow for possible cold starts, I recommend setting the Lambda timeout to 2x, i.e 1 minute
+This provides a safe buffer above the observed runtime.</p>
+<p>2. Maximum resident set size (kbytes): 54364</p>
+<p>This value represents the peak memory usage during script execution.
+Memory usage varies during execution, but the peak is critical.
+Because if the peak ever exceeds the Lambda memory allocation, it will trigger an <code>OutOfMemory</code> error.</p>
+<p>In this case, the script's peak usage was 54,364 kB (about 53.1 MB), which sits comfortably within Lambda's default 128 MB memory setting.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Use GNU time to measure your script's execution time and resource usage before Lambda deployment.</li>
+<li>These measurements helps you get the idea of your script's performance and identify opportunities for optimization.</li>
+<li>Once your script's performance is acceptable, configure your Lambda function's timeout and memory settings based on the measured values, also with a buffer for safety as cloud environment has variability.</li>
+</ul>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
