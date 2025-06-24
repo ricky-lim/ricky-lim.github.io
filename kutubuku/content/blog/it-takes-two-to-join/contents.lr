@@ -6,14 +6,14 @@ pub_date: 2025-06-21
 ---
 body:
 
-The world of SQL allows us to model the world of data as tables connecting one to another.
-One of the common model is a star schema.
-In this model, we have a table that contains many columns with IDs information.
-Such IDs are used to connect us with different tables.
-This where `join` becomes essential to connect these tables to extract information.
+Working with data often involves combining information spread across multiple related tables.
+Think each table as a puzzle piece, ***only*** when connected with others the full picture is revealed.
 
-In this blog, we're going to explore different types of join with `pyspark`.
-To join, we need two tables and here is the basic recipe for a join is:
+That’s where **joins** come in.
+A join allows us to combine data from different tables based on shared columns, helping us reveal insights that aren’t visible in isolation.
+
+In this blog, we’ll explore the different types of joins using **PySpark**, a powerful yet intuitive tool for processing data.
+Before we dive into the types of joins, let’s start with the basic syntax for performing a join in PySpark:
 
 ```
 [LEFT].join(
@@ -23,9 +23,19 @@ To join, we need two tables and here is the basic recipe for a join is:
 )
 ```
 
-Let's explore four different 'how' of joins using two tables: `lab_equipment`, `lab_protocol` .
+Here’s what each part means:
 
-## Tables
+- [LEFT]: This is the first table you're starting with.
+- [RIGHT]: This is the second table you want to join with the first.
+- on=[PREDICATES]: This specifies the column(s) both tables have in common — the base for joining them.
+- how=[METHOD]: This defines the type of join you want to use.
+
+Here we're going to explore four different types of joins i.e: `inner`, `left`, `left_semi`, `left_anti`.
+To demonstrate each one, we’ll use two example tables: `lab_equipment` and `lab_protocol`.
+
+## Sample Tables
+
+Let’s start by looking at the data:
 
 ```bash
 # Lab Equipment
@@ -54,11 +64,14 @@ Let's explore four different 'how' of joins using two tables: `lab_equipment`, `
 +-----------+-------------+------------+
 ```
 
+Notice that `lab_protocol` contains an `equipment_id` that doesn’t exist in lab_equipment (ID = 6).
+This will help illustrate how different joins behave.
+
 ## Inner Join
 
 Returns rows where the join key exists in both tables.
 Important to note that it may return duplicates in either table.
-Also watch out if the id on the left table is not found on the right table it will be skipped.
+Also watch out if the id on the left table is not found on the right table, it will be skipped.
 
 ```python
 # Joining lab protocol with lab equipment based on equipment_id
@@ -90,10 +103,14 @@ With inner join,
 2\. Non-Matches is skipped
 
 - Water Bath (id 4) is skipped as no associated protocol
-- Protocol B's equiment with id 6 is missing, only exact matches are included.
+- Protocol B's equiment with id 6 is missing, because only exact matches are included.
+
+## Left join
 
 Depending on your use cases it may or may not be desirable.
-If you want to ensure that the missing equipment is shown as NULL you need to use left join
+If you want to ensure that the missing equipment is shown as NULL you need to use left join.
+Left join returns all rows from the left table (lab_protocol) and matching rows with the righ table (lab_equipment).
+If there is no match, the right side will return NULLs.
 
 ```python
 # Left join to also include a missing lab equipment
@@ -130,7 +147,7 @@ In our example, the non-matching equipment is returned as `MISSING`.
 
 A left semi join returns all rows from the left table where there is at least one matching row in the right table, based on the join condition.
 
-This can be used for example, if we want to know which equipment that is at least being used once by a protocol.
+This can be used for example, if we want to know which equipment that is **at least** being used once by a protocol.
 
 ```python
 (
@@ -154,8 +171,8 @@ This can be used for example, if we want to know which equipment that is at leas
 
 A left anti join returns only the rows from the left of the table that do **not** have a match in the right table, based on the join condition.
 
-This type of join is useful to filter out the left table using right table.
-For example we want to know which lab equipment that is not being used by our lab protocol.
+This type of join is useful to **filter out** the left table using the right table.
+For example we want to know which lab equipment that is **not** being used by our lab protocol.
 
 ```python
 (
@@ -176,18 +193,26 @@ For example we want to know which lab equipment that is not being used by our la
 1\. Inner Join
 
 - Only matching records between left and right tables are returned
-- Non-matches are skipped: Equipment without protocols or protocols without equipment will not be shown
+- Non-matches are skipped: Equipment without protocols or protocols without equipment will not be returned
 - Watch for duplicates: A protocol with multiple equipments will appear as duplicates
 - Use case: Show a protocol with its equipment
+
+2\. Left Join
+
+- All rows from the left table are returned, plus matches from the right
+- Non-matching rows are returned as NULLs
+- Duplicates can occur if multiple matches exist on the right
+- Use case: Show a protocol with its associated equipment including the missing equipment
+
 
 2\. Left Semi Join
 
 - Filter record with >= 1 match between left and right tables
-- No duplicates
+- No duplicates from the right table are included
 - Use case: List equipment used in at least one protocol
 
 3\. Left Anti Join
 
 - The opposite of left semi
-- No duplicates
+- No duplicates introduced from matching with the right table
 - Use case: Find unused equipment
