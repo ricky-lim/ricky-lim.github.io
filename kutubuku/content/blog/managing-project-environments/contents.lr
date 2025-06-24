@@ -1,0 +1,38 @@
+title: Managing Project Environments
+---
+author: Ricky Lim
+---
+pub_date: 2025-06-24
+---
+body:
+
+It's very easy to get messy when managing different environment variables while working for different projects.
+Fro example, you might need a different `API_KEY` for Project A and Project B.
+Manually setting these everytime is tedious and also error-prone.
+
+`direnv` comes to fix this - a tool that automatically loads but also unloads environment variables as you navigate between different project directories.
+
+## How to use direnv with .envrc
+
+### 1. Install direnv, follow instructions at https://direnv.net
+### 2. In each of your project, create a `.envrc` file
+
+```bash
+# .envrc for Project A
+export API_KEY=aloha
+
+# .envrc for Project B
+export API_KEY=hohoho
+```
+
+### 3. That's it. The first time, direnv will block loading for safety and ask for your approval.
+
+When you `cd` into Project A. `API_KEY` is set to `aloha`.
+When you leave, it's also unset.
+When you enter into Project B. `API_KEY` is now set to `hohoho`.
+
+## Key Takeaways
+
+`direnv` is a simple tool to simplify managing environment variables in your multiple projects.
+It ensures you always have the right environment variables for the right project you're working on.
+With `direnv`, you can avoid cluttering environment variables in your global shell environment - you don't want that!
