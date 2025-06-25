@@ -4,6 +4,7 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
 
+# Samples
 lab_equipment = spark.createDataFrame(
     [
         [1, "Microscope"],
@@ -31,6 +32,14 @@ lab_protocol = spark.createDataFrame(
 
 # INNER JOIN: collect protocol with the corresponding equipments
 (
+    lab_protocol.join(lab_equipment, on=["equipment_id"], how="inner").show(
+        truncate=False
+    )
+)
+
+
+# INNER JOIN: with group the equipments by protocols
+(
     lab_protocol.join(lab_equipment, on=["equipment_id"], how="inner")
     .groupBy("protocol_name")
     .agg(F.collect_list("equipment_name").alias("equipments"))
@@ -39,6 +48,9 @@ lab_protocol = spark.createDataFrame(
 )
 
 # LEFT JOIN: ensure that missing equipments are shown
+(lab_protocol.join(lab_equipment, on=["equipment_id"], how="left").show(truncate=False))
+
+# LEFT JOIN: group by equipments by protocols
 (
     lab_protocol.join(lab_equipment, on=["equipment_id"], how="left")
     # Replace `null` with a value MISSING

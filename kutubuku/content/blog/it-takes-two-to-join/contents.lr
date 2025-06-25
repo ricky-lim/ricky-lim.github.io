@@ -7,7 +7,7 @@ pub_date: 2025-06-21
 body:
 
 Working with data often involves combining information spread across multiple related tables.
-Think each table as a puzzle piece, ***only*** when connected with others the full picture is revealed.
+Think each table as a puzzle piece, ***only*** when connected with others the full picture is exposed.
 
 That’s where **joins** come in.
 A join allows us to combine data from different tables based on shared columns, helping us reveal insights that aren’t visible in isolation.
@@ -78,9 +78,28 @@ Also watch out if the id on the left table is not found on the right table, it w
 (
     lab_protocol
         .join(lab_equipment, on=["equipment_id"], how="inner")
-        .groupBy("protocol_name").agg(F.collect_list("equipment_name").alias("equipments"))
-        .orderBy("protocol_name")
         .show(truncate=False)
+)
+
++------------+-----------+-------------+--------------+
+|equipment_id|protocol_id|protocol_name|equipment_name|
++------------+-----------+-------------+--------------+
+|1           |101        |Protocol A   |Microscope    |
+|1           |104        |Protocol D   |Microscope    |
+|2           |101        |Protocol A   |Centrifuge    |
+|2           |104        |Protocol D   |Centrifuge    |
+|3           |102        |Protocol B   |Pipette       |
+|5           |103        |Protocol C   |Spectrometer  |
+|5           |104        |Protocol D   |Spectrometer  |
++------------+-----------+-------------+--------------+
+
+# With group the equipments by protocols
+(
+    lab_protocol.join(lab_equipment, on=["equipment_id"], how="inner")
+    .groupBy("protocol_name")
+    .agg(F.collect_list("equipment_name").alias("equipments"))
+    .orderBy("protocol_name")
+    .show(truncate=False)
 )
 
 +-------------+--------------------------------------+
@@ -109,11 +128,29 @@ With inner join,
 
 Depending on your use cases it may or may not be desirable.
 If you want to ensure that the missing equipment is shown as NULL you need to use left join.
-Left join returns all rows from the left table (lab_protocol) and matching rows with the righ table (lab_equipment).
+Left join returns all rows from the left table (lab_protocol) and matching rows with the right table (lab_equipment).
 If there is no match, the right side will return NULLs.
 
 ```python
 # Left join to also include a missing lab equipment
+(
+    lab_protocol.join(lab_equipment, on=["equipment_id"], how="left")
+    .show(truncate=False)
+)
++------------+-----------+-------------+--------------+
+|equipment_id|protocol_id|protocol_name|equipment_name|
++------------+-----------+-------------+--------------+
+|1           |101        |Protocol A   |Microscope    |
+|2           |101        |Protocol A   |Centrifuge    |
+|6           |102        |Protocol B   |NULL          |
+|3           |102        |Protocol B   |Pipette       |
+|5           |103        |Protocol C   |Spectrometer  |
+|1           |104        |Protocol D   |Microscope    |
+|5           |104        |Protocol D   |Spectrometer  |
+|2           |104        |Protocol D   |Centrifuge    |
++------------+-----------+-------------+--------------+
+
+# Left join to show missing equipments grouped by protocols
 (
     lab_protocol
         .join(lab_equipment, on=["equipment_id"], how="left")
@@ -216,3 +253,8 @@ For example we want to know which lab equipment that is **not** being used by ou
 - The opposite of left semi
 - No duplicates introduced from matching with the right table
 - Use case: Find unused equipment
+
+## Extra
+
+If you'd like to experiment with the samples, here's the [Python code](./join_lab.py).
+You'll need `pyspark` and its Java friend installed.
