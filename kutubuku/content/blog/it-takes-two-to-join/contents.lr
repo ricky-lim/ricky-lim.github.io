@@ -1,0 +1,260 @@
+title: It Takes Two To Join
+---
+author: Ricky Lim
+---
+pub_date: 2025-06-21
+---
+body:
+
+Working with data often involves combining information spread across multiple related tables.
+Think each table as a puzzle piece, ***only*** when connected with others the full picture is exposed.
+
+That’s where **joins** come in.
+A join allows us to combine data from different tables based on shared columns, helping us reveal insights that aren’t visible in isolation.
+
+In this blog, we’ll explore the different types of joins using **PySpark**, a powerful yet intuitive tool for processing data.
+Before we dive into the types of joins, let’s start with the basic syntax for performing a join in PySpark:
+
+```
+[LEFT].join(
+    [RIGHT],
+    on=[PREDICATES],
+    how=[METHOD]
+)
+```
+
+Here’s what each part means:
+
+- [LEFT]: This is the first table you're starting with.
+- [RIGHT]: This is the second table you want to join with the first.
+- on=[PREDICATES]: This specifies the column(s) both tables have in common — the base for joining them.
+- how=[METHOD]: This defines the type of join you want to use.
+
+Here we're going to explore four different types of joins i.e: `inner`, `left`, `left_semi`, `left_anti`.
+To demonstrate each one, we’ll use two example tables: `lab_equipment` and `lab_protocol`.
+
+## Sample Tables
+
+Let’s start by looking at the data:
+
+```bash
+# Lab Equipment
++------------+--------------+
+|equipment_id|equipment_name|
++------------+--------------+
+|           1|    Microscope|
+|           2|    Centrifuge|
+|           3|       Pipette|
+|           4|    Water bath|
+|           5|  Spectrometer|
++------------+--------------+
+
+# Lab Protocol
++-----------+-------------+------------+
+|protocol_id|protocol_name|equipment_id|
++-----------+-------------+------------+
+|        101|   Protocol A|           1|
+|        101|   Protocol A|           2|
+|        102|   Protocol B|           3|
+|        102|   Protocol B|           6|
+|        103|   Protocol C|           5|
+|        104|   Protocol D|           1|
+|        104|   Protocol D|           2|
+|        104|   Protocol D|           5|
++-----------+-------------+------------+
+```
+
+Notice that `lab_protocol` contains an `equipment_id` that doesn’t exist in lab_equipment (ID = 6).
+This will help illustrate how different joins behave.
+
+## Inner Join
+
+Returns rows where the join key exists in both tables.
+Important to note that it may return duplicates in either table.
+Also watch out if the id on the left table is not found on the right table, it will be skipped.
+
+```python
+# Joining lab protocol with lab equipment based on equipment_id
+(
+    lab_protocol
+        .join(lab_equipment, on=["equipment_id"], how="inner")
+        .show(truncate=False)
+)
+
++------------+-----------+-------------+--------------+
+|equipment_id|protocol_id|protocol_name|equipment_name|
++------------+-----------+-------------+--------------+
+|1           |101        |Protocol A   |Microscope    |
+|1           |104        |Protocol D   |Microscope    |
+|2           |101        |Protocol A   |Centrifuge    |
+|2           |104        |Protocol D   |Centrifuge    |
+|3           |102        |Protocol B   |Pipette       |
+|5           |103        |Protocol C   |Spectrometer  |
+|5           |104        |Protocol D   |Spectrometer  |
++------------+-----------+-------------+--------------+
+
+# With group the equipments by protocols
+(
+    lab_protocol.join(lab_equipment, on=["equipment_id"], how="inner")
+    .groupBy("protocol_name")
+    .agg(F.collect_list("equipment_name").alias("equipments"))
+    .orderBy("protocol_name")
+    .show(truncate=False)
+)
+
++-------------+--------------------------------------+
+|protocol_name|equipments                            |
++-------------+--------------------------------------+
+|Protocol A   |[Microscope, Centrifuge]              |
+|Protocol B   |[Pipette]                             |
+|Protocol C   |[Spectrometer]                        |
+|Protocol D   |[Microscope, Centrifuge, Spectrometer]|
++-------------+--------------------------------------+
+
+```
+
+With inner join,
+
+1\. Multiple Matches return duplicates
+
+- Microscope (id 1) and Centrifuge (id 2) appear twice as used in both protocol A and D.
+
+2\. Non-Matches is skipped
+
+- Water Bath (id 4) is skipped as no associated protocol
+- Protocol B's equiment with id 6 is missing, because only exact matches are included.
+
+## Left join
+
+Depending on your use cases it may or may not be desirable.
+If you want to ensure that the missing equipment is shown as NULL you need to use left join.
+Left join returns all rows from the left table (lab_protocol) and matching rows with the right table (lab_equipment).
+If there is no match, the right side will return NULLs.
+
+```python
+# Left join to also include a missing lab equipment
+(
+    lab_protocol.join(lab_equipment, on=["equipment_id"], how="left")
+    .show(truncate=False)
+)
++------------+-----------+-------------+--------------+
+|equipment_id|protocol_id|protocol_name|equipment_name|
++------------+-----------+-------------+--------------+
+|1           |101        |Protocol A   |Microscope    |
+|2           |101        |Protocol A   |Centrifuge    |
+|6           |102        |Protocol B   |NULL          |
+|3           |102        |Protocol B   |Pipette       |
+|5           |103        |Protocol C   |Spectrometer  |
+|1           |104        |Protocol D   |Microscope    |
+|5           |104        |Protocol D   |Spectrometer  |
+|2           |104        |Protocol D   |Centrifuge    |
++------------+-----------+-------------+--------------+
+
+# Left join to show missing equipments grouped by protocols
+(
+    lab_protocol
+        .join(lab_equipment, on=["equipment_id"], how="left")
+        # Replace `null` with a value MISSING
+        .withColumn(
+            "equipment",
+            F.when(F.col("equipment_name").isNull(), F.lit("MISSING"))
+              .otherwise(F.col("equipment_name"))
+        )
+        .groupBy("protocol_name")
+        .agg(F.collect_list("equipment").alias("equipments"))
+        .orderBy("protocol_name")
+        .show(truncate=False)
+)
+
++-------------+--------------------------------------+
+|protocol_name|equipments                            |
++-------------+--------------------------------------+
+|Protocol A   |[Microscope, Centrifuge]              |
+|Protocol B   |[MISSING, Pipette]                    |
+|Protocol C   |[Spectrometer]                        |
+|Protocol D   |[Microscope, Spectrometer, Centrifuge]|
++-------------+--------------------------------------+
+
+```
+
+With left join, we are made aware that non-matching values are returned.
+In our example, the non-matching equipment is returned as `MISSING`.
+
+## Left Semi
+
+A left semi join returns all rows from the left table where there is at least one matching row in the right table, based on the join condition.
+
+This can be used for example, if we want to know which equipment that is **at least** being used once by a protocol.
+
+```python
+(
+    lab_equipment
+        .join(lab_protocol, on=["equipment_id"], how="left_semi")
+        .show()
+)
+
++------------+--------------+
+|equipment_id|equipment_name|
++------------+--------------+
+|           1|    Microscope|
+|           2|    Centrifuge|
+|           3|       Pipette|
+|           5|  Spectrometer|
++------------+--------------+
+
+```
+
+## Left Anti
+
+A left anti join returns only the rows from the left of the table that do **not** have a match in the right table, based on the join condition.
+
+This type of join is useful to **filter out** the left table using the right table.
+For example we want to know which lab equipment that is **not** being used by our lab protocol.
+
+```python
+(
+    lab_equipment
+        .join(lab_protocol, on=["equipment_id"], how="left_anti")
+        .show()
+)
+
++------------+--------------+
+|equipment_id|equipment_name|
++------------+--------------+
+|           4|    Water bath|
++------------+--------------+
+```
+
+# Key Takeaways:
+
+1\. Inner Join
+
+- Only matching records between left and right tables are returned
+- Non-matches are skipped: Equipment without protocols or protocols without equipment will not be returned
+- Watch for duplicates: A protocol with multiple equipments will appear as duplicates
+- Use case: Show a protocol with its equipment
+
+2\. Left Join
+
+- All rows from the left table are returned, plus matches from the right
+- Non-matching rows are returned as NULLs
+- Duplicates can occur if multiple matches exist on the right
+- Use case: Show a protocol with its associated equipment including the missing equipment
+
+
+2\. Left Semi Join
+
+- Filter record with >= 1 match between left and right tables
+- No duplicates from the right table are included
+- Use case: List equipment used in at least one protocol
+
+3\. Left Anti Join
+
+- The opposite of left semi
+- No duplicates introduced from matching with the right table
+- Use case: Find unused equipment
+
+## Extra
+
+If you'd like to experiment with the samples, here's the [Python code](./join_lab.py).
+You'll need `pyspark` and its Java friend installed.
