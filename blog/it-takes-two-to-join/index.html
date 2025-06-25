@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>It Takes Two To Join — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">It Takes Two To Join</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-06-21
+  </p>
+  <p>Working with data often involves combining information spread across multiple related tables.
+Think each table as a puzzle piece, <strong><em>only</em></strong> when connected with others the full picture is exposed.</p>
+<p>That’s where <strong>joins</strong> come in.
+A join allows us to combine data from different tables based on shared columns, helping us reveal insights that aren’t visible in isolation.</p>
+<p>In this blog, we’ll explore the different types of joins using <strong>PySpark</strong>, a powerful yet intuitive tool for processing data.
+Before we dive into the types of joins, let’s start with the basic syntax for performing a join in PySpark:</p>
+<pre><code>[LEFT].join(
+    [RIGHT],
+    on=[PREDICATES],
+    how=[METHOD]
+)
+</code></pre>
+<p>Here’s what each part means:</p>
+<ul>
+<li>[LEFT]: This is the first table you're starting with.</li>
+<li>[RIGHT]: This is the second table you want to join with the first.</li>
+<li>on=[PREDICATES]: This specifies the column(s) both tables have in common — the base for joining them.</li>
+<li>how=[METHOD]: This defines the type of join you want to use.</li>
+</ul>
+<p>Here we're going to explore four different types of joins i.e: <code>inner</code>, <code>left</code>, <code>left_semi</code>, <code>left_anti</code>.
+To demonstrate each one, we’ll use two example tables: <code>lab_equipment</code> and <code>lab_protocol</code>.</p>
+<h2>Sample Tables</h2>
+<p>Let’s start by looking at the data:</p>
+<pre><code class="lang-bash"># Lab Equipment
++------------+--------------+
+|equipment_id|equipment_name|
++------------+--------------+
+|           1|    Microscope|
+|           2|    Centrifuge|
+|           3|       Pipette|
+|           4|    Water bath|
+|           5|  Spectrometer|
++------------+--------------+
+
+# Lab Protocol
++-----------+-------------+------------+
+|protocol_id|protocol_name|equipment_id|
++-----------+-------------+------------+
+|        101|   Protocol A|           1|
+|        101|   Protocol A|           2|
+|        102|   Protocol B|           3|
+|        102|   Protocol B|           6|
+|        103|   Protocol C|           5|
+|        104|   Protocol D|           1|
+|        104|   Protocol D|           2|
+|        104|   Protocol D|           5|
++-----------+-------------+------------+
+</code></pre>
+<p>Notice that <code>lab_protocol</code> contains an <code>equipment_id</code> that doesn’t exist in lab_equipment (ID = 6).
+This will help illustrate how different joins behave.</p>
+<h2>Inner Join</h2>
+<p>Returns rows where the join key exists in both tables.
+Important to note that it may return duplicates in either table.
+Also watch out if the id on the left table is not found on the right table, it will be skipped.</p>
+<pre><code class="lang-python"># Joining lab protocol with lab equipment based on equipment_id
+(
+    lab_protocol
+        .join(lab_equipment, on=[&quot;equipment_id&quot;], how=&quot;inner&quot;)
+        .show(truncate=False)
+)
+
++------------+-----------+-------------+--------------+
+|equipment_id|protocol_id|protocol_name|equipment_name|
++------------+-----------+-------------+--------------+
+|1           |101        |Protocol A   |Microscope    |
+|1           |104        |Protocol D   |Microscope    |
+|2           |101        |Protocol A   |Centrifuge    |
+|2           |104        |Protocol D   |Centrifuge    |
+|3           |102        |Protocol B   |Pipette       |
+|5           |103        |Protocol C   |Spectrometer  |
+|5           |104        |Protocol D   |Spectrometer  |
++------------+-----------+-------------+--------------+
+
+# With group the equipments by protocols
+(
+    lab_protocol.join(lab_equipment, on=[&quot;equipment_id&quot;], how=&quot;inner&quot;)
+    .groupBy(&quot;protocol_name&quot;)
+    .agg(F.collect_list(&quot;equipment_name&quot;).alias(&quot;equipments&quot;))
+    .orderBy(&quot;protocol_name&quot;)
+    .show(truncate=False)
+)
+
++-------------+--------------------------------------+
+|protocol_name|equipments                            |
++-------------+--------------------------------------+
+|Protocol A   |[Microscope, Centrifuge]              |
+|Protocol B   |[Pipette]                             |
+|Protocol C   |[Spectrometer]                        |
+|Protocol D   |[Microscope, Centrifuge, Spectrometer]|
++-------------+--------------------------------------+
+</code></pre>
+<p>With inner join,</p>
+<p>1. Multiple Matches return duplicates</p>
+<ul>
+<li>Microscope (id 1) and Centrifuge (id 2) appear twice as used in both protocol A and D.</li>
+</ul>
+<p>2. Non-Matches is skipped</p>
+<ul>
+<li>Water Bath (id 4) is skipped as no associated protocol</li>
+<li>Protocol B's equiment with id 6 is missing, because only exact matches are included.</li>
+</ul>
+<h2>Left join</h2>
+<p>Depending on your use cases it may or may not be desirable.
+If you want to ensure that the missing equipment is shown as NULL you need to use left join.
+Left join returns all rows from the left table (lab_protocol) and matching rows with the right table (lab_equipment).
+If there is no match, the right side will return NULLs.</p>
+<pre><code class="lang-python"># Left join to also include a missing lab equipment
+(
+    lab_protocol.join(lab_equipment, on=[&quot;equipment_id&quot;], how=&quot;left&quot;)
+    .show(truncate=False)
+)
++------------+-----------+-------------+--------------+
+|equipment_id|protocol_id|protocol_name|equipment_name|
++------------+-----------+-------------+--------------+
+|1           |101        |Protocol A   |Microscope    |
+|2           |101        |Protocol A   |Centrifuge    |
+|6           |102        |Protocol B   |NULL          |
+|3           |102        |Protocol B   |Pipette       |
+|5           |103        |Protocol C   |Spectrometer  |
+|1           |104        |Protocol D   |Microscope    |
+|5           |104        |Protocol D   |Spectrometer  |
+|2           |104        |Protocol D   |Centrifuge    |
++------------+-----------+-------------+--------------+
+
+# Left join to show missing equipments grouped by protocols
+(
+    lab_protocol
+        .join(lab_equipment, on=[&quot;equipment_id&quot;], how=&quot;left&quot;)
+        # Replace `null` with a value MISSING
+        .withColumn(
+            &quot;equipment&quot;,
+            F.when(F.col(&quot;equipment_name&quot;).isNull(), F.lit(&quot;MISSING&quot;))
+              .otherwise(F.col(&quot;equipment_name&quot;))
+        )
+        .groupBy(&quot;protocol_name&quot;)
+        .agg(F.collect_list(&quot;equipment&quot;).alias(&quot;equipments&quot;))
+        .orderBy(&quot;protocol_name&quot;)
+        .show(truncate=False)
+)
+
++-------------+--------------------------------------+
+|protocol_name|equipments                            |
++-------------+--------------------------------------+
+|Protocol A   |[Microscope, Centrifuge]              |
+|Protocol B   |[MISSING, Pipette]                    |
+|Protocol C   |[Spectrometer]                        |
+|Protocol D   |[Microscope, Spectrometer, Centrifuge]|
++-------------+--------------------------------------+
+</code></pre>
+<p>With left join, we are made aware that non-matching values are returned.
+In our example, the non-matching equipment is returned as <code>MISSING</code>.</p>
+<h2>Left Semi</h2>
+<p>A left semi join returns all rows from the left table where there is at least one matching row in the right table, based on the join condition.</p>
+<p>This can be used for example, if we want to know which equipment that is <strong>at least</strong> being used once by a protocol.</p>
+<pre><code class="lang-python">(
+    lab_equipment
+        .join(lab_protocol, on=[&quot;equipment_id&quot;], how=&quot;left_semi&quot;)
+        .show()
+)
+
++------------+--------------+
+|equipment_id|equipment_name|
++------------+--------------+
+|           1|    Microscope|
+|           2|    Centrifuge|
+|           3|       Pipette|
+|           5|  Spectrometer|
++------------+--------------+
+</code></pre>
+<h2>Left Anti</h2>
+<p>A left anti join returns only the rows from the left of the table that do <strong>not</strong> have a match in the right table, based on the join condition.</p>
+<p>This type of join is useful to <strong>filter out</strong> the left table using the right table.
+For example we want to know which lab equipment that is <strong>not</strong> being used by our lab protocol.</p>
+<pre><code class="lang-python">(
+    lab_equipment
+        .join(lab_protocol, on=[&quot;equipment_id&quot;], how=&quot;left_anti&quot;)
+        .show()
+)
+
++------------+--------------+
+|equipment_id|equipment_name|
++------------+--------------+
+|           4|    Water bath|
++------------+--------------+
+</code></pre>
+<h1>Key Takeaways:</h1>
+<p>1. Inner Join</p>
+<ul>
+<li>Only matching records between left and right tables are returned</li>
+<li>Non-matches are skipped: Equipment without protocols or protocols without equipment will not be returned</li>
+<li>Watch for duplicates: A protocol with multiple equipments will appear as duplicates</li>
+<li>Use case: Show a protocol with its equipment</li>
+</ul>
+<p>2. Left Join</p>
+<ul>
+<li>All rows from the left table are returned, plus matches from the right</li>
+<li>Non-matching rows are returned as NULLs</li>
+<li>Duplicates can occur if multiple matches exist on the right</li>
+<li>Use case: Show a protocol with its associated equipment including the missing equipment</li>
+</ul>
+<p>2. Left Semi Join</p>
+<ul>
+<li>Filter record with &gt;= 1 match between left and right tables</li>
+<li>No duplicates from the right table are included</li>
+<li>Use case: List equipment used in at least one protocol</li>
+</ul>
+<p>3. Left Anti Join</p>
+<ul>
+<li>The opposite of left semi</li>
+<li>No duplicates introduced from matching with the right table</li>
+<li>Use case: Find unused equipment</li>
+</ul>
+<h2>Extra</h2>
+<p>If you'd like to experiment with the samples, here's the <a href="join_lab.py">Python code</a>.
+You'll need <code>pyspark</code> and its Java friend installed.</p>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
