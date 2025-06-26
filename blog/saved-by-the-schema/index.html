@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Saved by the Schema — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Saved by the Schema</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-06-25
+  </p>
+  <p>Have you ever tried to assemble furniture without instructions? That’s what working with data without a schema feels like.
+A schema is your data’s blueprint—it defines exactly what shape your data should take and what type each field must be.</p>
+<p>In this post, we’ll explore how schemas can save your data projects, using PySpark as our data tool.</p>
+<h2>Why Is Schema Important?</h2>
+<ul>
+<li>Data Integrity and Consistency</li>
+</ul>
+<p>A schema is like a security checkpoint: it only lets in data that matches your rules. This “fail fast” approach catches issues early and keeps your data integrity in check.</p>
+<ul>
+<li>Efficient Selective Ingestion</li>
+</ul>
+<p>A schema is your packing list—you only bring what you need. This makes data processing lighter and faster.</p>
+<h2>Understanding StructType and StructField</h2>
+<p>When defining schemas in PySpark, two key building blocks are <code>StructType</code> and <code>StructField</code>:</p>
+<ul>
+<li><strong>StructType</strong> is like a container or blueprint for your data structure. It describes the overall shape—think of it like JSON object.</li>
+<li><strong>StructField</strong> defines each individual field (column) within that structure, specifying its name, data type, and whether it can be NULL.</li>
+</ul>
+<p>For example, in the Iris dataset, the <code>measurement</code> field is itself a structured object, so we use a <code>StructType</code> to describe its fields, and <code>StructField</code> for each measurement:</p>
+<pre><code class="lang-python">measurement_schema = T.StructType([
+    T.StructField(&quot;sepal_length&quot;, T.DoubleType()),
+    T.StructField(&quot;sepal_width&quot;, T.DoubleType()),
+    T.StructField(&quot;petal_length&quot;, T.DoubleType()),
+    T.StructField(&quot;petal_width&quot;, T.DoubleType()),
+])
+</code></pre>
+<p>This makes your schema both flexible and precise, allowing you to represent nested and complex data structures with ease.</p>
+<h2>Practical Example: Defining Schema for Iris dataset</h2>
+<p>Here’s the Iris dataset in JSON format:</p>
+<pre><code class="lang-JSON">{&quot;measurement&quot;: {&quot;sepal_length&quot;: 5.1, &quot;sepal_width&quot;: 3.5, &quot;petal_length&quot;: 1.4, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+{&quot;measurement&quot;: {&quot;sepal_length&quot;: 4.9, &quot;sepal_width&quot;: 3.0, &quot;petal_length&quot;: 1.4, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+{&quot;measurement&quot;: {&quot;sepal_length&quot;: 4.7, &quot;sepal_width&quot;: 3.2, &quot;petal_length&quot;: 1.3, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+{&quot;measurement&quot;: {&quot;sepal_length&quot;: 4.6, &quot;sepal_width&quot;: 3.1, &quot;petal_length&quot;: 1.5, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+{&quot;measurement&quot;: {&quot;sepal_length&quot;: 5.0, &quot;sepal_width&quot;: 3.6, &quot;petal_length&quot;: 1.4, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+</code></pre>
+<p>Let’s define the schema for this dataset:</p>
+<pre><code class="lang-python">measurement_schema = T.StructType(
+    [
+        T.StructField(&quot;sepal_length&quot;, T.DoubleType()),
+        T.StructField(&quot;sepal_width&quot;, T.DoubleType()),
+        T.StructField(&quot;petal_length&quot;, T.DoubleType()),
+        T.StructField(&quot;petal_width&quot;, T.DoubleType()),
+    ]
+)
+
+iris_schema = T.StructType(
+    [
+        T.StructField(&quot;measurement&quot;, measurement_schema),
+        T.StructField(&quot;species&quot;, T.StringType()),
+    ]
+)
+</code></pre>
+<p>Now, read the JSON file using the schema:</p>
+<pre><code class="lang-python">iris = spark.read.json(&quot;iris.json&quot;, schema=iris_schema, multiLine=True, mode=&quot;FAILFAST&quot;)
+iris.printSchema()
+ |-- measurement: struct (nullable = true)
+ |    |-- sepal_length: double (nullable = true)
+ |    |-- sepal_width: double (nullable = true)
+ |    |-- petal_length: double (nullable = true)
+ |    |-- petal_width: double (nullable = true)
+ |-- species: string (nullable = true)
+</code></pre>
+<p>This prints the schema, showing the structure and types for each field.</p>
+<p>To flatten the table, select the measurement fields and species:</p>
+<pre><code class="lang-python">iris_df = iris.select(&quot;measurement.*&quot;, &quot;species&quot;)
+
+iris_df.show(5)
++------------+-----------+------------+-----------+-------+
+|sepal_length|sepal_width|petal_length|petal_width|species|
++------------+-----------+------------+-----------+-------+
+|         5.1|        3.5|         1.4|        0.2| setosa|
+|         4.9|        3.0|         1.4|        0.2| setosa|
+|         4.7|        3.2|         1.3|        0.2| setosa|
+|         4.6|        3.1|         1.5|        0.2| setosa|
+|         5.0|        3.6|         1.4|        0.2| setosa|
++------------+-----------+------------+-----------+-------+
+</code></pre>
+<p>This displays the data in a simple, flat table.</p>
+<p>If your data doesn’t match the schema like if a string sneaks in where a number is expected.
+PySpark will catch it immediately. For example, with this invalid data:</p>
+<pre><code class="lang-json">{&quot;measurement&quot;: {&quot;sepal_length&quot;: 5.1, &quot;sepal_width&quot;: 3.5, &quot;petal_length&quot;: 1.4, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+{&quot;measurement&quot;: {&quot;sepal_length&quot;: 4.9, &quot;sepal_width&quot;: 3.0, &quot;petal_length&quot;: 1.4, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+{&quot;measurement&quot;: {&quot;sepal_length&quot;: &quot;a&quot;, &quot;sepal_width&quot;: 3.2, &quot;petal_length&quot;: 1.3, &quot;petal_width&quot;: 0.2}, &quot;species&quot;: &quot;setosa&quot;}
+</code></pre>
+<p>When we read this data, it will fail with the following error:</p>
+<pre><code class="lang-bash">...
+Parse Mode: FAILFAST. To process malformed records as null result, try setting the option &#39;mode&#39; as &#39;PERMISSIVE&#39;.
+Cannot parse the value &#39;a&#39; of the field `sepal_length` as target spark data type Double
+...
+</code></pre>
+<p>Also we can use schema to read a subset of measurement for example only for petal.</p>
+<pre><code class="lang-python">petal_iris_schema = T.StructType(
+    [
+        T.StructField(&quot;measurement&quot;, T.StructType([
+            T.StructField(&quot;petal_length&quot;, T.DoubleType()),
+            T.StructField(&quot;petal_width&quot;, T.DoubleType()),
+        ])),
+        T.StructField(&quot;species&quot;, T.StringType()),
+    ]
+)
+petal_iris = spark.read.json(
+    &quot;iris.jsonl&quot;, schema=petal_iris_schema, multiLine=False, mode=&quot;FAILFAST&quot;
+)
+
+petal_iris.printSchema()
+root
+ |-- measurement: struct (nullable = true)
+ |    |-- petal_length: double (nullable = true)
+ |    |-- petal_width: double (nullable = true)
+ |-- species: string (nullable = true)
+</code></pre>
+<h2>Playground</h2>
+<p>Curious to see schema validation in action? You can experiment with all the code from this post using the files:</p>
+<ul>
+<li>Run and modify the example code in <a href="ingest_iris.py"><code>ingest_iris.py</code></a></li>
+<li>Use the provided data files: <a href="iris.jsonl"><code>iris.jsonl</code></a> (valid) and <a href="invalid_iris.jsonl"><code>invalid_iris.jsonl</code></a> (contains an error)</li>
+</ul>
+<p>Try changing the data or schema and see how PySpark reacts—it's a great way to learn by doing!</p>
+<h1>Key takeaways:</h1>
+<ul>
+<li>Predictable processing: Schemas give you control and consistency—no surprises.</li>
+<li>Fail fast: Catch data issues early, before they give you pain.</li>
+<li>Faster and cheaper: Only process what you need, saving time and resources</li>
+</ul>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
