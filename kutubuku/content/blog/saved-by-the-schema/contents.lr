@@ -1,4 +1,4 @@
-title: Save by the Schema
+title: Saved by the Schema
 ---
 author: Ricky Lim
 ---
@@ -6,27 +6,44 @@ pub_date: 2025-06-25
 ---
 body:
 
-A schema is to represent the expected structure, and types of your data.
-It's like a blueprint that defines how your data is shaped, what type each field is.
+Have you ever tried to assemble furniture without instructions? That’s what working with data without a schema feels like.
+A schema is your data’s blueprint—it defines exactly what shape your data should take and what type each field must be.
 
-Here, we're going to explore schema with pyspark.
+In this post, we’ll explore how schemas can save your data projects, using PySpark as our data tool.
 
-## Why Is Schema Important ?
+## Why Is Schema Important?
 
-### Data Integrity and consistency
+- Data Integrity and Consistency
 
-A well-defined schema is like ahead-of-time rules on your data, what types are allowed, which fields are required.
-This keeps your data reliable and if inconsistencies happen, schema can help us to fail fast.
-This "fail fast" is essential for early detection of upstream issues, saving time, and avoiding downstream data corruption.
+A schema is like a security checkpoint: it only lets in data that matches your rules. This “fail fast” approach catches issues early and keeps your data integrity in check.
 
-### Efficient selective ingestion
+- Efficient Selective Ingestion
 
-Defining a schema allows us to load only the fields that matter, skipping irrelevant data.
-By doing less ingestion, we can speed up the process and save on storage costs.
+A schema is your packing list—you only bring what you need. This makes data processing lighter and faster.
+
+## Understanding StructType and StructField
+
+When defining schemas in PySpark, two key building blocks are `StructType` and `StructField`:
+
+- **StructType** is like a container or blueprint for your data structure. It describes the overall shape—think of it like JSON object.
+- **StructField** defines each individual field (column) within that structure, specifying its name, data type, and whether it can be NULL.
+
+For example, in the Iris dataset, the `measurement` field is itself a structured object, so we use a `StructType` to describe its fields, and `StructField` for each measurement:
+
+```python
+measurement_schema = T.StructType([
+    T.StructField("sepal_length", T.DoubleType()),
+    T.StructField("sepal_width", T.DoubleType()),
+    T.StructField("petal_length", T.DoubleType()),
+    T.StructField("petal_width", T.DoubleType()),
+])
+```
+
+This makes your schema both flexible and precise, allowing you to represent nested and complex data structures with ease.
 
 ## Practical Example: Defining Schema for Iris dataset
 
-Here we have Iris dataset in JSON format that looks like this:
+Here’s the Iris dataset in JSON format:
 
 ```JSON
 {"measurement": {"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}, "species": "setosa"}
@@ -36,7 +53,7 @@ Here we have Iris dataset in JSON format that looks like this:
 {"measurement": {"sepal_length": 5.0, "sepal_width": 3.6, "petal_length": 1.4, "petal_width": 0.2}, "species": "setosa"}
 ```
 
-Let's define the schema for our iris dataset.
+Let’s define the schema for this dataset:
 
 ```python
 measurement_schema = T.StructType(
@@ -56,7 +73,7 @@ iris_schema = T.StructType(
 )
 ```
 
-Now we can read our iris json file.
+Now, read the JSON file using the schema:
 
 ```python
 iris = spark.read.json("iris.json", schema=iris_schema, multiLine=True, mode="FAILFAST")
@@ -69,11 +86,11 @@ iris.printSchema()
  |-- species: string (nullable = true)
 ```
 
+This prints the schema, showing the structure and types for each field.
 
-We can also convert it as a flat table.
+To flatten the table, select the measurement fields and species:
 
 ```python
-
 iris_df = iris.select("measurement.*", "species")
 
 iris_df.show(5)
@@ -88,7 +105,10 @@ iris_df.show(5)
 +------------+-----------+------------+-----------+-------+
 ```
 
-With this schema if there is any invalid type, as such in `invalid_iris.json`:
+This displays the data in a simple, flat table.
+
+If your data doesn’t match the schema like if a string sneaks in where a number is expected.
+PySpark will catch it immediately. For example, with this invalid data:
 
 ```json
 {"measurement": {"sepal_length": 5.1, "sepal_width": 3.5, "petal_length": 1.4, "petal_width": 0.2}, "species": "setosa"}
@@ -101,7 +121,7 @@ When we read this data, it will fail with the following error:
 ```bash
 ...
 Parse Mode: FAILFAST. To process malformed records as null result, try setting the option 'mode' as 'PERMISSIVE'.
-Cannot parse the value 'a' of the field `sepal_length` as target spark data type Doubl
+Cannot parse the value 'a' of the field `sepal_length` as target spark data type Double
 ...
 ```
 
@@ -129,8 +149,18 @@ root
  |-- species: string (nullable = true)
 ```
 
+## Playground
+
+Curious to see schema validation in action? You can experiment with all the code from this post using the files:
+
+- Run and modify the example code in [`ingest_iris.py`](./ingest_iris.py)
+- Use the provided data files: [`iris.jsonl`](./iris.jsonl) (valid) and [`invalid_iris.jsonl`](./invalid_iris.jsonl) (contains an error)
+
+Try changing the data or schema and see how PySpark reacts—it's a great way to learn by doing!
+
+
 # Key takeaways:
 
-- Predictable data processing: defining schema allows us to have robust data processing without reading it twice, no infer schema so you have the control!
-- Fail Fast: as a safety net if dataset changes
-- Faster processing: selecting only relevant data speeds up processing and lowers our compute and storage costs
+- Predictable processing: Schemas give you control and consistency—no surprises.
+- Fail fast: Catch data issues early, before they give you pain.
+- Faster and cheaper: Only process what you need, saving time and resources
