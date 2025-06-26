@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="icon" type="image/x-icon" href="../../../static/favicon.ico">
-  <link rel="apple-touch-icon" href="../../../static/favicon.png">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../../../static/style.css">
-  <link rel="stylesheet" href="../../../static/search.css">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
 
-  <title>Blog — kutubuku</title>
+  <title>Managing Project Environments — kutubuku</title>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
@@ -31,8 +31,8 @@
             </button>
 
             <!-- Brand/Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="../../../">
-              <img src="../../../static/rlim.png"
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
                    alt="rlim"
                    class="logo-rlim me-2">
             </a>
@@ -40,7 +40,7 @@
 
           <!-- Right side: Search Form (always visible) -->
           <div class="navbar-search-main w-50">
-            <form class="search-form d-flex" action="../../../search/" method="get">
+            <form class="search-form d-flex" action="../../search/" method="get">
               <div class="input-group">
                 <input type="search"
                        class="form-control form-control-sm search-input"
@@ -64,7 +64,7 @@
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-        <img src="../../../static/rlim.png"
+        <img src="../../static/rlim.png"
              alt="rlim"
              class="logo-rlim me-2">
       </h5>
@@ -74,22 +74,22 @@
       <ul class="navbar-nav flex-grow-1">
         <li class="nav-item">
           <a class="nav-link"
-             href="../../../">Welcome</a>
+             href="../../">Welcome</a>
         </li>
         
           <li class="nav-item">
             <a class="nav-link active"
-               href="../../">Blog</a>
+               href="../">Blog</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../search/">Search</a>
+               href="../../search/">Search</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../about/">About</a>
+               href="../../about/">About</a>
           </li>
         
       </ul>
@@ -99,73 +99,48 @@
   <div class="page">
     
   
-  <div class="blog-post">
-    <h3><a href="../../to-bridge-to-host-or-something-between-a-dockerian-network/">To Bridge, to Host, or Something Between: A Dockerian Network</a></h3>
-  </div>
+  <div class="blog-post" data-pagefind-body>
   
-  <div class="blog-post">
-    <h3><a href="../../to-mount-or-to-volume-a-guide-to-docker-data-persistence/">To Mount or to Volume? A Guide to Docker Data Persistence</a></h3>
-  </div>
+    <h1 data-pagefind-meta="title">Managing Project Environments</h1>
   
-  <div class="blog-post">
-    <h3><a href="../../a-quick-guide-to-watermarking/">A Quick Guide to Watermarking</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../avoiding-depedency-disasters-in-your-python-projects/">Avoiding Depedency Disasters in Your Python Projects</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../a-guide-to-pyproject-toml-migration/">A Guide to pyproject.toml Migration</a></h3>
-  </div>
-  
-
-  <div class="pagination-bottom">
+  <p class="meta">
+    written by
     
-  <div class="pagination">
+      Ricky Lim
     
-      
-        <a href="../2/" class="prev">← Previous</a>
-      
+    on 2025-06-24
+  </p>
+  <p>Managing environment variables across multiple projects can quickly become a headache.
+Have you ever accidentally used the wrong API key, or spent time cleaning up your shell after switching projects? If so, you’re not alone.</p>
+<p>It's very easy to get messy when managing different environment variables for different projects.
+For example, you might need a different <code>API_KEY</code> for Project A and Project B.
+Manually setting these every time is tedious and error-prone.</p>
+<p><code>direnv</code> comes to fix this - a tool that automatically loads but also unloads environment variables as you navigate between different project directories.</p>
+<p><strong>Benefits of using <code>direnv</code>:</strong></p>
+<ul>
+<li>Automatically loads and unloads environment variables as you switch projects</li>
+<li>Reduces manual errors and saves time</li>
+<li>Keeps your global environment clean and secure</li>
+</ul>
+<h2>How to use direnv with .envrc</h2>
+<p>1. <strong>Install direnv</strong> — Follow the instructions at <a href="https://direnv.net">https://direnv.net</a>
+2. <strong>Create a <code>.envrc</code> file in each project directory</strong></p>
+<p>Example:</p>
+<pre><code class="lang-bash"># .envrc for Project A
+export API_KEY=aloha
 
-      
-      <a href="../../" >1</a>
-
-      
-      
-
-      
-      
-        
-          <a href="../2/" >2</a>
-        
-      
-        
-          <a href="./" class="active">3</a>
-        
-      
-        
-          <a href="../4/" >4</a>
-        
-      
-
-      
-      
-        <span class="ellipsis">...</span>
-      
-
-      
-      
-        <a href="../6/" >6</a>
-      
-
-      
-        <a href="../4/" class="next">Next →</a>
-      
-    </div>
-  
+# .envrc for Project B
+export API_KEY=hohoho
+</code></pre>
+<p>3. <strong>Approve the environment</strong> — The first time you enter a project directory, direnv will ask for your approval to load the environment variables.</p>
+<p>Now, when you <code>cd</code> into Project A, <code>API_KEY</code> is set to <code>aloha</code>. When you leave, it’s unset. Enter Project B, and <code>API_KEY</code> is now <code>hohoho</code>.</p>
+<h2>Key Takeaways</h2>
+<p><code>direnv</code> is a simple tool to simplify managing environment variables in your multiple projects.
+It ensures you always have the right environment variables for the right project you're working on.
+With <code>direnv</code>, you can avoid cluttering environment variables in your global shell environment - you don't want that!</p>
 
   </div>
+
 
   </div>
 
