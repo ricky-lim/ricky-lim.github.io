@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Dynamic Yet Strong: Python Typing for Data Science — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Dynamic Yet Strong: Python Typing for Data Science</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-07-14
+  </p>
+  <p>Have you ever spent hours debugging a data pipeline only to discover you accidentally passed a DataFrame where a Series was expected?
+Or wondered why your colleague's function sometimes returns a list and sometimes a numpy array?
+Python's type system can help prevent these headaches while keeping the flexibility that makes Python awesome for data science.</p>
+<p>Python dominates data science for good reason.
+Beyond its rich ecosystem, expressiveness and easy to use, Python has a unique type system that is <strong><em>dynamic</em></strong> and yet <strong>strong</strong>.</p>
+<p>We can think of a type system as a label on a data container.
+It tells us what kind of data is inside so we can get the idea of what operations we can perform.
+Just like a package labeled "Fragile" tells us that it should be handled with care, a data type label like <code>int</code> or <code>str</code> informs us which operations are allowed.</p>
+<h3>Python is strongly typed</h3>
+<p>What does it mean? Python enforces <strong>no implicit type coercion</strong> to perform data operations.</p>
+<p>For example:</p>
+<pre><code class="lang-python">temp = 26.5
+temp + &quot;c&quot;  # ❌ TypeError: unsupported operand type(s) for +: &#39;float&#39; and &#39;str&#39;
+</code></pre>
+<p>In contrast, weakly typed languages such as JavaScript, will coerce one type to another which might lead to subtle bugs.</p>
+<pre><code class="lang-JavaScript">temp = 26.5
+temp + &quot;c&quot; # &#39;26.5c&#39;
+</code></pre>
+<p>In data science, we're working with different data types - strings, integers, floats, pandas.Series, etc.
+Strong typing helps prevent subtle bugs by refusing to mix incompatible types unless it's done explicitly.</p>
+<h3>Python is Also Dynamically Typed</h3>
+<p>Dynamically typed means that types are <strong><em>checked</em></strong> at <strong>runtime</strong>, when operations on objects are attempted.
+With Dynamic typing property, Python supports Duck typing.
+In practice, it means it doesn't matter what type an object is, only what an object can do.</p>
+<p>It comes from the saying:</p>
+<blockquote><p>If it looks like a duck, swims like a duck, and quacks like a duck — it’s probably a duck.</p>
+</blockquote>
+<p>If I can invoke <code>person.quack()</code>, then <code>person</code> is probably a duck in this context.</p>
+<p>Duck typing offers flexibility and makes Python objects focus on "getting things done".</p>
+<p>Dynamic typing makes Python easier to get started <strong><em>but</em></strong> allows <strong>unsupported</strong> operations that may cause errors at runtime 😱.</p>
+<p>As a comparison to the dynamic typing is a static typing adopted by C, Java, go, and other compiled languages, where you must declare types ahead of time.
+The types are then enforced at compile time - the compiler checks that types match before the program even built or runs.
+This is more robust than duck typing, with the advantage of catching bugs early in the development process.</p>
+<p>While there are benefits to static typing, there is also a price to pay.
+The type system makes the language less expressive and harder to read.</p>
+<p>For example, consider how you might annotate the type of HTTP headers in Python:</p>
+<pre><code class="lang-python"># 😵‍💫 This is difficult to read
+Headers = Union[
+    Mapping[basestring, basestring],
+    Iterable[Tuple[basestring, basestring]]
+]
+</code></pre>
+<p>While many types are simple like <code>int</code>, <code>str</code>, or <code>list[float]</code> — others are more complex, especially with dynamic patterns like <code>**kwargs</code>.</p>
+<p>Take Django settings, for example: config(**settings). The settings dictionary typically contains string keys, but its values can be strings, booleans, tuples, lists, or nested structures - only the universe knows.
+Typing this precisely is tricky, even then the maintenance can be error-prone.</p>
+<p>In Python typing is not a must but rather a hint to help your IDE, such as vscode helps you with autocompletion and error detection.
+With external tools like <code>mypy</code>, you can also integrate type checking into your CI pipeline to catch type-related errors early.</p>
+<p>That’s why it’s such a joy that with Python, you can choose to add type hints when you think it makes sense.
+This flexibility gives you the benefits of type safety when needed, without sacrificing its expressiveness.</p>
+<h3>Practical Typing Tips</h3>
+<p>When using type hints in data science, keeping a few key principles in mind can help you write clearer, more robust code.</p>
+<p>1. General vs Specific Types</p>
+<p>In type system, the more general the type is like <code>object</code> the fewer operations it supports.
+For example, <code>object</code> does not support  <code>__mul__</code> for multiplication, whereas more specific type like <code>int</code> does.</p>
+<p>So, the more specific the type, the more functionality you get.
+When you want to clearly define what operations are allowed, it's best to use more specific types.</p>
+<p>2. When annotating your functions: Be open to the input, and be specific about the output.</p>
+<p>Following Postel's Law:</p>
+<blockquote><p>Be liberal in what you accept, be conservative in what you send,</p>
+</blockquote>
+<p>A good rule of thumb when annotating functions is:</p>
+<ul>
+<li>Use abstract collection types (like <code>Sequence</code>, <code>Mapping</code>, or <code>Iterable</code>) for input arguments to allow flexibility.</li>
+<li>Use concrete types (like <code>int</code>, <code>string</code>) for return values to make it clear exactly what the function outputs.</li>
+</ul>
+<p>For example:</p>
+<pre><code>from typing import Sequence
+
+def capitalize_names(names: Sequence[str]) -&gt; list[str]:
+    return [name.capitalize() for name in names]
+</code></pre>
+<p>Input: <code>Sequence[str]</code></p>
+<ul>
+<li>Sequence[str] accepts both lists and tuples, making the function more flexible for the caller.</li>
+</ul>
+<p>Output: <code>list[str]</code></p>
+<ul>
+<li>Returning list[str] makes it clear that the function produces a new list of strings, with no ambiguity.</li>
+</ul>
+<h3>Practical Type Hints for Data Science</h3>
+<p>Here are some type hints that are especially useful in data science projects.</p>
+<h4>Optional</h4>
+<p><code>Optional</code> is used when we want to use <code>None</code> as a default.</p>
+<pre><code class="lang-python">from typing import Optional
+
+def hello(name: Optional[str] = None) -&gt; str:
+    return f&quot;hello {name}&quot; if name else &quot;hello world&quot;
+</code></pre>
+<h3>Union</h3>
+<p>We use <code>Union</code> to allow multiple types as options, and requires at least two types.</p>
+<pre><code class="lang-python">from typing import Union
+
+def fahrenheit_to_celsius(f: Union[float, str]) -&gt; float:
+    ...
+</code></pre>
+<p>🙅 Also <strong>avoid</strong> using <code>Union</code> for redundant types.</p>
+<pre><code>
+# ❌ This is redundant because float also covers operations performed by int
+def fahrenheit_to_celsius(f: Union[int, float]) -&gt; float:
+
+# ✅ float will also accept int values
+def fahrenheit_to_celsius(f: float) -&gt; float:
+</code></pre>
+<h3>Iterable</h3>
+<p>Iterable type is used to annotate anything you can loop over.
+Example: <code>tuple</code>, <code>list</code>, <code>str</code>, <code>dict</code>.</p>
+<p>Here is a practical example when we use <code>tuple</code> as type hints to represent a lab equipment (e.g from a database)</p>
+<pre><code class="lang-python"># +------------+--------------+
+# |equipment_id|equipment_name|
+# +------------+--------------+
+# |           1|    Microscope|
+EquipmentRecord = tuple[int, str]
+
+def get_equipment() -&gt; tuple[EquipmentRecord]:
+    ...
+</code></pre>
+<h3>Callable</h3>
+<p>Used to annotate function or callback parameters in higher-order functions.
+Higher-order function is a function that takes another function as input or returns a function as output.
+The signature of callable type:</p>
+<pre><code>Callable[[ParamType1, ParamType2], ReturnType]
+
+# For no argument
+Callable[[], ReturnType]
+
+# With flexible signature
+Callable[..., ReturnType]
+</code></pre>
+<p>For example:</p>
+<pre><code>from typing import Callable
+
+def convert_temp(n: float, convert_fn: Callable[[float], float]) -&gt; float:
+    return convert_fn(n)
+
+# Usage example
+def fahrenheit_to_celsius(f: float) -&gt; float:
+    return (f - 32) * 5 / 9
+
+def celsius_to_fahrenheit(c: float) -&gt; float:
+    return c * 9 / 5 + 32
+
+print(convert_temp(212, fahrenheit_to_celsius))
+print(convert_temp(100, celsius_to_fahrenheit))
+</code></pre>
+<h2>Key take aways</h2>
+<ul>
+<li><strong>Python is strongly typed</strong>: No implicit type coercion prevents subtle bugs when mixing incompatible types</li>
+<li><strong>Dynamic typing enables duck typing</strong>: Focus on what objects can do rather than what they are</li>
+<li><strong>Start small</strong>: Gradually add types when it makes sense</li>
+<li><strong>Follow Postel's Law</strong>: When annotating functions, be liberal in what you accept, be conservative in what you send. Your users will thank you.</li>
+</ul>
+<p>Remember: type hints are your helpful assistant, not your strict police!</p>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
