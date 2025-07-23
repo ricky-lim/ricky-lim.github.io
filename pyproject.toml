@@ -24,6 +24,7 @@ packages = ["src/ricky_lim_github_io"]
 [dependency-groups]
 dev = [
     "bump-my-version>=1.0.2",
+    "ipython>=8.12.3",
     "pre-commit>=3.5.0",
     "pyspark>=3.5.6",
     "pytest>=8.3.5",
