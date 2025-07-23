@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Never Say Never: Exhaustive Enums in Python — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Never Say Never: Exhaustive Enums in Python</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-07-16
+  </p>
+  <p>Have you ever needed to say <strong>"never"</strong>?
+Sometimes, when coding, explicitly indicating something should <strong>never</strong> happen can actually save you.</p>
+<p>Imagine you're developing data processing pipeline for laboratory automation.
+Each step in the pipeline - <strong><em>sample preparation, dilution, mixing</em></strong> - is an <strong>enum</strong> value in your logic.
+What happens if new steps are added, e.g <strong><em>normalization</em></strong>, but you forget to update your critical code that handles each step 😶‍🌫️?
+Your processing pipeline can silently skip 🤐 or worse produce errors in production 🔥.
+Missing a single processing step, could mean making flawed results based on incomplete processing pipeline 🙅.</p>
+<p>🛃 Exhaustive checks over enums, ensures your code aware to such future changes by providing warning about unhandled cases.
+That's where Python's special type <code>Never</code> comes to the rescue.</p>
+<h2>Never</h2>
+<p>It's introduced in Python 3.11 in <code>typing</code> module and is used to represent a value that should <strong>never</strong> be returned.
+It's mostly found in code to annotate functions that always raise exceptions or terminate the program.</p>
+<p>For example:</p>
+<pre><code class="lang-Python">import sys
+from typing import Never
+
+
+def lab_processing_error(message: str) -&gt; Never:
+    raise RuntimeError(f&quot;Lab processing error: {message}&quot;)
+</code></pre>
+<p>Here, <code>lab_processing_error</code> will <strong>never</strong> return and triggers runtime error and stops execution.</p>
+<p>Besides signaling errors, the <code>Never</code> type can also be useful for making sure all possible cases (like enum values) are handled in your code.</p>
+<h2>Using <code>Never</code> for Exhaustive Enums</h2>
+<p>In a data science project, you can use an <code>Enum</code> to represent a finite set of experiment steps. Let's say:</p>
+<pre><code class="lang-Python">class LabStep(Enum):
+    SAMPLE_PREPARATION = auto()
+    DILUTION = auto()
+    MIXING = auto()
+</code></pre>
+<p>And in your main logic, you want to ensure that all steps are being processed.
+The power of <code>Never</code> shines in the default of your processing logic.
+When you annotate this default branch using <code>Never</code> it's telling the type checker that this is the "impossible case" so it should not happen.
+If it does happen, it means that you have future enum values that are not yet handled.</p>
+<h3>Example</h3>
+<pre><code class="lang-Python">def liquid_handler(step: LabStep) -&gt; str:
+    match step:
+        case LabStep.SAMPLE_PREPARATION:
+            return &quot;Prepare the sample...&quot;
+        case LabStep.DILUTION:
+            return &quot;Dilute the sample...&quot;
+        case LabStep.MIXING:
+            return &quot;Mix the sample...&quot;
+        case _:
+            # This should never happen if all enums are handled
+            _: Never = step
+            raise RuntimeError(f&quot;The step is unhandled: {step}&quot;)
+</code></pre>
+<p>When you add a new step, such as <strong>normalization</strong>.</p>
+<pre><code class="lang-Python">class LabStep(Enum):
+    SAMPLE_PREPARATION = auto()
+    DILUTION = auto()
+    MIXING = auto()
+    NORMALIZATION = auto()  # New step added
+
+def liquid_handler(step: LabStep) -&gt; str:
+    match step:
+        case LabStep.SAMPLE_PREPARATION:
+            return &quot;Prepare the sample...&quot;
+        case LabStep.DILUTION:
+            return &quot;Dilute the sample...&quot;
+        case LabStep.MIXING:
+            return &quot;Mix the sample...&quot;
+        case _:
+            _: Never = step
+            raise RuntimeError(f&quot;The step is unhandled: {step}&quot;)
+</code></pre>
+<p>The default case will now be reachable, unfortunately and when you run <code>mypy</code>, it will raise a type <strong><em>ERROR</em></strong>, with a beautiful message.</p>
+<p>The message is very clear, pointing you to the unhandled enum value 🙌 !</p>
+<pre><code class="lang-bash">never_say_never.py:26: error: Incompatible types in assignment (expression has type &quot;Literal[LabStep.NORMALIZATION]&quot;, variable has type &quot;Never&quot;)  [assignment]
+Found 1 error in 1 file (checked 1 source file)
+</code></pre>
+<p>When you have the <code>mypy</code> extension enabled in VSCode, you’ll notice a helpful little red squiggle 〰️ like this:</p>
+<p><img src="unhandled_enum_error.png" alt="unhandled_enum_vscode"></p>
+<p>This error helps you as a reminder that you did NOT yet handle all your enum cases.</p>
+<p>To fix this, we need to handle our new lab step.</p>
+<pre><code class="lang-Python">def liquid_handler(step: LabStep) -&gt; str:
+    match step:
+        case LabStep.SAMPLE_PREPARATION:
+            return &quot;Prepare the sample...&quot;
+        case LabStep.DILUTION:
+            return &quot;Dilute the sample...&quot;
+        case LabStep.MIXING:
+            return &quot;Mix the sample...&quot;
+        # Handle the missing step
+        case LabStep.NORMALIZATION:
+            return &quot;Normalize the sample...&quot;
+        case _:
+            _: Never = step
+            raise RuntimeError(f&quot;The step is unhandled: {step}&quot;)
+</code></pre>
+<p>Now the red squiggle is gone and also when you run again <code>mypy</code>, it happily reports 🥳:</p>
+<pre><code class="lang-bash">Success: no issues found in 1 source file
+</code></pre>
+<h2>Key Takeaways</h2>
+<ul>
+<li><strong>Exhaustive Enum</strong>: Exhaustive enum handling is essential in data science as missing a case can lead to silent incorrect analysis</li>
+<li><strong>Never</strong>: Python's <code>Never</code> type is your friend to provide a kind reminder for unhandled enum cases</li>
+</ul>
+<p>When enums code split across files, team collaboration, and ever changing requirements as we make progress in science,
+this pattern is our line of defense to catch errors before we run our code in production.</p>
+<p>🫰 Consider giving <code>Never</code> a try in your projects. Enabling the <code>mypy</code> extension in VSCode and adding <code>mypy</code> checks to your CI pipeline can help us shipping more reliable code.</p>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
