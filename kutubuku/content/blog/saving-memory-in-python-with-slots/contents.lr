@@ -1,0 +1,136 @@
+title: Saving Memory in Python with __slots__
+---
+author: Ricky Lim
+---
+pub_date: 2025-07-26
+---
+body:
+
+Using `__slots__` is like swapping a Sinterklaas (Saint Nicholas)'s bag for a Bento's box - you lose flexibility, but save space.
+
+By default, Python stores instance attributes in a dict.
+This is very flexible as we can add attributes dynamically, but it also comes with a significant memory overhead, especially when many instances are created.
+When we use `__slots__`, Python will store instance attributes in a memory-efficient hidden array instead of the dynamic dictionary.
+
+Here, we demonstrate the impact of __slots__ on memory consumption by comparing Python data classes with and without it.
+
+```python
+# Without __slots__
+@dataclass
+class Measurement:
+    sample_id: int
+    timestamp: str
+
+# With __slots__
+@dataclass(slots=True)
+class Measurement:
+    sample_id: int
+    timestamp: str
+```
+
+To measure the memory savings from using __slots__, we compare the RAM usage when creating 10,000,000 instances of a Python data class — one without `__slots__`, and another with it.
+
+### Without `__slots__`:
+
+```
+Initial RAM usage: 13_733_888 KB
+Final RAM usage: 1_605_283_840 KB
+Memory consumption: 1_591_549_952 KB
+
+```
+
+### With `__slots__`:
+
+```
+Initial RAM usage: 13_762_560 KB
+Final RAM usage: 1_282_011_136 KB
+Memory consumption: 1_268_248_576 KB
+```
+
+Using __slots__ reduced memory consumption by approximately 20 %.
+
+## Caveats
+
+`__slots__` comes with a few limitaions that you should be aware of:
+
+1\. Must be declared in every subclass
+
+If you subclass a class that uses `__slots__` but does not use `__slots__` in the subclass, Python will create a `__dict__` for subclass' instances.
+This will defeat its purpose.
+
+```python
+@dataclass(slots=True)
+class Measurement:
+    sample_id: int
+    timestamp: str
+
+
+@dataclass
+class TemperatureMeasurement(Measurement):
+    temperature: float
+
+# The subclass now has __dict__
+t = TemperatureMeasurement(sample_id=1, temperature=20.1, timestamp=datetime.now())
+
+# So you can also dynamically add attributes
+t.owner = "Ricky Lim"
+
+t.__dict__
+{'temperature': 20.1, 'owner': 'Ricky Lim'}
+
+# To fix it
+@dataclass(slots=True)
+class TemperatureMeasurement(Measurement):
+    temperature: float
+
+t = TemperatureMeasurement(sample_id=1, temperature=20.1, timestamp=datetime.now())
+
+# Now it should not have the __dict__
+t.__dict__
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+Cell In[36], line 1
+----> 1 t.__dict__
+```
+
+2\. Instances cannot be targets of weak references
+
+Weakref is commonly used during caching as the cache object can be removed from memory.
+As such, we do not want to keep them alive in memory if nothing else is using them.
+
+```
+import weakref
+
+m = Measurement(1, datetime.now())
+weakref.ref(m) # TypeError: cannot create weak reference to 'Measurement' object
+```
+
+3\. Incompatible with `@cached_property`
+
+```python
+@dataclass(slots=True)
+class ElectricalMeasurement(Measurement):
+    voltage: float
+    current: float
+
+    @cached_property
+    def power(self):
+        return self.voltage * self.current
+
+e = ElectricalMeasurement(sample_id=2, timestamp=datetime.now(), voltage=5.0, current=3.0)
+e.power # TypeError: No '__dict__' attribute on 'ElectricalMeasurement' instance to cache 'power' property.
+```
+
+## Key takeaways
+
+`__slots__` can reduce memory usage when working with large datasets.
+However, they also impose restrictions on class flexibility, inheritance complexity and also compatibility with various python features such as `@cached_property`.
+Therefore, careful consideration and testing are highly recommended before adopting `__slots__`, particularly in rapidly evolving codebases.
+
+That being said, it's still a simple switch to save memory for fixed-structure data class objects used at large scale.
+
+To run the benchmark yourself, I've included the scripts:
+
+- [mem_test.py](./mem_test.py) to measure the memory
+- [m.py](./m.py) defines the class **without** `__slots__`
+- [m_slots.py](./m.py) defines the class **with** `__slots__`
