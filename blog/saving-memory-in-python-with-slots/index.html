@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Saving Memory in Python with __slots__ — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+  
+    <h1 data-pagefind-meta="title">Saving Memory in Python with __slots__</h1>
+  
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-07-26
+  </p>
+  <p>Using <code>__slots__</code> is like swapping a Sinterklaas (Saint Nicholas)'s bag for a Bento's box - you lose flexibility, but save space.</p>
+<p>By default, Python stores instance attributes in a <code>dict</code>.
+This is very flexible as we can add attributes dynamically, but it also comes with a significant memory overhead, especially when many instances are created.
+When we use <code>__slots__</code>, Python will store instance attributes in a memory-efficient hidden array instead of the dynamic dictionary.</p>
+<p>Here, we demonstrate the impact of <strong>slots</strong> on memory consumption by comparing Python data classes with and without it.</p>
+<pre><code class="lang-python"># Without __slots__
+@dataclass
+class Measurement:
+    sample_id: int
+    timestamp: str
+
+# With __slots__
+@dataclass(slots=True)
+class Measurement:
+    sample_id: int
+    timestamp: str
+</code></pre>
+<p>To measure the memory savings from using <strong>slots</strong>, we compare the RAM usage when creating 10_000_000 instances of a Python data class — one without <code>__slots__</code>, and another with it.</p>
+<h3>Without <code>__slots__</code>:</h3>
+<pre><code>Initial RAM usage: 13_733_888 KB
+Final RAM usage: 1_605_283_840 KB
+Memory consumption: 1_591_549_952 KB
+</code></pre>
+<h3>With <code>__slots__</code>:</h3>
+<pre><code>Initial RAM usage: 13_762_560 KB
+Final RAM usage: 1_282_011_136 KB
+Memory consumption: 1_268_248_576 KB
+</code></pre>
+<p>By using <code>__slots__</code>, memory consumption was reduced approximately <strong>20 %</strong>.</p>
+<h2>Caveats</h2>
+<p><code>__slots__</code> comes with a few limitaions that you should be aware of:</p>
+<p>1. Must be declared in every subclass</p>
+<p>If you subclass a class that uses <code>__slots__</code> but does <strong><em>not</em></strong> use <code>__slots__</code> in the subclass, Python will create a <code>__dict__</code> for subclass' instances.
+This defeats the purpose of using <strong>slots</strong>, as it reintroduces both the memory overhead and the ability to add dynamic attributes.</p>
+<pre><code class="lang-python">@dataclass(slots=True)
+class Measurement:
+    sample_id: int
+    timestamp: str
+
+
+@dataclass
+class TemperatureMeasurement(Measurement):
+    temperature: float
+
+# The subclass now has __dict__
+t = TemperatureMeasurement(sample_id=1, temperature=20.1, timestamp=datetime.now())
+
+# So you can also dynamically add attributes
+t.owner = &quot;Ricky Lim&quot;
+
+t.__dict__
+{&#39;temperature&#39;: 20.1, &#39;owner&#39;: &#39;Ricky Lim&#39;}
+
+# To fix it
+@dataclass(slots=True)
+class TemperatureMeasurement(Measurement):
+    temperature: float
+
+t = TemperatureMeasurement(sample_id=1, temperature=20.1, timestamp=datetime.now())
+
+# Now it should not have the __dict__
+t.__dict__
+--------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+Cell In[36], line 1
+----&gt; 1 t.__dict__
+</code></pre>
+<p>2. Instances cannot be targets of weak references</p>
+<p>Weakref is commonly used during caching as the cache object can be removed from memory.
+As such, we do not want to keep them alive in memory if nothing else is using them.</p>
+<pre><code>import weakref
+
+m = Measurement(1, datetime.now())
+weakref.ref(m) # TypeError: cannot create weak reference to 'Measurement' object
+</code></pre>
+<p>3. Incompatible with <code>@cached_property</code></p>
+<pre><code class="lang-python">@dataclass(slots=True)
+class ElectricalMeasurement(Measurement):
+    voltage: float
+    current: float
+
+    @cached_property
+    def power(self):
+        return self.voltage * self.current
+
+e = ElectricalMeasurement(sample_id=2, timestamp=datetime.now(), voltage=5.0, current=3.0)
+e.power # TypeError: No &#39;__dict__&#39; attribute on &#39;ElectricalMeasurement&#39; instance to cache &#39;power&#39; property.
+</code></pre>
+<h2>Key takeaways</h2>
+<p><code>__slots__</code> can reduce memory usage when working with large datasets.
+However, they also impose restrictions on class flexibility, inheritance complexity and also compatibility with various python features such as <code>@cached_property</code>.
+Therefore, careful consideration and testing are highly recommended before adopting <code>__slots__</code>, particularly in rapidly evolving codebases.</p>
+<p>That being said, it's still a simple switch to save memory for fixed-structure data class objects, especially when used at large scale.</p>
+<p>To run the benchmark yourself, I've included the scripts:</p>
+<ul>
+<li><a href="mem_test.py">mem_test.py</a> to measure the memory</li>
+<li><a href="m.py">m.py</a> defines the class <strong>without</strong> <code>__slots__</code></li>
+<li><a href="m.py">m_slots.py</a> defines the class <strong>with</strong> <code>__slots__</code></li>
+</ul>
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
