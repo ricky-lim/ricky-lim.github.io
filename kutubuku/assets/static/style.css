@@ -22,27 +22,6 @@ html {
     font-size: var(--base-font-size);
 }
 
-.logo-rlim {
-    height: 1em;
-    width: 1em;
-    border-radius: 50%; /* Standard border radius */
-    object-fit: cover;
-    vertical-align: middle;
-    margin-left: 5px;
-
-    /* Safari-specific properties */
-    -webkit-border-radius: 50%;
-    -webkit-clip-path: circle(50%);
-    clip-path: circle(50%);
-
-     /* Additional Safari/iOS fixes */
-     -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
-     mask-image: radial-gradient(circle, white 100%, black 100%);
-
-    /* Ensure no distortion */
-    overflow: hidden;
-}
-
 body {
     margin: 0;
     display: flex;
