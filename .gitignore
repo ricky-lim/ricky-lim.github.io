@@ -13,3 +13,5 @@ wheels/
 
 # Generated static files
 kutubuku/public/
+
+.DS_STORE
