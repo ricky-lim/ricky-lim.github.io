@@ -1,0 +1,223 @@
+title: Dynamic Yet Strong: Python Typing for Data Science
+---
+author: Ricky Lim
+---
+pub_date: 2025-07-14
+---
+body:
+
+Have you ever spent hours debugging a data pipeline only to discover you accidentally passed a DataFrame where a Series was expected?
+Or wondered why your colleague's function sometimes returns a list and sometimes a numpy array?
+Python's type system can help prevent these headaches while keeping the flexibility that makes Python awesome for data science.
+
+Python dominates data science for good reason.
+Beyond its rich ecosystem, expressiveness and easy to use, Python has a unique type system that is ***dynamic*** and yet **strong**.
+
+We can think of a type system as a label on a data container.
+It tells us what kind of data is inside so we can get the idea of what operations we can perform.
+Just like a package labeled "Fragile" tells us that it should be handled with care, a data type label like `int` or `str` informs us which operations are allowed.
+
+### Python is strongly typed
+
+What does it mean? Python enforces **no implicit type coercion** to perform data operations.
+
+For example:
+
+```python
+temp = 26.5
+temp + "c"  # ❌ TypeError: unsupported operand type(s) for +: 'float' and 'str'
+```
+
+In contrast, weakly typed languages such as JavaScript, will coerce one type to another which might lead to subtle bugs.
+
+```JavaScript
+temp = 26.5
+temp + "c" # '26.5c'
+```
+
+In data science, we're working with different data types - strings, integers, floats, pandas.Series, etc.
+Strong typing helps prevent subtle bugs by refusing to mix incompatible types unless it's done explicitly.
+
+### Python is Also Dynamically Typed
+
+Dynamically typed means that types are ***checked*** at **runtime**, when operations on objects are attempted.
+With Dynamic typing property, Python supports Duck typing.
+In practice, it means it doesn't matter what type an object is, only what an object can do.
+
+It comes from the saying:
+
+> If it looks like a duck, swims like a duck, and quacks like a duck — it’s probably a duck.
+
+If I can invoke `person.quack()`, then `person` is probably a duck in this context.
+
+Duck typing offers flexibility and makes Python objects focus on "getting things done".
+
+Dynamic typing makes Python easier to get started ***but*** allows **unsupported** operations that may cause errors at runtime 😱.
+
+As a comparison to the dynamic typing is a static typing adopted by C, Java, go, and other compiled languages, where you must declare types ahead of time.
+The types are then enforced at compile time - the compiler checks that types match before the program even built or runs.
+This is more robust than duck typing, with the advantage of catching bugs early in the development process.
+
+While there are benefits to static typing, there is also a price to pay.
+The type system makes the language less expressive and harder to read.
+
+For example, consider how you might annotate the type of HTTP headers in Python:
+
+```python
+# 😵‍💫 This is difficult to read
+Headers = Union[
+    Mapping[basestring, basestring],
+    Iterable[Tuple[basestring, basestring]]
+]
+```
+
+While many types are simple like `int`, `str`, or `list[float]` — others are more complex, especially with dynamic patterns like `**kwargs`.
+
+Take Django settings, for example: config(**settings). The settings dictionary typically contains string keys, but its values can be strings, booleans, tuples, lists, or nested structures - only the universe knows.
+Typing this precisely is tricky, even then the maintenance can be error-prone.
+
+In Python typing is not a must but rather a hint to help your IDE, such as vscode helps you with autocompletion and error detection.
+With external tools like `mypy`, you can also integrate type checking into your CI pipeline to catch type-related errors early.
+
+That’s why it’s such a joy that with Python, you can choose to add type hints when you think it makes sense.
+This flexibility gives you the benefits of type safety when needed, without sacrificing its expressiveness.
+
+### Practical Typing Tips
+
+When using type hints in data science, keeping a few key principles in mind can help you write clearer, more robust code.
+
+1\. General vs Specific Types
+
+In type system, the more general the type is like `object` the fewer operations it supports.
+For example, `object` does not support  `__mul__` for multiplication, whereas more specific type like `int` does.
+
+So, the more specific the type, the more functionality you get.
+When you want to clearly define what operations are allowed, it's best to use more specific types.
+
+2\. When annotating your functions: Be open to the input, and be specific about the output.
+
+Following Postel's Law:
+
+> Be liberal in what you accept, be conservative in what you send,
+
+A good rule of thumb when annotating functions is:
+
+- Use abstract collection types (like `Sequence`, `Mapping`, or `Iterable`) for input arguments to allow flexibility.
+- Use concrete types (like `int`, `string`) for return values to make it clear exactly what the function outputs.
+
+For example:
+
+```
+from typing import Sequence
+
+def capitalize_names(names: Sequence[str]) -> list[str]:
+    return [name.capitalize() for name in names]
+```
+
+Input: `Sequence[str]`
+
+- Sequence[str] accepts both lists and tuples, making the function more flexible for the caller.
+
+Output: `list[str]`
+
+- Returning list[str] makes it clear that the function produces a new list of strings, with no ambiguity.
+
+### Practical Type Hints for Data Science
+
+Here are some type hints that are especially useful in data science projects.
+
+#### Optional
+
+`Optional` is used when we want to use `None` as a default.
+
+```python
+from typing import Optional
+
+def hello(name: Optional[str] = None) -> str:
+    return f"hello {name}" if name else "hello world"
+```
+
+### Union
+
+We use `Union` to allow multiple types as options, and requires at least two types.
+
+```python
+from typing import Union
+
+def fahrenheit_to_celsius(f: Union[float, str]) -> float:
+    ...
+
+```
+
+🙅 Also **avoid** using `Union` for redundant types.
+
+```
+
+# ❌ This is redundant because float also covers operations performed by int
+def fahrenheit_to_celsius(f: Union[int, float]) -> float:
+
+# ✅ float will also accept int values
+def fahrenheit_to_celsius(f: float) -> float:
+```
+
+### Iterable
+
+Iterable type is used to annotate anything you can loop over.
+Example: `tuple`, `list`, `str`, `dict`.
+
+Here is a practical example when we use `tuple` as type hints to represent a lab equipment (e.g from a database)
+
+```python
+# +------------+--------------+
+# |equipment_id|equipment_name|
+# +------------+--------------+
+# |           1|    Microscope|
+EquipmentRecord = tuple[int, str]
+
+def get_equipment() -> tuple[EquipmentRecord]:
+    ...
+```
+
+### Callable
+
+Used to annotate function or callback parameters in higher-order functions.
+Higher-order function is a function that takes another function as input or returns a function as output.
+The signature of callable type:
+
+```
+Callable[[ParamType1, ParamType2], ReturnType]
+
+# For no argument
+Callable[[], ReturnType]
+
+# With flexible signature
+Callable[..., ReturnType]
+```
+
+For example:
+
+```
+from typing import Callable
+
+def convert_temp(n: float, convert_fn: Callable[[float], float]) -> float:
+    return convert_fn(n)
+
+# Usage example
+def fahrenheit_to_celsius(f: float) -> float:
+    return (f - 32) * 5 / 9
+
+def celsius_to_fahrenheit(c: float) -> float:
+    return c * 9 / 5 + 32
+
+print(convert_temp(212, fahrenheit_to_celsius))
+print(convert_temp(100, celsius_to_fahrenheit))
+```
+
+## Key take aways
+
+- **Python is strongly typed**: No implicit type coercion prevents subtle bugs when mixing incompatible types
+- **Dynamic typing enables duck typing**: Focus on what objects can do rather than what they are
+- **Start small**: Gradually add types when it makes sense
+- **Follow Postel's Law**: When annotating functions, be liberal in what you accept, be conservative in what you send. Your users will thank you.
+
+Remember: type hints are your helpful assistant, not your strict police!

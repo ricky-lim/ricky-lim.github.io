@@ -1,0 +1,152 @@
+title: Least Privilege Matters
+---
+author: Ricky Lim
+---
+pub_date: 2025-05-27
+---
+body:
+
+Ever wondered why some installations require sudo while others don't? Or why Docker containers might create files owned by root?
+This guide explains the principle of least privilege and shows practical examples for safer practices not only when using tools but also during development.
+
+### sudo vs su: What's the Difference?
+
+In our daily work, we often depend on external tools, which frequently require the use of `sudo` or `su` to install.
+Both are commonly used to elevate privileges — but they operate differently with distinct security implications:
+
+`sudo` lets a user to run specific commands with elevated (root) privileges. It’s temporary — typically only for about 5 minutes — and is ideal for one-off commands like `sudo apt update`.
+Watch out with `su`, because it switches your session to another user (usually root), giving you a full shell with root privileges that persist until you manually kill it. There’s no timeout.
+
+For most installation tasks, `sudo` is your safer choice. It limits the duration and scope of elevated access, reducing your risk of accidental or unauthorized system changes.
+
+However, before installing external tools with `sudo`, **pause** and ask yourself:
+
+**Is it really necessary? Could this be done with user-level permissions instead of root access?**
+
+Often, there are safer alternatives:
+
+- For Python, use a virtual environment `python -m venv .venv` instead of installing packages system-wide.
+- For Node.js, use `nvm` (Node Version Manager) to manage versions and install without sudo.
+- For Java, use `sdkman` to install and switch between versions in user space.
+
+### Why Least Privilege for Tool Installation ?
+
+**The principal of least privilege** means granting only the minimum permissions necessary to perform a task - and no more.
+
+Imagine you're staying at a hotel. Every guest is given a key that opens only their own room - not every room in the hotel.
+Then, the cleaning staffs may have different keys that can open a limited set of guest rooms.
+Only the hotel owner has a master key that can open every door.
+
+If our guest loses their key, then a potential thief can **only** enter a room and **not** the whole hotel.
+But if everyone was given the master key, losing just one would set the entire hotel at risk.
+
+In the same way, **the principle of least privilege** should inspire our interactions with tools by limiting access to what the tools need.
+This reduces potential damage if something goes wrong.
+In case our system is compromised, the attacker can not easily gain full control without further exploitation.
+
+Therefore, wehenever possible, tools should be installed and run with the least permissions required.
+
+### Privilege Levels Visualized
+
+To better understand this concept, it's helpful to visualize the different privilege levels typically used in a Unix-like environment:
+
+```shell
+🔑 Regular User
+└── Limited access to user's files
+
+🔐 sudo User
+└── Temporary elevated access
+
+👑 Root User (su)
+└── Complete system access
+```
+
+### Docker: Why User Privilege Matter ?
+
+Docker is one of the widely adopted tool among researchers and developers, especially in data science.
+However, it's essential to understand that Docker has unique security implications.
+Mainly because the Docker daemon runs as root by default.
+
+When you run a docker container, it interacts directly with the docker daemon.
+As a result, the container can execute commands with root-level priveleges on the host - **even without typing `sudo` or `su`**.
+
+This behavior can have serious security implications, especially if your workloads are later deployed on a bare Linux environment.
+In such cases, actions carried as root inside containers can potentially harm your linux host.
+
+For example, on a Linux system running the native Docker Engine (not Docker Desktop), you can easily create root-owned files on your host from inside a container:
+
+```Dockerfile
+# Dockerfile
+FROM ubuntu:22.04
+```
+
+Build the Image:
+
+```bash
+$ docker build -t ubuntu:root .
+```
+
+Then run a container that creates a file in your current directory:
+
+```bash
+$ docker run --rm -v "$(pwd):/app" ubuntu:root touch /app/root.txt
+$ ls -lh root.txt
+```
+
+Output:
+
+```bash
+-rw-r--r-- 1 root root 0 May 27 19:00 root.txt
+```
+
+Here, root.txt is owned by root on your host, which can cause permission issues and represents a security risk 😱 .
+
+#### How to make it safer.
+
+To avoid these problems, you can explicitly create and use a non-root user inside your Docker container. Here’s an improved Dockerfile:
+
+```Dockerfile
+FROM ubuntu:22.04
+
+ARG username=appuser
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g ${GID} ${USERNAME} \
+    && useradd -m -u ${UID} -g ${GID} ${USERNAME}
+
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+```
+
+Build the safer image, by explicitly set your host user's UID and GID:
+
+```bash
+$ docker build -t ubuntu:safe -f Dockerfile-safe --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg USERNAME=$(whoami) .
+```
+
+Now, when you run the container and create a file:
+
+```bash
+$ docker run --rm -v "$(pwd):/app" ubuntu:safe touch /app/safe.txt
+$ ls -lh safe.txt
+```
+
+Output:
+
+```bash
+-rw-r--r-- 1 rlim rlim 0 May 27 19:05 safe.txt
+```
+
+The file is now owned by a regular user `rlim`, not root. This is safer and also easier to manage.
+
+Note: Docker Desktop for MacOS uses a Linux VM and a special filesystem to map file ownership.
+Therefore even if the container runs as root, files created in mounted directories are owned by a MacOS user.
+That being said, it's still important to be mindful that containers can run as root by default, especially when deploying on bare Linux host.
+
+## Key takeaways
+
+- Avoid installing tools with `sudo`; always prefer user-level installations when possible.
+- Be mindful of the privilege level your containers run with, and choose to run them as non-root users to minimize security risks and permission issues.
+
+> Be least in privilege but abundant in curiosity — while your tools should never run as root, your mind should always be rooting new ideas!

@@ -1,0 +1,128 @@
+title: Human-First Versioning: A Guide for Scientific Software
+---
+author: Ricky Lim
+---
+pub_date: 2025-03-05
+---
+body:
+
+## 🤔 Why Versioning Matters in Science
+
+Imagine you're developing a Python software for genome sequence analysis.
+Everything works perfectly **today**—but without proper versioning of software dependencies, the **future** is uncertain:
+
+❌ Your results may become non-reproducible as dependencies change.
+
+❌ Collaborators may struggle to run your code.
+
+❌ Future updates could silently break your software.
+
+The solution? Managing dependencies properly using `pyproject.toml`. For example:
+
+```toml
+[project]
+dependencies = [
+    "tensorflow>=2.1,<3.0",
+    "pandas>=1.3,<2.0"
+]
+```
+
+Explicitly specifying dependencies ensures your software always runs with compatible versions, preventing unexpected issues.
+
+But versioning isn’t just about managing your own dependencies—it also makes your software reliable for others.
+Proper versioning allows seamless integration into other workflows, ensuring stability and long-term compatibility.
+
+In this blog post, we'll explore best practices for versioning scientific software to enhance reliability and reproducibility.
+
+## 🎯 A Human-First Approach to Versioning
+
+A human-first approach keeps people at the center—ensuring changelogs are carefully crafted, peer-reviewed, and verified before release.
+Combined with automation, this approach ensures consistency, making changes clear, reliable, and seamless for collaboration.
+
+To showcase this approach, I've created a demo repository, https://github.com/ricky-lim/versioning, demonstrating how to:
+
+- Implement semantic versioning for meaningful version numbers
+- Maintain a clear, human-readable changelog
+- Automate version management with GitHub Actions
+
+With this approach, each version carries semantic meaning, includes a Git tag for easy rollbacks, and provides a clear changelog to communicate changes effectively.
+
+### 🔧 Key Components
+
+#### 1. 🔢 Semantic Versioning
+
+I use `bump-my-version` to automate version updates.
+This tool allows you to update the version in pyproject.toml and can also be configured directly within the file for seamless integration.
+
+Version bumps trigger automatically when merging to main:
+
+- release-* branches trigger major version bump (2.0.0)
+- feature-* branches trigger minor version bump (1.1.0)
+- bugfix-* branches trigger patch version bump (1.0.1)
+
+Additionally, `bump-my-version` automates Git tag creation, ensuring each new version is properly tagged for easy tracking and rollbacks.
+To roll back to a previous version, use `git checkout <tag>`. For example, run `git checkout v1.0.0` to revert to version 1.0.0.
+
+#### 2. 📝 Changelog management
+
+Using [common-changelog](https://common-changelog.org), developers manually curate `CHANGELOG.md`
+
+```markdown
+## NEXT
+
+### Added
+- New genome analysis pipeline
+
+### Fixed
+- Memory leak in sequence processing
+
+### Changed
+- Updated TensorFlow to 2.15.0
+```
+
+GitHub Actions automatically transforms this into a release entry:
+
+```markdown
+## [1.2.0] - 2025-02-26
+
+### Added
+- New genome analysis pipeline
+
+### Fixed
+- Memory leak in sequence processing
+
+### Changed
+- Updated TensorFlow to 2.15.0
+```
+
+This approach combines human-curated changes with automated versioning.
+
+#### 3. ⚡ Github Actions Automation
+
+Automate versioning with two essential workflows:
+
+1\. `pre-commit.yml`
+
+- Run the pre-commit hooks including check for changelog
+
+2\. `version_bump.yml`
+
+- Updates version in `pyproject.toml`
+- Replaces NEXT with the release version and date.
+- Handles Git tagging and main branch updates.
+- Includes smart rollback protection to maintain main branch integrity
+
+## 💡 Key Takeaways
+
+- 🎯 Semantic versioning = meaningful version numbers
+- 🏷️ Git tags = simple, reliable rollbacks
+- 📖 Changelog = changes from and for humans
+- 🤖 Github Actions Automation = consistent releases
+
+"This human-centered versioning strategy ensures reliable and reproducible scientific software while effectively communicating changes to users, contributors, and our future selves"
+
+## 📚 References
+
+- [Semantic Versioning](https://semver.org/)
+- [Common Changelog](https://common-changelog.org/)
+- [Bump My Version](https://pypi.org/project/bump-my-version/)

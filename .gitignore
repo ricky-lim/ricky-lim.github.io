@@ -14,4 +14,11 @@ wheels/
 # Generated static files
 kutubuku/public/
 
+<<<<<<< HEAD
 .DS_STORE
+=======
+tmp.md
+
+.DS_STORE
+**/.DS_STORE
+>>>>>>> main

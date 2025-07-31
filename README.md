@@ -1,5 +1,9 @@
 # Kutubuku Blog
 
+![CI](https://github.com/ricky-lim/ricky-lim.github.io/actions/workflows/ci.yml/badge.svg)
+![CD](https://github.com/ricky-lim/ricky-lim.github.io/actions/workflows/cd.yml/badge.svg)
+[![Changelog](https://img.shields.io/badge/changelog-Common%20Changelog-blue.svg)](CHANGELOG.md)
+
 My blog about tech, life, and everything in between.
 
 ## Developmemt Setup
@@ -18,9 +22,9 @@ Install dependencies:
 
 ```bash
 uv venv
-source venv/bin/activate
+source .venv/bin/activate
 
-uv pip install -e ".[dev]"
+uv sync
 ```
 
 Start the development server:
@@ -41,3 +45,7 @@ Apply branch protection rules
 gh api --method PUT /repos/ricky-lim/ricky-lim.github.io/branches/main/protection \
   --input branch-protection-rules.json
 ```
+
+## CHANGELOG
+
+All notabel changes to this project are documented in the [CHANGELOG](CHANGELOG.md).

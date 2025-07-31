@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+echo "Start of script"
+
+
+echo "Entering critical section. Ctrl+C will be ignored here."
+(
+    # Ignore SIGINT in this subshell
+    trap '' SIGINT
+
+    # Simulate critical file save
+    echo "Saving critical file..."
+    sleep 5
+    echo "Critical file saved."
+)
+
+echo "Critical section complete. Ctrl+C will now work again."
+
+echo "Script finished."

@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
 
+/* Base font settings */
 :root {
     --primary-color: #7da382;
     --secondary-color: #F5F7F5;
@@ -7,16 +9,17 @@
     --text-primary: #333;
     --text-secondary: #666;
     --border-light: #eee;
+    --base-font-size: 18px;
 }
 
 * {
     box-sizing: border-box;
+    font-family: 'Fira Code', monospace !important;
 }
 
-/* Base styles (mobile first) */
+/* Mobile-first font sizing */
 html {
-    font-family: 'Fira Code', monospace;
-    font-size: 21px;
+    font-size: var(--base-font-size);
 }
 
 .logo-rlim {
@@ -45,172 +48,269 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-nav a {
-    color: var(--secondary-color);
-    text-decoration: none;
+/* Content sizing for all devices */
+.page-content p,
+.blog-post p,
+.meta,
+table,
+.pagination a,
+footer,
+.page {
+    font-size: 1rem;
 }
 
-nav a:hover {
-    color: #FAFBFA;
-    text-decoration: underline;
+/* Increase headings for mobile */
+.page-header h1,
+header h1 {
+    font-size: 2rem;
 }
 
-nav a.active,
-nav li.active a {
-    text-decoration: underline;
-    color: var(--secondary-color);
+.page-content h2,
+.blog-post h2 {
+    font-size: 1.25rem;
 }
 
-a {
-    color: black;
+.page-content h3 {
+    font-size: 1rem;
 }
 
-a:hover {
-    color: black;
-}
-
+/* Header */
 header {
     background: var(--primary-color);
     padding: 20px 30px;
-}
-
-div.page {
-    flex: 1;
-    background: var(--primary-color);
-    padding: 20px 30px;
-}
-
-h2 a {
-    text-decoration: none;
-}
-
-h2 a:hover {
-    color: black;
-}
-
-footer {
-    text-align: right;
-    padding: 10px;
-    margin-top: auto;
-    background: var(--primary-color);
-    padding: 20px 30px;
-    color: var(--secondary-color);
-}
-
-footer a {
-    color: #8C1515;
-    /* A specific maroon shade */
-    text-decoration: none;
-    font-weight: bold;
-}
-
-footer a:hover {
-    text-decoration: underline;
 }
 
 header h1 {
     color: var(--secondary-color);
     margin: 0;
     font-weight: normal;
-    font-size: 42px;
+    font-size: 2rem;
 }
 
-header nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+/* Logo */
+.logo-rlim {
+    height: 2.5m;
+    width: 2.5em;
+    border-radius: 50%;
+    object-fit: cover;
+    overflow: hidden;
 }
 
-header nav ul li {
-    display: inline;
-    margin: 0 8px 0 0;
-    padding: 0;
-}
-
-div.page {
-    background: var(--secondary-color)
-}
-
-.blog-post h2 {
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-.blog-post a {
+/* Navbar */
+.navbar-brand {
+    color: var(--secondary-color) !important;
+    font-size: 2rem !important;
+    font-weight: 600;
     text-decoration: none;
+}
+
+.navbar-brand:hover {
+    color: var(--secondary-color) !important;
+}
+
+.navbar-toggler {
+    border: none;
+    background: transparent;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    width: 1.8em;
+    height: 1.8em;
+}
+
+/* Navbar search responsive styles */
+.navbar-search-main {
+    display: flex !important;
+    flex: 1;
+    margin: 0 1rem;
+    max-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .navbar-search-main {
+        max-width: 200px;
+        margin: 0 0.5rem;
+    }
+
+    .search-input {
+        font-size: 0.875rem;
+    }
+}
+
+/* Bootstrap Offcanvas Customization */
+.offcanvas {
+    background: var(--primary-color) !important;
+    width: 350px !important;
+    border: none !important;
+}
+
+.offcanvas-header {
+    background: var(--primary-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+}
+
+.offcanvas-title {
+    color: var(--secondary-color) !important;
+    font-size: 2rem !important;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.offcanvas .btn-close {
+    background: none !important;
+    border: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    padding: 0.5rem !important;
+    margin: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.offcanvas .btn-close::before {
+    content: "✕";
+    color: var(--secondary-color);
+    font-size: 1.8rem;
+    font-weight: 300;
+    display: block;
+}
+
+.offcanvas .btn-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px;
+}
+
+.offcanvas-body {
+    padding: 0;
+}
+
+/* Navigation Links in Offcanvas */
+.offcanvas .navbar-nav {
+    width: 100%;
+    padding: 1rem 0;
+}
+
+.offcanvas .nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 0;
+}
+
+.offcanvas .nav-item:last-child {
+    border-bottom: none;
+}
+
+.offcanvas .nav-link {
+    color: var(--secondary-color) !important;
+    font-weight: 500;
+    padding: 1.5rem 1.5rem !important;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    margin: 0;
+    display: block;
+    position: relative;
+    font-size: 1.6rem !important;
+    text-decoration: none;
+}
+
+.offcanvas .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--secondary-color) !important;
+    padding-left: 2rem !important;
+    transform: translateX(5px);
+}
+
+.offcanvas .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    font-weight: 600;
+    border-left: 4px solid var(--secondary-color);
+    padding-left: calc(1.5rem - 4px) !important;
+}
+
+.offcanvas .nav-link.active:hover {
+    padding-left: calc(2rem - 4px) !important;
+}
+
+/* Add subtle animation to the border lines */
+.offcanvas .nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.offcanvas .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    transition: width 0.3s ease;
+}
+
+.offcanvas .nav-item:hover::after {
+    width: 100%;
+}
+
+/* Custom backdrop */
+.offcanvas-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Page content */
+.page {
+    flex: 1;
+    background: var(--secondary-color);
+    padding: 20px 30px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Footer */
+footer {
+    text-align: right;
+    background: var(--primary-color);
+    padding: 20px 30px;
+    color: var(--secondary-color);
+    font-size: 1rem;
+}
+
+footer a.lektor-link {
+    color: #77304c;
+    text-decoration: none;
+    font-weight: 600;
     transition: color 0.2s ease;
 }
 
-.blog-post a:hover {
-    color: var(--primary-color)
+footer a.lektor-link:hover {
+    text-decoration: underline;
 }
 
-/* Responsive image sizing for blog posts */
-.blog-post img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+/* Links */
+a {
+    color: black;
 }
 
-.pagination-bottom {
-    margin-bottom: 10px;
-    text-align: center;
-    border-top: 1px solid #eee;
-}
-
-.pagination .active {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-.pagination a {
-    padding: 5px 10px;
+h2 a {
     text-decoration: none;
 }
 
-.pagination a:hover {
-    background-color: #e9ecef;
-    border-radius: 4px;
-}
-
-.meta {
-    text-align: right;
-    margin-top: 10px;
-    color: #666;
-    font-style: italic;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 20px 0;
-}
-
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f5f5f5;
-    font-weight: bold;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f5f5f5;
-}
-
+/* Blog posts */
 .blog-post {
     background: white;
     border-radius: 8px;
@@ -218,28 +318,218 @@ tr:hover {
     margin: 1.5rem 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .blog-post:hover {
     transform: translateY(-2px);
 }
 
-.page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+/* Blog post headings */
+.blog-post h1 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    line-height: 1.3;
+    margin: 2rem 0 1.5rem;
+}
+
+.blog-post h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    line-height: 1.3;
+}
+
+.blog-post h3 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    line-height: 1.3;
+}
+
+.blog-post a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.blog-post a:hover {
+    color: var(--primary-color);
+}
+
+.blog-post img,
+.blog-post video,
+.blog-post iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.blog-post pre {
+    overflow-x: auto;
+    white-space: pre;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+
+    /* Webkit scrollbar styles for Chrome, Safari, Edge */
+    &::-webkit-scrollbar {
+        height: 8px;
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-color);
+    }
+}
+
+.blog-post p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    font-size: 0.95rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* Table container to prevent stretching */
+.page-content table,
+.blog-post table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+    display: block;
+    overflow-x: auto;
+}
+
+/* Reset display for table elements */
+table tbody,
+table thead,
+table tr,
+table td,
+table th {
+    display: revert;
+    width: auto;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 0.8em;
+    text-align: left;
+    min-width: 100px;
+}
+
+/* Pagination */
+.pagination-bottom {
+    margin: 2rem 0 1rem 0;
+    text-align: center;
+    border-top: 1px solid var(--border-light);
+    padding-top: 1.5rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.pagination li {
+    margin: 0;
+    padding: 0;
+}
+
+.pagination .active {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    font-size: 1rem;
+}
+
+.pagination a {
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--text-primary);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 48px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.pagination a:hover {
+    background-color: #e9ecef;
+    border-color: var(--primary-color);
+}
+
+/* Meta info */
+.meta {
+    text-align: right;
 }
 
 .page-header {
     margin-bottom: 2rem;
-    border-bottom: 3px solid var(--primary-color);
+    margin-top: 2rem;
     padding-bottom: 1rem;
+    text-align: center;
 }
 
 .page-header h1 {
     color: var(--primary-color);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Heading spacing */
+h1 {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* First h1 in a section shouldn't have top margin */
+.page-header h1:first-child,
+header h1:first-child {
+    margin-top: 0;
+}
+
+/* Ensure proper spacing between consecutive h1s */
+h1+h1 {
+    margin-top: 3rem;
+}
+
+/* Adjust spacing after h1 when followed by other elements */
+h1+p,
+h1+div,
+h1+section {
+    margin-top: 1.5rem;
 }
 
 .page-content {
@@ -248,19 +538,174 @@ tr:hover {
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     line-height: 1.8;
-    width: 100%;
+    width: 90%;
+    margin: 0 auto;
+    font-size: 1rem;
 }
 
 .page-content p {
     margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.page-content h1 {
+    color: var(--text-primary);
+    margin: 2rem 0 1rem;
+    font-size: 2.0rem;
+    line-height: 1.3;
 }
 
 .page-content h2 {
-    color: var(--text-primary);
-    margin: 2rem 0 1rem;
     font-size: 1.8rem;
+    margin: 1.8rem 0 1rem;
+    line-height: 1.3;
 }
 
-.blog-post a {
-    color: var(--primary-color)
+.page-content h3 {
+    font-size: 1.4rem;
+    margin: 1.5rem 0 1rem;
+    line-height: 1.3;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+    .offcanvas-title {
+        font-size: 1.5rem !important;
+    }
+
+    .offcanvas .btn-close::before {
+        font-size: 1.5rem;
+    }
+
+    .offcanvas .nav-link {
+        font-size: 1.1rem !important;
+        padding: 1.25rem 1.5rem !important;
+    }
+
+    .page {
+        font-size: 1rem;
+    }
+
+    .blog-post h1 {
+        font-size: 2.5rem;
+    }
+
+    .blog-post h2 {
+        font-size: 2rem;
+    }
+
+    .blog-post h3 {
+        font-size: 1.6rem;
+    }
+
+    .blog-post p {
+        font-size: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+    }
+
+    .page-content {
+        font-size: 1rem;
+    }
+
+    .page-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .page-content h2 {
+        font-size: 2rem;
+    }
+
+    .page-content h3 {
+        font-size: 1.6rem;
+    }
+
+    .pagination .active,
+    .pagination a {
+        padding: 8px 12px;
+        font-size: 1rem;
+        min-width: 40px;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    th,
+    td {
+        padding: 8px;
+    }
+}
+
+/* Blockquote styles */
+.blog-post blockquote {
+    background: linear-gradient(to right, rgba(125, 163, 130, 0.15), rgba(125, 163, 130, 0.05));
+    border-left: 6px solid var(--primary-color);
+    margin: 2.5rem 1rem;
+    padding: 2rem 2.5rem;
+    border-radius: 0 12px 12px 0;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.blog-post blockquote::before {
+    content: '“';
+    position: absolute;
+    top: -1.0rem;
+    left: 1rem;
+    font-size: 5rem;
+    font-family: "Playfair Display", Georgia, serif;
+    color: var(--primary-color);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 0;
+}
+
+.blog-post blockquote p {
+    font-style: italic;
+    color: var(--text-primary);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.blog-post blockquote:hover {
+    transform: translateX(8px);
+    background: linear-gradient(to right, rgba(125, 163, 130, 0.2), rgba(125, 163, 130, 0.08));
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+    .blog-post blockquote {
+        margin: 3rem 2.5rem;
+        padding: 2.5rem 3rem;
+    }
+
+    .blog-post blockquote p {
+        font-size: 1.2rem;
+    }
 }
