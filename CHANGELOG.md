@@ -6,6 +6,7 @@
 ### Added
 
 - Support for a main image field in blog posts, allowing a featured image to be displayed alongside the post title.
+- Makefile updated to support main image handling for blog posts.
 
 ## [0.6.0] - 2025-05-26
 
