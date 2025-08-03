@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">A Guide to pyproject.toml Migration</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-03-28
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">A Guide to pyproject.toml Migration</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-03-28
+      </p>
+  </div>
+
   <h2>Why Migrate from <code>requirements.txt</code> to <code>pyproject.toml</code> ?</h2>
 <p>Imagine managing a library. <strong><code>requirements.txt</code></strong> is like keeping a
 a manual list of books on paper, requiring updates and separate lists for different sections
@@ -199,6 +206,7 @@ $ uv remove requests
 <li>Enhanced Reproducibility: Uses <code>uv.lock</code> to ensure precise dependency versions, making projects highly reproducible.</li>
 <li>Streamlined Workflow: Focus on development, not managing project configurations</li>
 </ul>
+
 
   </div>
 

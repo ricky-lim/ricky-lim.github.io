@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">To Bridge, to Host, or Something Between: A Dockerian Network</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-04-26
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">To Bridge, to Host, or Something Between: A Dockerian Network</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-04-26
+      </p>
+  </div>
+
   <p>When it comes to Docker, understanding how containers communicate — both with each other and the outside world — is essential to building reliable applications.
 One of the most important pieces of that puzzle is Docker networking.</p>
 <p>In this post, we'll take a hands-on tour through the Docker CLI to learn how to manage networks effectively.
@@ -175,6 +182,7 @@ when running tests to let your containerized app to access services on your host
 <p>Choose your docker network mode based on your application's needs for isolation, performance, and host integration.</p>
 <p>Bridge network offers private docker network isolation, and reserve host network for scenarios where direct access to the host netwrok is essential.</p>
 <p>Use <code>extra_hosts</code> to bridge without to host, this enables controlled access from containers to the host without sacrificing the benefits of bridge isolation.</p>
+
 
   </div>
 

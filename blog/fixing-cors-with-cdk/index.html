@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">Fixing Cors with CDK</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-05-01
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Fixing Cors with CDK</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-05-01
+      </p>
+  </div>
+
   <p>CORS (Cross-Origin Resource Sharing) is a security mechanism implemented by web browsers to prevent unauthorized requests from <strong><em>one origin to another</em></strong>.
 An origin is defined by its protocol, domain, and port.</p>
 <p>For example, in <code>http://my-site.com</code>:</p>
@@ -217,6 +224,7 @@ This ensures secure and authorized communication between your web application an
 <li>CORS must be <strong><em>explicitly</em></strong> configured to define allowed origins, methods, and headers</li>
 <li>For development, you can use Cors.ALL_ORIGINS and Cors.ALL_METHODS, but in production, always be explicit</li>
 </ul>
+
 
   </div>
 

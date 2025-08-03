@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">To Mount or to Volume? A Guide to Docker Data Persistence</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-04-19
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">To Mount or to Volume? A Guide to Docker Data Persistence</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-04-19
+      </p>
+  </div>
+
   <p>Docker containers are designed to be ephemeral - once stopped or removed, any data stored inside is lost.</p>
 <p>Let’s take a quick CLI tour to see just how ephemeral Docker containers really are.</p>
 <pre><code class="lang-bash"># Run a container
@@ -227,6 +234,7 @@ volumes:
 <h2>Key takeaways</h2>
 <p>To make data persistent in Docker, use volumes for databases and bind mounts for live code during development.
 With Docker Compose, managing both becomes simple — ideal for developing web applications like those built with Django.</p>
+
 
   </div>
 

@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">Avoiding Depedency Disasters in Your Python Projects</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-04-05
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Avoiding Depedency Disasters in Your Python Projects</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-04-05
+      </p>
+  </div>
+
   <h2>Why should we care about our python projects' dependency ?</h2>
 <p>Forgetting to declare dependencies in Python projects can result in runtime errors like <code>ModuleNotFoundError</code> or <code>ImportError</code>.
 In contrast, including unnecessary dependencies can unnecessarily bloat your project, particularly when deploying it as a Docker container where size matters.</p>
@@ -236,6 +243,7 @@ FawltyDeps-unused........................................................Passed
 </code></pre>
 <h2>Key Takeaways</h2>
 <p>Setting up FawltyDeps as a pre-commit hook helps catch <strong>undeclared</strong> and <strong>unused</strong> dependencies, ensuring your project stays lean and avoids runtime errors.</p>
+
 
   </div>
 

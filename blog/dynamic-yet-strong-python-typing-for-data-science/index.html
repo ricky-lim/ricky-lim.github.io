@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">Dynamic Yet Strong: Python Typing for Data Science</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-07-14
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Dynamic Yet Strong: Python Typing for Data Science</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-07-14
+      </p>
+  </div>
+
   <p>Have you ever spent hours debugging a data pipeline only to discover you accidentally passed a DataFrame where a Series was expected?
 Or wondered why your colleague's function sometimes returns a list and sometimes a numpy array?
 Python's type system can help prevent these headaches while keeping the flexibility that makes Python awesome for data science.</p>
@@ -262,6 +269,7 @@ print(convert_temp(100, celsius_to_fahrenheit))
 <li><strong>Follow Postel's Law</strong>: When annotating functions, be liberal in what you accept, be conservative in what you send. Your users will thank you.</li>
 </ul>
 <p>Remember: type hints are your helpful assistant, not your strict police!</p>
+
 
   </div>
 

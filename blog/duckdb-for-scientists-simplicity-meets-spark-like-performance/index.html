@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">DuckDb for Scientists: Simplicity Meets Spark-like Performance</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-05-18
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">DuckDb for Scientists: Simplicity Meets Spark-like Performance</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-05-18
+      </p>
+  </div>
+
   <p>Scientists are working with increasing volumes of data with a variety of formats such as Excel, CSV, or JSON.
 These formats store data in rows, which well-suited for accessing or updating a single entry at a time.
 However, for analytical tasks like grouping totals (e.g annual rainfall), row-based formats are inefficient.
@@ -281,6 +288,7 @@ duckdb -c &quot;SELECT COUNT(*) FROM &#39;data/movies.parquet&#39;&quot;
 <li>Spark is efficient at distributed analysis of columnar data like Parquet, but its startup time and operational complexity - resource management and logging, can be overkill for small to medium-sized datasets.</li>
 <li>For these use cases, DuckDB offers a lightweight, efficient alternative that is easier to set up and use.</li>
 </ul>
+
 
   </div>
 

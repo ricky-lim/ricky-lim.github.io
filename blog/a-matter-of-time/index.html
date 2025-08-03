@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">A Matter of Time</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-06-15
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">A Matter of Time</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-06-15
+      </p>
+  </div>
+
   <p>One popular and efficient way to go serverless is by running your Python scripts as AWS Lambda functions.
 Lambda lets your script run effortlessly without managing servers.
 While Lambda simplifies deployment, it also comes with limits: a maximum execution time of 15 minutes and a memory allocation from 128 MB to 10 GB.</p>
@@ -174,6 +181,7 @@ Because if the peak ever exceeds the Lambda memory allocation, it will trigger a
 <li>These measurements helps you get the idea of your script's performance and identify opportunities for optimization.</li>
 <li>Once your script's performance is acceptable, configure your Lambda function's timeout and memory settings based on the measured values, also with a buffer for safety as cloud environment has variability.</li>
 </ul>
+
 
   </div>
 

@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">Graceful Exit with trap</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-06-08
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Graceful Exit with trap</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-06-08
+      </p>
+  </div>
+
   <p>When working with automation, data pipelines, or any processing scripts in Unix-based environment, it's essential to ensure that they exit gracefully, even when unexpected errors occur.
 This is where <code>trap</code> comes to the rescue handling tasks like cleaning up temporary files, logging errors, but also preventing interruption during a critical operation.</p>
 <h2>What is <code>trap</code> ?</h2>
@@ -177,6 +184,7 @@ mycommand
 <p>Think of <code>trap</code> like a safety net - it helps you clean up messes, log errors, and even blocks interruptions during critical operations.</p>
 <blockquote><p>Trap — catching the crap before your script snaps.</p>
 </blockquote>
+
 
   </div>
 

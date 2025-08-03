@@ -100,16 +100,23 @@
     
   
   <div class="blog-post" data-pagefind-body>
-  
-    <h1 data-pagefind-meta="title">Secure your container build</h1>
-  
-  <p class="meta">
-    written by
+
+  <div class="blog-post-header">
     
-      Ricky Lim
-    
-    on 2025-01-29
-  </p>
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Secure your container build</h1>
+      
+    </div>
+      <p class="meta">
+        written by
+        
+          Ricky Lim
+        
+        on 2025-01-29
+      </p>
+  </div>
+
   <blockquote><p>"Ever wondered how your secrets might be exposed in your docker image? You're not alone 😉".</p>
 </blockquote>
 <p>In this blog post, we'll dive into the world of Docker builds to learn two powerful ways to handle variables: <strong>build arguments</strong> and <strong>mount secrets</strong>.</p>
@@ -225,6 +232,7 @@ $ docker run --rm secure-app cat /token.txt
 <li>Mount secrets are like passing a note that self-destructs after reading.</li>
 </ul>
 <p>Ready to secure your docker builds? Start using mount secrets today! 🔒 and keep build args for public configurations.</p>
+
 
   </div>
 
