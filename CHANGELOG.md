@@ -1,6 +1,12 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
+## NEXT
+
+### Added
+
+- Support for a main image field in blog posts, allowing a featured image to be displayed alongside the post title.
+
 ## [0.6.0] - 2025-05-26
 
 ### Changed
