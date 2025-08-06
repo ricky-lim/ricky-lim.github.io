@@ -4,6 +4,8 @@ author: Ricky Lim
 ---
 pub_date: 2025-07-26
 ---
+main_image: image.png
+---
 body:
 
 Using `__slots__` is like swapping a Sinterklaas (Saint Nicholas)'s bag for a Bento's box - you lose flexibility, but save space.

@@ -22,6 +22,8 @@ new-blog: ## Create a new blog post
 	echo "---" >> $$BLOG_PATH/contents.lr; \
 	echo "pub_date: $$(date +%Y-%m-%d)" >> $$BLOG_PATH/contents.lr; \
 	echo "---" >> $$BLOG_PATH/contents.lr; \
+	echo "main_image: image.png" >> $$BLOG_PATH/contents.lr; \
+	echo "---" >> $$BLOG_PATH/contents.lr; \
 	echo "body:" >> $$BLOG_PATH/contents.lr; \
 	echo "" >> $$BLOG_PATH/contents.lr; \
 	echo "Write your content here" >> $$BLOG_PATH/contents.lr; \

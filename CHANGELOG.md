@@ -1,6 +1,13 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
+## [0.7.0] - 2025-08-03
+
+### Added
+
+- Support for a main image field in blog posts, allowing a featured image to be displayed alongside the post title.
+- Makefile updated to support main image handling for blog posts.
+
 ## [0.6.0] - 2025-05-26
 
 ### Changed
