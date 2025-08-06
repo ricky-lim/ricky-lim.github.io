@@ -506,6 +506,12 @@ td {
 /* Meta info */
 .meta {
     text-align: right;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.01em;
 }
 
 .page-header {
