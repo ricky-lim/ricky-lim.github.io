@@ -9,39 +9,39 @@ main_image: image.png
 body:
 
 
-If you've ever run into weird errors while installing Python packages, you're not alone.
+If you've ever run into weird errors while installing Python packages, you're **not** alone.
 From my experience, one common source of frustrations has been accidentally using the **global** pip, instead of the **local** pip.
-In this post, we'll walk through why that can cause problems and share some simple, practical tips to keep your Python setup clean and working smoothly
+In this post, we'll walk through ***why*** that can cause problems and share some simple tips to keep your Python setup clean.
 
 
 ## The problem with the Global `pip`
 
 1\. **Package Conflicts**
 
-With global pip, we enter a Jurassic-Park-like working situation, where all packages are installed into the same system-wide location, such as `/usr/local/lib/python3.x/dist-packages/`.
-This is not good, because our project dependencies can interfere with each other.
-I've run into this myself, and based on that experience, I strongly recommend avoiding it. Here's why:
+With global pip, we enter a Jurassic Park-like working situation 🦖, where all packages are installed into the same system-wide location, such as `/usr/local/lib/python3.x/dist-packages/`.
+This is no good 🙅, because our project dependencies can interfere with each other.
+I've run into this myself, and based on that experience, I strongly recommend to avoid it. Here's why:
 
 - Version conflicts: Project A requires `pyspark==3.3.0` while Project B requires `pyspark==4.0.0`.
-With two major versions' conflicts, it becomes ***impossible*** to resolve both requirements.
-- Broken environments: When we update Project B's environment, it will ***unexpectedly break*** Project A's environment.
+With two major versions' conflicts, it becomes ***impossible*** to resolve both requirements in peace 🕊.
+- Broken environments: When we update Project B's environment, it will **widely break*** Project A's environment.
 - Chaotic system:
 Over time, using global pip doesn’t just affect your project's environment—it can also clutter or break your entire system setup.
-It gets even worse if you're part of the exclusive member of sudoers.
+It gets even worse if you're part of the exclusive member of ***sudoers***.
 Since one bad install can affect everything.
 
 2\. **Security Risks**
 
-When updating dependencies becomes the exception rather than the norm, we leave our projects exposed to potential security risks.
+When updating dependencies becomes the exception rather than the norm, we leave our projects more exposed to potential security risks.
 
 3\. **Lack of reproducibility**
 
-A project that works today does not give guarantee in the future.
-Uninstalling packages can make things even messier—since they're shared across multiple projects, removing one can break others.
+A project that works today does ***not*** give guarantee in the future.
+Uninstalling packages can make things even messier—since they're shared across multiple projects, removing one is like pulling out a crucial block from a Jenga tower: it can cause the whole structure to collapse and break other projects unexpectedly.
 
 ## The solution with Local `pip`
 
-Local `pip` is a `pip` that is installed in your one and the only `virtualenv` that manages your python dependencies in isolation.
+Here comes to the rescue, our local `pip`. The `pip` that lives in your `virtualenv` that manages your python dependencies in isolation.
 One way to create a complete isolation is:
 
 ```
@@ -49,14 +49,14 @@ One way to create a complete isolation is:
 uv venv --seed
 ```
 
-The highlight here is `--seed` which also install build packages such as **`pip`**, `setuptools`, `wheel` into your virtual environment.
+‼️ The highlight here is `--seed` ‼️, which also install build packages such as **`pip`**, `setuptools`, `wheel` into your virtual environment.
 So it ensures complete isolation from our global python installation.
 
 ```bash
 # Activate the environment
 source .venv/bin/activate
 
-# Now pip refers to the local pip
+# Now pip refers to the local pip 🥳
 which pip  # Shows .venv/bin/pip, not /usr/bin/pip
 ```
 
@@ -98,22 +98,22 @@ Local pip configuration allows you to:
 - Configure project-specific installation settings
 
 
-3\. [Optional] Use `--seed` with `uv`
+3\. [Optional] Use `--seed` with `uv`❗
 
 If you create virtual environments with `uv`, always append `seed` to ensure local pip is available as well.
 
 ```bash
-# Correct approach
+# Correct approach ✅
 uv venv --seed
 source .venv/bin/activate
 pip install your-packages
 
-# This will use global pip
+# This will use global pip ❎
 uv venv  # This creates env without pip
 source .venv/bin/activate
 pip install your-packages  # This might use global pip!
 
-# Always check which pip you're using
+# Always check which pip you're using 🤔
 # If it’s not coming from .venv/bin/pip, that’s a red flag! 🚩
 which pip
 ```
