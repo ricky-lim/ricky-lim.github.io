@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Don’t Skip Local pip — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Don’t Skip Local pip" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Don’t Skip Local pip</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-08-03
+  </p>
+  <p>If you've ever run into weird errors while installing Python packages, you're <strong>not</strong> alone.
+From my experience, one common source of frustrations has been accidentally using the <strong>global</strong> pip, instead of the <strong>local</strong> pip.
+In this post, we'll walk through <strong><em>why</em></strong> that can cause problems and share some simple tips to keep your Python setup clean.</p>
+<h2>The problem with the Global <code>pip</code></h2>
+<p>1. <strong>Package Conflicts</strong></p>
+<p>With global pip, we enter a Jurassic Park-like working situation 🦖, where all packages are installed into the same system-wide location, such as <code>/usr/local/lib/python3.x/dist-packages/</code>.
+This is no good 🙅, because our project dependencies can interfere with each other.
+I've run into this myself, and based on that experience, I strongly recommend to avoid it. Here's why:</p>
+<ul>
+<li>Version conflicts: Project A requires <code>pyspark==3.3.0</code> while Project B requires <code>pyspark==4.0.0</code>.
+With two major versions' conflicts, it becomes <strong><em>impossible</em></strong> to resolve both requirements in peace 🕊.</li>
+<li>Broken environments: When we update Project B's environment, it will <strong>widely break*</strong> Project A's environment.</li>
+<li>Chaotic system:
+Over time, using global pip doesn’t just affect your project's environment—it can also clutter or break your entire system setup.
+It gets even worse if you're part of the exclusive member of <strong><em>sudoers</em></strong>.
+Since one bad install can affect everything.</li>
+</ul>
+<p>2. <strong>Security Risks</strong></p>
+<p>When updating dependencies becomes the exception rather than the norm, we leave our projects more exposed to potential security risks.</p>
+<p>3. <strong>Lack of reproducibility</strong></p>
+<p>A project that works today does <strong><em>not</em></strong> give guarantee in the future.
+Uninstalling packages can make things even messier—since they're shared across multiple projects, removing one is like pulling out a crucial block from a Jenga tower: it can cause the whole structure to collapse and break other projects unexpectedly.</p>
+<h2>The solution with Local <code>pip</code></h2>
+<p>Here comes to the rescue, our local <code>pip</code>. The <code>pip</code> that lives in your <code>virtualenv</code> that manages your python dependencies in isolation.
+One way to create a complete isolation is:</p>
+<pre><code># Create virtualenv with pip included
+uv venv --seed
+</code></pre>
+<p>‼️ The highlight here is <code>--seed</code> ‼️, which also install build packages such as <strong><code>pip</code></strong>, <code>setuptools</code>, <code>wheel</code> into your virtual environment.
+So it ensures complete isolation from our global python installation.</p>
+<pre><code class="lang-bash"># Activate the environment
+source .venv/bin/activate
+
+# Now pip refers to the local pip 🥳
+which pip  # Shows .venv/bin/pip, not /usr/bin/pip
+</code></pre>
+<h3>Configuring pip for private repositories</h3>
+<p>Local pip becomes even more essential when working with private repositories.</p>
+<p>You can create environment-specific pip configuration, as follows:</p>
+<pre><code>mkdir -p .venv/pip.conf
+cat &gt; .venv/pip.conf &lt;&lt; EOF
+[global]
+index-url = https://your-awesome-private-repo.org/simple/
+trusted-host = your-awesome-private-repo.org
+</code></pre>
+<p>With local pip configuration, it allows different projects to use different private repositories <strong>without</strong> conflicts.
+Importantly, local pip configuration plays well with local pip, ensuring that <strong><em>only</em></strong> the local configuration is applied <strong><em>not</em></strong> the global pip configuration.</p>
+<h2>Best practices for pip configuration</h2>
+<p>1. Enforce virtualenv globally</p>
+<p>Configure pip to require virtual environments can save us from accidental global installations.</p>
+<pre><code class="lang-bash"># Set globally to require virtual environments
+pip config set global.require-virtualenv true
+</code></pre>
+<p>2. Use Environment-Specific Configurations</p>
+<p>Instead of relying on global pip configuration files, use the local one at <code>.venv/pip.conf</code>.
+Local pip configuration allows you to:</p>
+<ul>
+<li>Set up different package repository per project</li>
+<li>Add authentication for your private repositories</li>
+<li>Configure project-specific installation settings</li>
+</ul>
+<p>3. [Optional] Use <code>--seed</code> with <code>uv</code>❗</p>
+<p>If you create virtual environments with <code>uv</code>, always append <code>seed</code> to ensure local pip is available as well.</p>
+<pre><code class="lang-bash"># Correct approach ✅
+uv venv --seed
+source .venv/bin/activate
+pip install your-packages
+
+# This will use global pip ❎
+uv venv  # This creates env without pip
+source .venv/bin/activate
+pip install your-packages  # This might use global pip!
+
+# Always check which pip you&#39;re using 🤔
+# If it’s not coming from .venv/bin/pip, that’s a red flag! 🚩
+which pip
+</code></pre>
+<h2>Key takeaways</h2>
+<ul>
+<li>🏠 Avoid using global package installation in your python projects, unless you're the system admin.</li>
+<li>🛌 Use local pip and its local configuration for a complete project isolation.
+This not only helps ensure reproducibility—it also gives you a good sleep, knowing your setup won’t break unexpectedly</li>
+<li>If you're using <code>uv</code>, use <code>uv venv --seed</code> to make it easier to create a fast and proper isolated environment.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
