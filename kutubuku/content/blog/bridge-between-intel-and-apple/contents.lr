@@ -1,0 +1,76 @@
+title: Bridge between Intel and Apple
+---
+author: Ricky Lim
+---
+pub_date: 2025-08-09
+---
+main_image: image.png
+---
+body:
+
+Working with docker gives me the impression that no matter the machine my team works on, it will also work on mine.
+So the "works on my machine" problem should be taken care by Docker.
+
+Well, not quite when Apple and Intel started to diverge in their architecture.
+Unfortunately, the M series chips that use ARM architecture is not compatible with Intel's x86 architecture.
+Think of Apple Silicon and Intel chips as two separate islands, with their own unique languages.
+On Intel island, you speak x86, while on Apple island everyone speaks ARM64.
+
+## Translator needed to bridge the communication
+
+Just as Apple's Rosetta 2 translates x86 instructions to ARM64 on the fly, QEMU acts as a translator that enables ARM64 containers to run on x86 machines.
+Without this translator, attempting to run an ARM64 Apple container on Intel machines would result in errors like:
+
+```bash
+exec format error # Translated as I don't speak that language
+```
+
+If you encounter this error, you're not alone.
+I also ran into this issue when needed to build ARM64 images for deployment on AWS graviton while working on my Intel machine.
+
+My solution was to use docker QEMU so I do not need to manually install QEMU and let Docker handle the installation for me.
+
+```bash
+# Install QEMU, like deploying a team of expert translators for our diplomatic mission
+docker run --privileged --rm tonistiigi/binfmt --install all
+```
+
+The `--privileged` flag is required as it needs to modify the host's kernel settings to register the QEMU binary formats.
+It's like updating our communication policies, to ensure our translator works across different container architectures.
+
+Verify the installation
+
+```bash
+docker run --rm --platform=linux/arm64 alpine uname -m
+```
+
+If you see `aarch64` as the output, then the installation was successful.
+The `aarch64` is a common identifier for ARM64 systems.
+
+## Performance Trade-off
+
+While QEMU is a powerful translator, it also introduces some performance overhead as it emulates the ARM64 architecture on Intel machines.
+This is our Intel users will experience a slower docker experience when running ARM64 containers during development.
+On the bright side, when deploying to AWS Graviton, not only the performance is better, but also the cost is lower.
+
+## Key Takeaways
+
+For consistent cross-platform run:
+
+```
+# Install emulators once, however this does not survive restart so you need to run it again
+docker run --privileged --rm tonistiigi/binfmt --install all
+```
+
+Protip: run `docker run <IMAGE> uname -m` to check the architecture.
+If it return `X86_64`, then you are on Intel, if it echoes `AARCH64`, then you are on Apple Silicon.
+
+For consistent cross-platform build:
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -t <my-awesome-app>:multiarch .
+```
+
+By building for multiple architectures, you ensure that your application can run seamlessly on both Intel and Apple Silicon machines.
+
+> Build bridges not walls when you're shipping your applications.
