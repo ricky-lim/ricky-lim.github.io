@@ -1,0 +1,126 @@
+title: Don’t Skip Local pip
+---
+author: Ricky Lim
+---
+pub_date: 2025-08-03
+---
+main_image: image.png
+---
+body:
+
+
+If you've ever run into weird errors while installing Python packages, you're **not** alone.
+From my experience, one common source of frustrations has been accidentally using the **global** pip, instead of the **local** pip.
+In this post, we'll walk through ***why*** that can cause problems and share some simple tips to keep your Python setup clean.
+
+
+## The problem with the Global `pip`
+
+1\. **Package Conflicts**
+
+With global pip, we enter a Jurassic Park-like working situation 🦖, where all packages are installed into the same system-wide location, such as `/usr/local/lib/python3.x/dist-packages/`.
+This is no good 🙅, because our project dependencies can interfere with each other.
+I've run into this myself, and based on that experience, I strongly recommend to avoid it. Here's why:
+
+- Version conflicts: Project A requires `pyspark==3.3.0` while Project B requires `pyspark==4.0.0`.
+With two major versions' conflicts, it becomes ***impossible*** to resolve both requirements in peace 🕊.
+- Broken environments: When we update Project B's environment, it will **widely break*** Project A's environment.
+- Chaotic system:
+Over time, using global pip doesn’t just affect your project's environment—it can also clutter or break your entire system setup.
+It gets even worse if you're part of the exclusive member of ***sudoers***.
+Since one bad install can affect everything.
+
+2\. **Security Risks**
+
+When updating dependencies becomes the exception rather than the norm, we leave our projects more exposed to potential security risks.
+
+3\. **Lack of reproducibility**
+
+A project that works today does ***not*** give guarantee in the future.
+Uninstalling packages can make things even messier—since they're shared across multiple projects, removing one is like pulling out a crucial block from a Jenga tower: it can cause the whole structure to collapse and break other projects unexpectedly.
+
+## The solution with Local `pip`
+
+Here comes to the rescue, our local `pip`. The `pip` that lives in your `virtualenv` that manages your python dependencies in isolation.
+One way to create a complete isolation is:
+
+```
+# Create virtualenv with pip included
+uv venv --seed
+```
+
+‼️ The highlight here is `--seed` ‼️, which also install build packages such as **`pip`**, `setuptools`, `wheel` into your virtual environment.
+So it ensures complete isolation from our global python installation.
+
+```bash
+# Activate the environment
+source .venv/bin/activate
+
+# Now pip refers to the local pip 🥳
+which pip  # Shows .venv/bin/pip, not /usr/bin/pip
+```
+
+### Configuring pip for private repositories
+
+Local pip becomes even more essential when working with private repositories.
+
+You can create environment-specific pip configuration, as follows:
+
+```
+mkdir -p .venv/pip.conf
+cat > .venv/pip.conf << EOF
+[global]
+index-url = https://your-awesome-private-repo.org/simple/
+trusted-host = your-awesome-private-repo.org
+```
+
+With local pip configuration, it allows different projects to use different private repositories **without** conflicts.
+Importantly, local pip configuration plays well with local pip, ensuring that ***only*** the local configuration is applied ***not*** the global pip configuration.
+
+## Best practices for pip configuration
+
+1\. Enforce virtualenv globally
+
+Configure pip to require virtual environments can save us from accidental global installations.
+
+```bash
+# Set globally to require virtual environments
+pip config set global.require-virtualenv true
+```
+
+2\. Use Environment-Specific Configurations
+
+Instead of relying on global pip configuration files, use the local one at `.venv/pip.conf`.
+Local pip configuration allows you to:
+
+- Set up different package repository per project
+- Add authentication for your private repositories
+- Configure project-specific installation settings
+
+
+3\. [Optional] Use `--seed` with `uv`❗
+
+If you create virtual environments with `uv`, always append `seed` to ensure local pip is available as well.
+
+```bash
+# Correct approach ✅
+uv venv --seed
+source .venv/bin/activate
+pip install your-packages
+
+# This will use global pip ❎
+uv venv  # This creates env without pip
+source .venv/bin/activate
+pip install your-packages  # This might use global pip!
+
+# Always check which pip you're using 🤔
+# If it’s not coming from .venv/bin/pip, that’s a red flag! 🚩
+which pip
+```
+
+## Key takeaways
+
+- 🏠 Avoid using global package installation in your python projects, unless you're the system admin.
+- 🛌 Use local pip and its local configuration for a complete project isolation.
+This not only helps ensure reproducibility—it also gives you a good sleep, knowing your setup won’t break unexpectedly
+- If you're using `uv`, use `uv venv --seed` to make it easier to create a fast and proper isolated environment.

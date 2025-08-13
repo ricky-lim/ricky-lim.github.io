@@ -12,17 +12,17 @@
         <h1 data-pagefind-meta="title">{{ post.title }}</h1>
       {% endif %}
     </div>
-      <p class="meta">
-        written by
-        {% if post.twitter_handle %}
-          <a href="https://twitter.com/{{ post.twitter_handle }}">{{ post.author or post.twitter_handle }}</a>
-        {% else %}
-          {{ post.author }}
-        {% endif %}
-        on {{ post.pub_date }}
-      </p>
   </div>
 
+  <p class="meta">
+    written by
+    {% if post.twitter_handle %}
+      <a href="https://twitter.com/{{ post.twitter_handle }}">{{ post.author or post.twitter_handle }}</a>
+    {% else %}
+      {{ post.author }}
+    {% endif %}
+    on {{ post.pub_date }}
+  </p>
   {{ post.body }}
 
   </div>
