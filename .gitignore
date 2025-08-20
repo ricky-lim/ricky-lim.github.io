@@ -18,3 +18,6 @@ tmp.md
 
 .DS_STORE
 **/.DS_STORE
+
+# Example for images
+kutubuku/content/blog/getting-things-done-faster/**/*.jpg
