@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Getting Things Done Faster — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Getting Things Done Faster" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Getting Things Done Faster</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-08-17
+  </p>
+  <p>Data science often begins with Python scripts, which are excellent for transforming messy data into meaningful insights, but not always efficient when it comes to speed.
+This is especially true when running the same script across many different inputs.
+A classic case of an <strong>embarrassingly parallel problem</strong>, where tasks can run independently without needing to communicate to each other.
+Welcome <strong>GNU Parallel</strong>: a powerful tool that transforms your single-threaded Python tasks into parallel operations, harnessing the full power of your CPU.</p>
+<h2>What is GNU Parallel?</h2>
+<p>GNU Parallel is a shell tool to execute jobs in parallel on one or more computers.
+It's very simple to use particularly for embarrassingly parallel tasks, that would otherwise run sequentially.
+The shell tool can parse multiple inputs, running scripts or any CLI commands against them in parallel at the same time, allowing us to use all available CPU.
+As it's a tool that can be integrated on top of your python scripts, we can get things done faster <strong><em>without</em></strong> rewriting our code.</p>
+<h3>Installation</h3>
+<p>To get GNU Parallel is very simple.</p>
+<pre><code class="lang-bash"># Ubuntu / Debian
+sudo apt-get install parallel
+
+# MacOS
+brew install parallel
+</code></pre>
+<h4>Basic Syntax</h4>
+<p>The basic syntax follows this pattern:</p>
+<pre><code class="lang-bash">parallel [options] command ::: arguments
+</code></pre>
+<p>Important options:</p>
+<ul>
+<li><code>-j N</code> specifies the number of jobs to run in parallel (default is the number of CPU cores).</li>
+<li><code>--dry-run</code> shows what would be executed without actually running the commands, handy during development and testing.</li>
+<li><code>--bar</code> displays a progress bar.</li>
+</ul>
+<p>Key replacement features:</p>
+<ul>
+<li><code>{}</code> represents the input arguments</li>
+<li><code>{.}</code>represents the filename without the extension</li>
+<li><code>{/}</code> represents the filename without the directory path</li>
+<li><code>:::</code> separates the command from the input arguments</li>
+</ul>
+<h2>Practical example</h2>
+<p>Let's create a simple python script that data scientists might encounter regularly - batch image resizing for computer vision projects.
+Here's a complete Python script that resizes images to a specified <code>width</code> and <code>height</code>, saving them to a new directory.</p>
+<pre><code class="lang-python">#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = &quot;&gt;=3.12&quot;
+# dependencies = [
+#   &quot;Pillow&quot;,
+# ]
+# ///
+
+import sys
+import os
+from pathlib import Path
+
+from PIL import Image
+
+def resize_image(input_path, output_path, target_width=224, target_height=224):
+    &quot;&quot;&quot;Resize image&quot;&quot;&quot;
+    try:
+        with Image.open(input_path) as img:
+            # Convert to RGB if necessary (handles PNG with alpha, etc.)
+            if img.mode != &#39;RGB&#39;:
+                img = img.convert(&#39;RGB&#39;)
+
+            # Resize maintaining aspect ratio, then center crop
+            img.thumbnail((target_width, target_height), Image.Resampling.LANCZOS)
+
+            # Create centered crop if needed
+            width, height = img.size
+            if width != target_width or height != target_height:
+                left = (width - target_width) // 2
+                top = (height - target_height) // 2
+                right = left + target_width
+                bottom = top + target_height
+                img = img.crop((left, top, right, bottom))
+
+            Path(os.path.dirname(output_path)).mkdir(parents=True, exist_ok=True)
+
+            img.save(output_path, &#39;JPEG&#39;, quality=95)
+
+            print(f&quot;Success processing: {input_path} -&gt; {output_path}&quot;)
+
+    except Exception as e:
+        print(f&quot;Error processing {input_path}: {e}&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    if len(sys.argv) not in [3, 4, 5]:
+        print(&quot;Usage: python resize_image.py &lt;input_path&gt; &lt;output_path&gt; [width] [height]&quot;)
+        print(&quot;Example: python resize_image.py input.jpg processed/output.jpg 300 300&quot;)
+        sys.exit(1)
+
+    input_path = sys.argv[1]
+    output_path = sys.argv[2]
+
+    # Optional width and height parameters
+    width = int(sys.argv[3]) if len(sys.argv) &gt; 3 else 300
+    height = int(sys.argv[4]) if len(sys.argv) &gt; 4 else 300
+
+    resize_image(input_path, output_path, width, height)
+</code></pre>
+<h2>Serial vs Parallel Execution</h2>
+<pre><code class="lang-bash"># For example we have a folder with images to be processed
+$ for img in images/*.jpg; do
+echo $img
+done
+
+images/18152ecff8b937eb7eb5f88e64dcd1f134e77f0d.jpg
+images/39bd7298aab2ac17c2adf313306aa1ea8bea1021.jpg
+images/696466495ed4373790d8e2c24a6ccedd70f32c84.jpg
+images/add5b3f12898bcbcc45cfb0ef5371c1b3d4df9e8.jpg
+images/c2bbc96ece4ae546b503a57587d1035b82154815.jpg
+images/c327aad0d8bc44b65dc2ea38a70a780dec36b350.jpg
+images/cb61950871d5ec60c6c82a3e9fca9c43c2365f3d.jpg
+images/ea163022f89ea6c10995c1c8ac0aae74db0541c6.jpg
+images/eb268d7d7ae234c8b39fef70ad8c4d9c9cb06f29.jpg
+images/ebda49b2cb5555f0896cb68e8f9832106a4991ce.jpg
+</code></pre>
+<p>Traditional serial processing:</p>
+<pre><code class="lang-bash">for img in images/*.jpg; do
+    # Resize image to 300x300
+    uv run resize.py $img &quot;processed/$(basename -- $img)&quot; 300 300
+done
+</code></pre>
+<p>GNU parallel processing:</p>
+<pre><code class="lang-bash">parallel uv run resize.py {} &quot;processed/{/}&quot; 300 300 ::: images/*.jpg
+</code></pre>
+<p>This scales beautifully with our compute capacity, allowing us to process multiple images simultaneously.
+In addition to that, GNU parallel does not stop processing other images if one fails.</p>
+<pre><code class="lang-bash"># Example if there is a corrupt image
+parallel uv run resize.py {} &quot;processed/{/}&quot; 300 300 ::: images/*.jpg
+
+...
+Success processing: images/c2bbc96ece4ae546b503a57587d1035b82154815.jpg -&gt; processed/c2bbc96ece4ae546b503a57587d1035b82154815.jpg
+Error processing images/corrupt.jpg: cannot identify image file &#39;images/corrupt.jpg&#39;
+Success processing: images/ea163022f89ea6c10995c1c8ac0aae74db0541c6.jpg -&gt; processed/ea163022f89ea6c10995c1c8ac0aae74db0541c6.jpg
+...
+</code></pre>
+<p>This pattern ensures robust batch processing: bad images get logged when failed and the rest of the images continue to be processed.</p>
+<h2>Key Takeaways</h2>
+<p>GNU Parallel offers advantages for data scientists:</p>
+<ul>
+<li>Simplicity: Zero code changes needed, just wrap your existing scripts with <code>parallel</code>.</li>
+<li>Language agnostic: Works with any command-line tool, not just Python scripts.</li>
+<li>Better Error Handling: Failed jobs don't stop the entire batch.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
