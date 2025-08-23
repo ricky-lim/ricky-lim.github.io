@@ -1,0 +1,461 @@
+title: serverless-scraping
+---
+author: Ricky Lim
+---
+pub_date: 2025-08-23
+---
+main_image: image.png
+---
+body:
+
+As data scientists, mastering the art of web scraping isn’t just about extracting data—it’s about doing it responsibly.
+That means scraping web servers with respect: no flooding them with excessive requests, no unnecessary strain.
+Responsible scraping keeps your projects ethical, efficient, and sustainable.
+
+In this blog post, I’ll walk you through a solution that makes web scraping both human-like and fully automated—without the hassle of managing infrastructure.
+
+To achieve this, we’ll use **Scrapy** integrated with **Playwright**, a powerful combination that allows us to mimic real user behavior while scraping.
+This approach helps us extract data responsibly and avoid getting blocked by servers.
+Finally, we’ll take it a step further by containerizing the application and deploying it on AWS ECS Fargate, a serverless platform for running containers effortlessly as tasks.
+
+## Overview
+
+In this tutorial, picture yourself embarking on an adventurous quest to gather precious gems scattered across distant islands.
+Our ship for this voyage is Scrapy, cruising its course across the vast ocean of websites.
+The gems we’re after? Inspiring quotes from every corner of the internet.
+And once we’ve collected these treasures, we’ll safely store them in our very own S3 treasure chest, ready for future adventures.
+
+Our journey begins with collecting quotes from https://quotes.toscrape.com/ and https://goodreads.com/quotes.
+The first site, quotes.toscrape.com, will serve as our training ground—a safe space to practice scraping techniques.
+We’ll start with https://quotes.toscrape.com/scroll as our initial URL, demonstrating how to use Playwright to handle infinite scrolling and load more quotes dynamically.
+Once we’ve mastered these techniques, we’ll move on to the real challenge: scraping quotes from Goodreads.
+
+Here's the architecture of the solution we'll use to harvest our quotes:
+
+![](solution.drawio.png)
+
+We'll start with short introduction to Scrapy integrated with Playwright.
+Then we'll going to create our spiders to scrape quotes.
+Finally, we'll containerize our application and deploy it on AWS ECS Fargate.
+
+## Background
+
+What is scrapy? Scrapy is a framework that provides a structured way to extract data from websites.
+If you're familiar with Django, scrapy would feel also similar to you.
+
+Here is how I usually start a scrapy project:
+
+```bash
+# We will name our project as quote-harvester
+uvx run scrapy startproject quote-harvester
+
+# We will then setup our project
+cd quote-harvester
+uv venv --seed --python
+
+# Activate your virtual environment
+source .venv/bin/activate
+
+# Start a uv project
+uv init
+uv add scrapy scrapy-playwright boto3
+uv add --dev ipython
+```
+
+You can also access the project code and follow along at https://github.com/ricky-lim/quote-harvester
+
+### Basic of Scrapy
+
+Scrapy as to my understanding has the following components:
+
+1\. Spider
+
+This is the core of scrapy, where we will create our spiders to define how to scrape a website.
+The integration with Playwright is done at the spider level.
+
+For example, here is our spider to scrape quotes from https://quotes.toscrape.com/scroll
+
+```python
+
+
+class QuotesSpider(scrapy.Spider):
+    name = "quotes"
+    allowed_domains = ["quotes.toscrape.com"]
+    start_urls = ["https://quotes.toscrape.com/scroll"]
+
+    async def start(self):
+        for url in self.start_urls:
+            yield scrapy.Request(
+                url,
+                callback=self.parse,
+                meta={"playwright": True, "playwright_include_page": True},
+            )
+
+    async def parse(self, response):
+        page = response.meta["playwright_page"]
+        # Scroll down to load more quotes
+        previous_height = await page.evaluate("document.body.scrollHeight")
+        while True:
+            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            await page.wait_for_timeout(1000)
+            new_height = await page.evaluate("document.body.scrollHeight")
+            if new_height == previous_height:
+                break
+            previous_height = new_height
+
+        content = await page.content()
+        selector = scrapy.Selector(text=content)
+        container = selector.xpath("//div[@class='quote']")
+        for quote in container:
+            item = ItemLoader(item=QuoteItem(), selector=quote, response=response)
+            item.add_xpath("quote", ".//span[@class='text']/text()")
+            item.add_xpath("author", ".//small[@class='author']/text()")
+            item.add_xpath("tags", ".//div[@class='tags']/a/text()")
+            yield item.load_item()
+```
+
+Our spider is defined as a class that inherits from `scrapy.Spider`.
+Then we define the `name`, `allowed_domains`, and `start_urls` attributes.
+
+Next we implement the `start` and `parse` methods, where we will use Playwright to handle the infinite scrolling and load more quotes dynamically.
+The `start` method is responsible for initiating the scraping process, while the `parse` method processes the response and extracts the desired data.
+Integration with playwright is straightforward, as we can hook-in playwright via **`meta`** kwargs in the scrapy request.
+
+Our parse method can use Playwright to interact with the page, such as scrolling down to load more content.
+The core extraction logic is using xpath selectors to extract the desired data from the page content.
+The extracted data is then stored as `QuoteItem` which we will define later in our `items.py`, our next component.
+
+`xpath` is a XML path language that allows us to navigate through elements in an XML document.
+To get the `xpath` you can use your browser's developer tools to inspect the elements.
+It's also helpful to use your AI assistant to generate the `xpath` for you.
+Always verify the `xpath` generated by your AI assistant and also adjust it as needed, as scraping is often an art of precision and flexibility.
+A xpath syntax that I found handy to be more flexible is to use `contains` with your HTML attributes, such as `//div[contains(@class, 'quote')]`
+This is to match elements with a class that contains the word "quote" as css class usually combined with other classes.
+Another syntax that I found useful is to use `last()` to match the last element in a list.
+
+2\. Item
+
+After we define our spider, we need to model our data using `Item` in `items.py`.
+Here we also inherit from `scrapy.Item` and define the fields we want to extract.
+
+```python
+import scrapy
+
+class QuoteItem(scrapy.Item):
+    quote = scrapy.Field(input_processor=..., output_processor=...)
+    author = scrapy.Field(input_processor=..., output_processor=...)
+    tags = scrapy.Field(input_processor=..., output_processor=...)
+```
+
+The `input_processor` is where we can apply our data cleaning and transformation as it is added to the loader.
+In our spider where we use `ItemLoader`, we can define how to process the data as being added.
+`output_processor` is to process the final value after all input values have been processed and combined.
+
+Scrapy yields a list of values to each item's field, therefore when we apply the `input_processor` to each value, we use a higher-level function such as `MapCompose`.
+With `MapCompose`, we can apply a set of our functions to each value in the list.
+Another common higher-level functions are:
+
+- `Join`: to join a list of values into a single string
+- `TakeFirst`: to take the first non-null value from the list
+
+
+3\. Pipeline
+
+In Scrapy, a pipeline is a way to process item. What's the difference between pipeline and item processors?
+
+The item processors (`input_processor` and `output_processor`) are applied to each field of the item as it is added to the loader `ItemLoader`.
+Whereas pipeline is applied after the item is fully loaded and process the entire item (all fields) as a whole.
+The pipeline is defined in `pipelines.py`.
+
+For example, here is a pipeline to upload the item to S3:
+
+```python
+class QuotePipelineS3Upload:
+    def open_spider(self, _):
+        self.s3 = boto3.client("s3")
+        self.bucket = os.getenv("BUCKET_NAME")
+        self.prefix = "quotes"
+
+    def process_item(self, item, _):
+        file_hash = hashlib.md5(item.get("quote", "").encode("utf-8")).hexdigest()
+        s3_key = f"{self.prefix}/{file_hash}.json"
+        item_json = json.dumps(dict(item))
+        self.s3.put_object(
+            Bucket=self.bucket,
+            Key=s3_key,
+            Body=item_json,
+            ContentType="application/json",
+        )
+        return item
+```
+
+In Scrapy, the `open_spider` is a special pipeline hook that is called once when the spider starts crawling.
+It's typically used to perform any setup needed, such as initializing s3 client, or database connection, or any resource that needs to be set up before processing items.
+With `open_spider`, we also have `close_spider` which is another special hook that is called when the spider finishes crawling.
+This is used to perform any cleanup needed, or reporting after all items have been processed.
+
+In our pipeline, we implement `process_item` to handle how we want to upload our quotes to S3.
+Here we use md5sum to generate a unique hash for each quote, so similar quotes would be stored in the same file.
+
+4\. Middleware
+
+Middleware is a way that we can define how our spiders behave.
+It is defined in `middlewares.py`.
+
+In this tutorial, we are using defining custom middlewares, but we are using the `scrapy-playwright` middleware to integrate Playwright with Scrapy.
+
+Here is how we enable the `scrapy-playwright` middleware in our `settings.py`:
+
+```python
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
+```
+
+By enabling `scrapy-playwright` middleware, we then instruct our spider to use `playwright` to download and render web pages instead of using the default downloader.
+The default downloader can not handle JavaScript like scrolling.
+However using playwright comes also with a cost that makes our crawling more resource intensive and as result would be slower.
+
+### Expanding the basics
+
+With the basics, we can scrape quotes from https://quotes.toscrape.com/scroll.
+Then we will use our knowledge to scrape quotes from https://goodreads.com/quotes.
+
+Here is some interesting points that I learned:
+
+1\. Use scrapy shell to help with development
+
+Scrapy shell is a great tool during development and very simple to use.
+
+```sh
+$ scrapy shell https://www.goodreads.com/quotes/tag/science
+[s] Available Scrapy objects:
+[s]   scrapy     scrapy module (contains scrapy.Request, scrapy.Selector, etc)
+[s]   crawler    <scrapy.crawler.Crawler object at 0x106220140>
+[s]   item       {}
+[s]   request    <GET https://www.goodreads.com/quotes/tag/science>
+[s]   response   <200 https://www.goodreads.com/quotes/tag/science>
+[s]   settings   <scrapy.settings.Settings object at 0x1061f7ec0>
+[s] Useful shortcuts:
+[s]   fetch(url[, redirect=True]) Fetch URL and update local objects (by default, redirects are followed)
+[s]   fetch(req)                  Fetch a scrapy.Request and update local objects
+[s]   shelp()           Shell help (print this help)
+[s]   view(response)    View response in a browserTip: IPython 9.0+ has hooks to integrate AI/LLM completions.
+
+You can `view(response)` in your browser to inspect the HTML content or ask your AI assistant to help you generate the xpath selectors.
+````
+
+
+
+2\. Make the selector more flexible.
+
+While trying to scrape quotes for both the popular quotes and the science-tagged quotes. I adjusted the selector to be more generic.
+Here is the adjustment.
+
+```python
+# Playwright setup
+...
+ yield scrapy.Request(
+                url,
+                callback=self.parse,
+                meta={
+                    "playwright": True,
+                    "playwright_page_methods": [
+                        # Wait for the page to load
+                        PageMethod("wait_for_load_state", "networkidle"),
+                        # Wait until at least one element matching the selector appears in the DOM
+                        PageMethod("wait_for_selector", "div[class*='quote']"),
+                    ],
+                    "playwright_include_page": True,
+                },
+            )
+```
+
+3\. Crawl with page range parameters
+
+The spider is parametrized with `from_page` and `to_page` arguments, allowing it to crawl a specific range of pages.
+This is useful to crawl a large number of pages in a divide-and-conquer manner.
+
+```python
+...
+
+def __init__(self, *args, **kwargs):
+    super(GoodreadsSpider, self).__init__(*args, **kwargs)
+    self.from_page = int(kwargs.get("from_page", 1))
+    self.to_page = int(kwargs.get("to_page", 1))
+
+    self.page_urls = []
+    for url in self.start_urls:
+        for i in range(self.from_page, self.to_page):
+            self.page_urls.append(f"{url}?page={i}")
+```
+
+With this we can run the spider as follows:
+
+```sh
+# Scroll from page 1 to page 5 (inclusive)
+scrapy crawl goodreads -o goodreads-test.json -a from_page=1 -a to_page=6
+```
+
+4\. Handle duplicates and missing data
+
+In the pipeline, we can implement logic to filter out duplicates and quotes that are missing either the quote text or the author.
+
+```python
+class QuotePipelineDuplicateRemoval:
+    def __init__(self):
+        self.seen_quotes = set()
+
+    def process_item(self, item, _):
+        quote = item.get("quote")
+        if quote in self.seen_quotes:
+            raise DropItem("Duplicate quote found")
+
+        self.seen_quotes.add(quote)
+        return item
+
+
+class QuotePipelineNoQuoteOrNoAuthorRemoval:
+    def process_item(self, item, _):
+        if not item.get("quote") or not item.get("author"):
+            raise DropItem("Missing quote or author")
+        return item
+```
+
+With multiple pipelines, we can define the order of execution in `settings.py`.
+
+```python
+ITEM_PIPELINES = {
+    "quote_scrapy.pipelines.QuotePipelineDuplicateRemoval": 100,
+    "quote_scrapy.pipelines.QuotePipelineNoQuoteOrNoAuthorRemoval": 200,
+    "quote_scrapy.pipelines.QuotePipelineS3Upload": 300,
+}
+```
+
+The numbers, 100, 200, and 300, represent the priority of each pipeline.
+Lower numbers means higher priority, meaning the `QuotePipelineDuplicateRemoval` will be executed first, followed by `QuotePipelineNoQuoteOrNoAuthorRemoval`, and finally `QuotePipelineS3Upload`.
+
+5\. Adjust settings to be respectful
+
+```python
+CONCURRENT_REQUESTS_PER_DOMAIN = 1
+DOWNLOAD_DELAY = 5
+AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_START_DELAY = 5
+AUTOTHROTTLE_MAX_DELAY = 60
+AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+```
+
+These settings intend to optimize the politeness during scraping to prevent overloading the target server.
+AutoThrottle, when enabled, allows Scrapy to measure the latency of the requests to dynamically adjusts the download delays based on server's response times.
+
+
+Now to test run our spiders, we can use the following commands:
+
+```sh
+# Comment it out the S3 upload pipeline in settings.py if you don't have a bucket yet
+$ cd quote-scrapy
+
+$ scrapy crawl quotes -O quotes-test.json
+# Check the output
+$ python -m json.tool quotes-test.json | less
+
+$ scrapy crawl goodreads -O goodreads-test.json -a from_page=1 -a to_page=6
+$ python -m json.tool goodreads-test.json | less
+```
+
+## Deployment
+
+With our spiders ready, we can now containerize our application and deploy it on AWS ECS Fargate.
+
+```
+# The image was intended to be deployed on ARM64, if you're on X86, you need to first run
+# If you're curious about the way, please refer to this blog post: https://ricky-lim.github.io/blog/bridge-between-intel-and-apple/
+docker run --privileged --rm tonistiigi/binfmt --install all
+
+# The Dockerfile is available at the root of the project
+docker build  -t quote-scraper .
+```
+
+Now with our docker built, we can start our AWS deployment.
+To automate the deployment, I use `cdk` which is cloud development kit, that allows to define our cloud resources.
+The logic is now encapsulated into `Makefile` which is at the root of the project.
+
+```sh
+make deploy
+```
+
+After the cdk deployment is done, we can get the resources name needed to run our task.
+
+```sh
+	./get_env_from_cfn.sh
+```
+
+Then we can run our task on AWS ECS Fargate.
+
+```sh
+make quotes
+```
+
+#TODO: Add picture of ECS fargate task
+
+
+Once the task running is completed, as it's serverless it will be stopped and deprovisioned which is kind of nice as it does not incur cost when not in use.
+The next step is we are using glue-crawler which is also serverless crawler to infer the schema of our json files stored in S3 so we can query it using Athena.
+
+```sh
+make glue-crawler
+```
+
+Once the crawler is done, we can now explore our quotes data using Athena.
+
+1. Go to AWS console, and search for Athena
+2. Select your database and table name
+3. Start with SQL query such as:
+
+```sql
+-- Replace the table name accordingly
+TABLE_NAME="demoquotequotes.quotes"
+
+-- Tag count
+SELECT tag, COUNT(*) AS quote_count
+FROM ${TABLE_NAME}
+CROSS JOIN UNNEST(tags) AS t(tag)
+GROUP BY tag
+ORDER BY quote_count DESC
+LIMIT 10;
+
+--Top author
+SELECT author, COUNT(*) AS num_quotes
+FROM ${TABLE_NAME}
+GROUP BY author
+ORDER BY num_quotes DESC
+LIMIT 10;
+
+-- Humor quote
+SELECT *
+FROM ${TABLE_NAME}
+WHERE CONTAINS(tags, 'humor')
+LIMIT 10;
+
+-- Filter by author
+SELECT *
+FROM ${TABLE_NAME}
+WHERE author = 'cassandra clare';
+```
+
+#TODO: Show image of the tag count
+
+Last but not least, to clean up the resources, we can run:
+
+```sh
+# Clean up our AWS resources
+make destroy
+```
+
+## Key Takeways:
+
+- Scrapy is a powerful framework for web scraping, and the integration with Playwright makes it handling JavaScript in website easier
+- Containerizing our scrapy application allows us to deploy it on serveless platform such as AWS ECS Fargate - pay for what you use
+- Using AWS Glue Crawler and Athena allows us to easily query our scraped data without the need to manage any infrastructure
