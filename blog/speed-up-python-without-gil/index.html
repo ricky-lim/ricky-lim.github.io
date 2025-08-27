@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Speed up Python without GIL — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Speed up Python without GIL" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Speed up Python without GIL</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-08-23
+  </p>
+  <p>GIL, Global Interprete Lock, has been a safety mechanism for CPython memory management, ensuring thread safety when dealing with Python objects.</p>
+<p>However, It also comes with a performance cost, especially for embarrassingly CPU-bound tasks that couldn't truly run in parallel with threads.
+Even if we spawn multiple threads, only one can execute at a time, leading to underutilization of multi-core processors.</p>
+<p>Traditionally, the workaround was to use <code>multiprocessing.Pool</code> for parallel execution.
+While effective, it brings its own overhead:</p>
+<ul>
+<li>Inter-process communication: Data must be serialized and passed between processes</li>
+<li>Higher memory usage: each process runs its own python interpreter and maintains separate memory space</li>
+<li>Startup cost: spawning processes is slower than starting threads</li>
+</ul>
+<p><strong>The exciting news?</strong> Since Python 3.13, CPython has introduced experimental GIL-free builds, such as <code>python 3.14t</code>.
+This means we can run threads in parallel and no need to rely on heavy multiprocessing for CPU-bound tasks.</p>
+<h2>Python 3.14t: Free-Threading</h2>
+<p>Python 3.14t, removes the GIL, allowing threads to run truly in parallel on multi-core processors.
+To explore this exciting new feature,
+I wrote a simple python script to check <strong><em>whether a number is a prime</em></strong> using multiple threads.
+The idea was inspired by <strong><em>fluent python</em></strong> by Luciano Ramalho - a great resource if you want to dive deeper into threading concepts.</p>
+<p>Below is a quick snippet of the threaded prime-checking logic.
+You can find the full script <a href="is_prime.py">here</a>.</p>
+<pre><code class="lang-python">... # Omitting TEST_CASES
+
+def is_prime(n: int) -&gt; bool:
+    if n &lt; 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+
+    root = math.isqrt(n)
+    for i in range(3, root + 1, 2):
+        if n % i == 0:
+            return False
+    return True
+
+
+class IsPrimeWorker:
+    def __init__(self, n):
+        self.n = n
+        self.name = hash(n)
+        self.result = None
+
+    def run(self):
+        self.result = is_prime(self.n)
+
+    @classmethod
+    def create_workers(cls):
+        return [cls(n) for n in NUMBERS]
+
+def main():
+    workers = IsPrimeWorker.create_workers()
+    threads = [Thread(target=worker.run) for worker in workers]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+</code></pre>
+<p>To run the script with both Python 3.14 (with GIL) and Python 3.14t (GIL-free), run the following commands:</p>
+<pre><code class="lang-bash"># Run with GIL enabled
+uv run -p 3.14 is_prime.py
+
+# Run with GIL removed
+uv run -p 3.14t is_prime.py
+</code></pre>
+<p>To benchmark the performance difference between the two versions, use:</p>
+<pre><code class="lang-sh">uv run --python 3.14 benchmark.py
+</code></pre>
+<p>The benchmark script is availble <a href="benchmark.py">here</a>, if you'd like to try it yourself.</p>
+<p>Here are the benchmark results from my Macbook:</p>
+<pre><code class="lang-bash">Testing Python 3.14 (GIL)...
+  Run 1: 12.51s, 100%,  16.7MB
+  Run 2: 12.43s, 100%,  15.2MB
+  Run 3: 12.77s, 100%,  15.0MB
+Testing Python 3.14t (No GIL)...
+  Run 1: 4.84s, 569%,  22.2MB
+  Run 2: 4.69s, 575%,  22.1MB
+  Run 3: 4.83s, 565%,  27.3MB
+</code></pre>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Python 3.14 (GIL)</th>
+<th>Python 3.14t (No GIL)</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Wall Time</strong></td>
+<td>12.57 s</td>
+<td>4.79 s</td>
+<td><strong>2.63× faster</strong></td>
+</tr>
+<tr>
+<td><strong>CPU Usage</strong></td>
+<td>100 %</td>
+<td>570 %</td>
+<td><strong>5.7× cores</strong></td>
+</tr>
+<tr>
+<td><strong>Memory Usage</strong></td>
+<td>15.6 MB</td>
+<td>23.9 MB</td>
+<td><strong>1.53× overhead</strong></td>
+</tr>
+</tbody>
+</table>
+<p>This comparison, fresh from my own local machine 🤗, reveals the following:</p>
+<ul>
+<li>Performance gain: in the No GIL version, my script runs nearly 3x faster.</li>
+<li>CPU Utilization: on my multi-core machine, the CPU usage without GIL jumps to ~6x, leveraging parallelism.</li>
+<li>Memory Overhead: The No-GIL version uses more memory because removing the GIL seems to require extra safety mechanisms for multi-threaded execution.
+Each thread manages its own memory bins, object deallocation is often delayed until all threads finish, and additional metadata (or “tags”) is added to objects to prevent race conditions and ensure thread safety.</li>
+</ul>
+<p>Things to watch out for threading:</p>
+<ul>
+<li>Long-lived threads: ensure that threads are properly terminated. If you're deploying on the cloud, ensure you put <strong>timeout</strong> limits in place. This is to avoid resource leaks when errors stop cancellations.</li>
+<li>Thread safety: ensure that data is properly synchronized to avoid data corruption, always lean towards using immutable data structures.</li>
+<li>Complexity: managing multiple threads can introduce complexity in code, making it harder to understand and maintain.</li>
+</ul>
+<h2>Key Takeaways</h2>
+<ul>
+<li>If you already have multi-threaded python scripts, you can leverage <code>python 3.14t</code> to speed up your code without rewriting it.</li>
+<li>Or, if you've been using a <code>ProcessPool</code>, consider switching to a <code>ThreadPool</code> with <code>python 3.14t</code> to leverage parallel threads without the overhead of multiprocessing.</li>
+<li>With high performing threads comes with high responsibility. Ensure that you're script is not only fast but also correct - avoid data corruption at all costs.</li>
+<li>Set timeout limits for threads to avoid resource leaks, especially in cloud deployments to avoid your pocket from being drained.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
