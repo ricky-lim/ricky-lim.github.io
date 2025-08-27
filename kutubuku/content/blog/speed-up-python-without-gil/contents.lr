@@ -18,16 +18,16 @@ While effective, it brings its own overhead:
 
 - Inter-process communication: Data must be serialized and passed between processes
 - Higher memory usage: each process runs its own python interpreter and maintains separate memory space
-- Startup cost: spawning processes is slower than spawning threads
+- Startup cost: spawning processes is slower than starting threads
 
-The exciting news? Python 3.14 introduces experimental GIL-free builds, known as `python 3.14t`.
+**The exciting news?** Since Python 3.13, CPython has introduced experimental GIL-free builds, such as `python 3.14t`.
 This means we can run threads in parallel and no need to rely on heavy multiprocessing for CPU-bound tasks.
 
 ## Python 3.14t: Free-Threading
 
 Python 3.14t, removes the GIL, allowing threads to run truly in parallel on multi-core processors.
 To explore this exciting new feature,
-I wrote a simple python script to check whether a number is a prime using multiple threads.
+I wrote a simple python script to check ***whether a number is a prime*** using multiple threads.
 The idea was inspired by ***fluent python*** by Luciano Ramalho - a great resource if you want to dive deeper into threading concepts.
 
 Below is a quick snippet of the threaded prime-checking logic.
@@ -114,25 +114,21 @@ Testing Python 3.14t (No GIL)...
 | **Memory Usage** |   15.6 MB         |   23.9 MB             | **1.53× overhead** |
 
 
-From this comparison, we can see the following:
+This comparison, fresh from my own local machine 🤗, reveals the following:
 
 - Performance gain: in the No GIL version, my script runs nearly 3x faster.
 - CPU Utilization: on my multi-core machine, the CPU usage without GIL jumps to ~6x, leveraging parallelism.
-- Memory Overhead: The No-GIL version uses more memory because removing the GIL requires extra safety mechanisms for multi-threaded execution.
+- Memory Overhead: The No-GIL version uses more memory because removing the GIL seems to require extra safety mechanisms for multi-threaded execution.
 Each thread manages its own memory bins, object deallocation is often delayed until all threads finish, and additional metadata (or “tags”) is added to objects to prevent race conditions and ensure thread safety.
 
 Things to watch out for threading:
-- Long-lived threads: ensure that threads are properly terminated. If you're deploying on the cloud, ensure you put **timeout** limits in place to avoid resource leaks.
-- Thread safety: ensure that data is properly synchronized to avoid data corruption
+- Long-lived threads: ensure that threads are properly terminated. If you're deploying on the cloud, ensure you put **timeout** limits in place. This is to avoid resource leaks when errors stop cancellations.
+- Thread safety: ensure that data is properly synchronized to avoid data corruption, always lean towards using immutable data structures.
 - Complexity: managing multiple threads can introduce complexity in code, making it harder to understand and maintain.
 
 ## Key Takeaways
 
 - If you already have multi-threaded python scripts, you can leverage `python 3.14t` to speed up your code without rewriting it.
 - Or, if you've been using a `ProcessPool`, consider switching to a `ThreadPool` with `python 3.14t` to leverage parallel threads without the overhead of multiprocessing.
-- With high performing threads comes with high responsibility. Ensure that you're script is not only fast but also correct, avoiding data corruption.
+- With high performing threads comes with high responsibility. Ensure that you're script is not only fast but also correct - avoid data corruption at all costs.
 - Set timeout limits for threads to avoid resource leaks, especially in cloud deployments to avoid your pocket from being drained.
-
-I think `python 3.14t` is a great step forward for Python, for data scientists, researchers, and anyone doing CPU-intensive tasks.
-It unlocks the potential of multi-core processors in an efficient way.
-I hope that in future development, the memory footprint will also become more efficient.
