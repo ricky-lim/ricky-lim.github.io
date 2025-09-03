@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Learning TUI Development with Textual — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Learning TUI Development with Textual" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Learning TUI Development with Textual</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-09-02
+  </p>
+  <p>When developing tools that require user interaction, we often turn to web-based graphical user interfaces (GUIs).
+While web development provides rich interactivity and internet-friendly accessibility, it also introduces significant overhead in terms of development and maintenance.</p>
+<p>For medium to large, complex projects, the trade-offs usually justify choosing a web application.
+However, for small projects—often created by a single developer to support just a handful of users—web development can be overkilled.</p>
+<h2>TUI</h2>
+<p>As an alternative, I'm exploring TUIs or Textual User Interface development.
+With <code>textual</code>, TUIs offer a unique combination of a simple terminal environment paired with web-like interactivity, powered by the boring and yet powerful CSS.
+This makes Textual a practial option for <strong><em>anyone</em></strong> who want to bring interactivity of their python scripts to their users, <strong>without</strong> the overhead of full web development.</p>
+<p>In this blog post, I share my experience learning <strong>Textual</strong> by following its tutorial to build a simple, yet <strong>terminally</strong> beautiful, timer.
+Here’s how it looks in action:</p>
+<div align="center">
+    <video src="https://github.com/user-attachments/assets/ed19e408-b7e3-4a1c-9206-9d97c250969c" width="500" height="400" controls></video>
+</div><h3>Timer</h3>
+<p>Run it instantly with just one command! <code>uvx 'git+https://github.com/ricky-lim/timertui.git'</code></p>
+<h3>Learning points</h3>
+<p>Along the way, I picked up a few lessons. Here’s what I learned:</p>
+<p>1. Keyboard-driven interactions made easy</p>
+<p>I’m a huge fan of keyboard shortcuts, so having them in any terminal app is a must for me.
+Textual makes mapping shortcuts incredibly intuitive—just prefix your keyboard action methods with <code>action_</code>, and you’re good to go.
+For example, here’s how you can create a shortcut to toggle between dark and light mode using <code>Ctrl+D</code>:</p>
+<pre><code class="lang-python">class TimerApp(App):
+    BINDINGS = [
+        (&quot;ctrl+d&quot;, &quot;toggle_dark&quot;, &quot;Toggle dark mode&quot;),
+        ...
+    ]
+
+    def action_toggle_dark(self) -&gt; None:
+        self.theme = (
+            &quot;textual-dark&quot; if self.theme == &quot;textual-light&quot; else &quot;textual-light&quot;
+        )
+</code></pre>
+<p>2. Custom widgets with reactive variables</p>
+<p><code>textual</code> also makes it easy to build custom widgets that automatically update whenever their states change.
+By marking a variable as <code>reactive</code>, you can let <code>Textual</code> handle re-rendering for you.
+Then, simply define a handler method prefixed with <code>watch_</code> as a convention, to react to those changes.</p>
+<p>For example, here’s a custom countdown display widget that updates <code>remaining_time</code> continuously:</p>
+<pre><code class="lang-python">class TimeDisplay(Digits):
+    &quot;&quot;&quot;Countdown display with beep on finish.&quot;&quot;&quot;
+
+    remaining_time: float = reactive(0.0)
+
+    def watch_remaining_time(self) -&gt; None:
+        time = self.remaining_time
+        time, seconds = divmod(time, 60)
+        hours, minutes = divmod(time, 60)
+        time_string = f&quot;{hours:02.0f}:{minutes:02.0f}:{seconds:05.2f}&quot;
+        self.update(time_string)
+</code></pre>
+<p>3. Simple Frame rendering</p>
+<p>For smooth animations, <code>textual</code> provides the <code>set_interval</code> method to control frame rendering.
+This makes it straightforward to add animated elements to your TUI without much extra effort.
+Here’s an example that sets up a 60 FPS update loop for the countdown display:</p>
+<pre><code class="lang-python">
+class TimeDisplay(Digits):
+    &quot;&quot;&quot;Countdown display with beep on finish.&quot;&quot;&quot;
+
+    def on_mount(self) -&gt; None:
+        # Update 60 times per second, but start in paused state which you can start later within your app logic
+        self._timer = self.set_interval(1 / 60, self.update_remaining_time, pause=True)
+</code></pre>
+<p>4. Separation of Logic and Style</p>
+<p><code>textual</code> separates application logic from styling by using CSS.
+This makes UI tweaks much easier to manage and iterate on.
+Even better, with tools like <code>textual-dev</code>, styles are hot-reloaded as you make changes—giving you a much <strong>first-class</strong> developer experience.</p>
+<p>5. Installation is a straightforward</p>
+<p>Framework installation is a breeze—no bulky <code>node_modules</code> or extra config files to deal with.</p>
+<pre><code># Use uv
+uv add textual
+# For development
+uv add --dev textual-dev
+</code></pre>
+<h2>Challenges</h2>
+<p>In this hobby project, getting a simple beep sound, turned out to be harder than expected—Python doesn’t make it easy.
+For now, I use <code>afplay</code> on macOS and <code>paplay</code> on WSL, though I wish there were a simpler cross-platform solution.
+If you know a better alternative, I’d love to hear it!</p>
+<p>Another challenge was state management, especially with multiple custom widgets.
+Careful design is needed to avoid introducing too many Python variables.
+Reactive variables help with updates, but they also require careful handling.</p>
+<p>I’m also curious about deploying the project without needing a local installation.</p>
+<h2>Final Thoughts</h2>
+<p>Having said that, my overall Textual experience has been positive, it offers a nice balance between simplicity and usability.</p>
+<p>If you're curious about building a TUI, following their tutorial is an excellent start: <a href="https://textual.textualize.io/tutorial/">https://textual.textualize.io/tutorial/</a>.</p>
+<p>And if you'd like to experiment with my timer TUI project, feel free to explore my github repo:<a href="https://github.com/ricky-lim/timertui/">https://github.com/ricky-lim/timertui/</a>.</p>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
