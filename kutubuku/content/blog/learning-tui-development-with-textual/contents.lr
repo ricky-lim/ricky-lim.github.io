@@ -1,0 +1,132 @@
+title: Learning TUI Development with Textual
+---
+author: Ricky Lim
+---
+pub_date: 2025-09-02
+---
+main_image: image.png
+---
+body:
+
+When developing tools that require user interaction, we often turn to web-based graphical user interfaces (GUIs).
+While web development provides rich interactivity and internet-friendly accessibility, it also introduces significant overhead in terms of development and maintenance.
+
+For medium to large, complex projects, the trade-offs usually justify choosing a web application.
+However, for small projects—often created by a single developer to support just a handful of users—web development can be overkilled.
+
+## TUI
+
+As an alternative, I'm exploring TUIs or Textual User Interface development.
+With `textual`, TUIs offer a unique combination of a simple terminal environment paired with web-like interactivity, powered by the boring and yet powerful CSS.
+This makes Textual a practial option for ***anyone*** who want to bring interactivity of their python scripts to their users, **without** the overhead of full web development.
+
+In this blog post, I share my experience learning **Textual** by following its tutorial to build a simple, yet **terminally** beautiful, timer.
+Here’s how it looks in action:
+
+<div align="center">
+    <video src="https://github.com/user-attachments/assets/ed19e408-b7e3-4a1c-9206-9d97c250969c" width="500" height="400" controls></video>
+</div>
+
+### Timer
+
+Run it instantly with just one command! `uvx 'git+https://github.com/ricky-lim/timertui.git'`
+
+### Learning points
+
+Along the way, I picked up a few lessons. Here’s what I learned:
+
+
+1\. Keyboard-driven interactions made easy
+
+I’m a huge fan of keyboard shortcuts, so having them in any terminal app is a must for me.
+Textual makes mapping shortcuts incredibly intuitive—just prefix your keyboard action methods with `action_`, and you’re good to go.
+For example, here’s how you can create a shortcut to toggle between dark and light mode using `Ctrl+D`:
+
+```python
+class TimerApp(App):
+    BINDINGS = [
+        ("ctrl+d", "toggle_dark", "Toggle dark mode"),
+        ...
+    ]
+
+    def action_toggle_dark(self) -> None:
+        self.theme = (
+            "textual-dark" if self.theme == "textual-light" else "textual-light"
+        )
+```
+
+2\. Custom widgets with reactive variables
+
+`textual` also makes it easy to build custom widgets that automatically update whenever their states change.
+By marking a variable as `reactive`, you can let `Textual` handle re-rendering for you.
+Then, simply define a handler method prefixed with `watch_` as a convention, to react to those changes.
+
+For example, here’s a custom countdown display widget that updates `remaining_time` continuously:
+
+```python
+class TimeDisplay(Digits):
+    """Countdown display with beep on finish."""
+
+    remaining_time: float = reactive(0.0)
+
+    def watch_remaining_time(self) -> None:
+        time = self.remaining_time
+        time, seconds = divmod(time, 60)
+        hours, minutes = divmod(time, 60)
+        time_string = f"{hours:02.0f}:{minutes:02.0f}:{seconds:05.2f}"
+        self.update(time_string)
+
+```
+
+3\. Simple Frame rendering
+
+For smooth animations, `textual` provides the `set_interval` method to control frame rendering.
+This makes it straightforward to add animated elements to your TUI without much extra effort.
+Here’s an example that sets up a 60 FPS update loop for the countdown display:
+
+```python
+
+class TimeDisplay(Digits):
+    """Countdown display with beep on finish."""
+
+    def on_mount(self) -> None:
+        # Update 60 times per second, but start in paused state which you can start later within your app logic
+        self._timer = self.set_interval(1 / 60, self.update_remaining_time, pause=True)
+```
+
+4\. Separation of Logic and Style
+
+`textual` separates application logic from styling by using CSS.
+This makes UI tweaks much easier to manage and iterate on.
+Even better, with tools like `textual-dev`, styles are hot-reloaded as you make changes—giving you a much **first-class** developer experience.
+
+5\. Installation is a straightforward
+
+Framework installation is a breeze—no bulky `node_modules` or extra config files to deal with.
+
+```
+# Use uv
+uv add textual
+# For development
+uv add --dev textual-dev
+```
+
+## Challenges
+
+In this hobby project, getting a simple beep sound, turned out to be harder than expected—Python doesn’t make it easy.
+For now, I use `afplay` on macOS and `paplay` on WSL, though I wish there were a simpler cross-platform solution.
+If you know a better alternative, I’d love to hear it!
+
+Another challenge was state management, especially with multiple custom widgets.
+Careful design is needed to avoid introducing too many Python variables.
+Reactive variables help with updates, but they also require careful handling.
+
+I’m also curious about deploying the project without needing a local installation.
+
+## Final Thoughts
+
+Having said that, my overall Textual experience has been positive, it offers a nice balance between simplicity and usability.
+
+If you're curious about building a TUI, following their tutorial is an excellent start: https://textual.textualize.io/tutorial/.
+
+And if you'd like to experiment with my timer TUI project, feel free to explore my github repo:https://github.com/ricky-lim/timertui/.
