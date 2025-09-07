@@ -14,6 +14,10 @@ That curiosity led me to create a simple retro game "Invader" with Textual.
 
 This is what the gameplay looks like:
 
+<div align="center">
+    <video src="./invader.mp4" width="500" height="400" controls></video>
+</div>
+
 # Why Textual
 
 Textual as a framework provides terminal hacks that make creating a retro game surprisingly simple.
