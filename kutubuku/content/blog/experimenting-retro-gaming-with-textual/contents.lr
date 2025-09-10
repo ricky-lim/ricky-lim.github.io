@@ -8,9 +8,9 @@ main_image: image.png
 ---
 body:
 
-After building [TimerTui](https://github.com/ricky-lim/timertui), which taught me about widgets, layouts, and event handling in the terminal,
-I wanted to experiment something fun.
-That curiosity led me to create a simple retro game "Invader" with Textual.
+After building [TimerTui](https://github.com/ricky-lim/timertui), I've got the basics of how to build a TUI.
+So, I rolled up my sleeves to experiment something fun.
+That led me to create a simple retro game "Invader".
 
 This is what the gameplay looks like:
 
@@ -22,15 +22,16 @@ This is what the gameplay looks like:
 
 Textual as a framework provides terminal hacks that make creating a retro game surprisingly simple.
 With just about 200 lines of code, you can create a fully playable retro game.
-If you'd like to explore the code, or even play around with it, check out the script [here](/invader.py).
+If you'd like to explore the code, or even play around with it, check out the script [here](./invader.py).
+This script does not pretend to be production-ready invader game, just a fun toy example how to build a game with Textual.
 
 # Game Plays
 
-- You're the brave pilot of a spaceship 🛸, zipping left and right to fire your glorious shots.
+- You're the brave pilot of a spaceship 🛸, zipping left and right to ***fire*** your glorious shots.
 - From above, swarms of invaders 👾 march down aiming to reach your last line of defense.
 - Unlease your blazing shots to obliterate the invaders in bursts of glory.
 - Victory is yours if you wipe them all out, but if even one invader slips through to the bottom, defeat will be your eternal companion.
 
 # Lessons learned
 
-Building terminal games with it isn't just possible but it's also a great way to explore the framework's flexibility while having fun.
+Building terminal games with it isn't just possible but it's also a great way to explore the framework's capability for fun.
