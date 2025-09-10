@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="icon" type="image/x-icon" href="../../../static/favicon.ico">
-  <link rel="apple-touch-icon" href="../../../static/favicon.png">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../../../static/style.css">
-  <link rel="stylesheet" href="../../../static/search.css">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
 
-  <title>Blog — kutubuku</title>
+  <title>Experimenting Retro Gaming with Textual — kutubuku</title>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
@@ -31,8 +31,8 @@
             </button>
 
             <!-- Brand/Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="../../../">
-              <img src="../../../static/rlim.png"
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
                    alt="rlim"
                    class="logo-rlim me-2">
             </a>
@@ -40,7 +40,7 @@
 
           <!-- Right side: Search Form (always visible) -->
           <div class="navbar-search-main w-50">
-            <form class="search-form d-flex" action="../../../search/" method="get">
+            <form class="search-form d-flex" action="../../search/" method="get">
               <div class="input-group">
                 <input type="search"
                        class="form-control form-control-sm search-input"
@@ -64,7 +64,7 @@
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-        <img src="../../../static/rlim.png"
+        <img src="../../static/rlim.png"
              alt="rlim"
              class="logo-rlim me-2">
       </h5>
@@ -74,22 +74,22 @@
       <ul class="navbar-nav flex-grow-1">
         <li class="nav-item">
           <a class="nav-link"
-             href="../../../">Welcome</a>
+             href="../../">Welcome</a>
         </li>
         
           <li class="nav-item">
             <a class="nav-link active"
-               href="../../">Blog</a>
+               href="../">Blog</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../search/">Search</a>
+               href="../../search/">Search</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../about/">About</a>
+               href="../../about/">About</a>
           </li>
         
       </ul>
@@ -99,71 +99,50 @@
   <div class="page">
     
   
-  <div class="blog-post">
-    <h3><a href="../../dont-skip-local-pip/">Don’t Skip Local pip</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../saving-memory-in-python-with-slots/">Saving Memory in Python with __slots__</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../never-say-never-exhaustive-enums-in-python/">Never Say Never: Exhaustive Enums in Python</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../dynamic-yet-strong-python-typing-for-data-science/">Dynamic Yet Strong: Python Typing for Data Science</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../saved-by-the-schema/">Saved by the Schema</a></h3>
-  </div>
-  
+  <div class="blog-post" data-pagefind-body>
 
-  <div class="pagination-bottom">
+  <div class="blog-post-header">
     
-  <div class="pagination">
+      <img src="image.png" alt="Main image for Experimenting Retro Gaming with Textual" class="main-image" />
     
+    <div class="blog-post-header-content">
       
-        <a href="../../" class="prev">← Previous</a>
-      
-
-      
-      <a href="../../" >1</a>
-
-      
-      
-
-      
-      
-        
-      
-        
-          <a href="./" class="active">2</a>
-        
-      
-        
-          <a href="../3/" >3</a>
-        
-      
-
-      
-      
-        <span class="ellipsis">...</span>
-      
-
-      
-      
-        <a href="../8/" >8</a>
-      
-
-      
-        <a href="../3/" class="next">Next →</a>
+        <h1 data-pagefind-meta="title">Experimenting Retro Gaming with Textual</h1>
       
     </div>
-  
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-09-07
+  </p>
+  <p>After building <a href="https://github.com/ricky-lim/timertui">TimerTui</a>, I've got the basics of how to build a TUI.
+So, I rolled up my sleeves to experiment something fun.
+That led me to create a simple retro game "Invader".</p>
+<p>This is what the gameplay looks like:</p>
+<div align="center">
+    <video src="./invader.mp4" width="500" height="400" controls></video>
+</div><h1>Why Textual</h1>
+<p>Textual as a framework provides terminal hacks that make creating a retro game surprisingly simple.
+With just about 200 lines of code, you can create a fully playable retro game.
+If you'd like to explore the code, or even play around with it, check out the script <a href="invader.py">here</a>.
+This script does not pretend to be production-ready invader game, just a fun toy example how to build a game with Textual.</p>
+<h1>Game Plays</h1>
+<ul>
+<li>You're the brave pilot of a spaceship 🛸, zipping left and right to <strong><em>fire</em></strong> your glorious shots.</li>
+<li>From above, swarms of invaders 👾 march down aiming to reach your last line of defense.</li>
+<li>Unlease your blazing shots to obliterate the invaders in bursts of glory.</li>
+<li>Victory is yours if you wipe them all out, but if even one invader slips through to the bottom, defeat will be your eternal companion.</li>
+</ul>
+<h1>Lessons learned</h1>
+<p>Building terminal games with it isn't just possible but it's also a great way to explore the framework's capability for fun.</p>
+
 
   </div>
+
 
   </div>
 
