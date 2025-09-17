@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Removing Clutter for Terminal User — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Removing Clutter for Terminal User" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Removing Clutter for Terminal User</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-09-17
+  </p>
+  <p>In the world of data science, data can accumulate suddenly 📈 and consume most of our available storage 🪫, which often goes <strong><em>unnoticed</em></strong> 🤐.
+This can be the root of annoying issues 🤕.
+In the worst case, when my disk completely filled up, I couldn’t even reach my remote machine anymore 😭.</p>
+<p>The other day, I run into this same issue when my disk bloated 🫃 to nearly 90%.
+So it was time to roll up my sleeves to start my digital clean-up journey 🧹.
+To make my journey fun and also more efficient 🚀, I began looking for a terminal tool to assist — and that’s when I came across <code>ncdu</code> 💡.</p>
+<h2>What is <code>ncdu</code>?</h2>
+<p><code>ncdu</code> is short for NCurses Disk Usage, or to me it's a TUI for our traditional <code>du</code>.
+With <code>ncdu</code>, we can scan and interactively navigate our directories to hunt for disk hogs and remove them.</p>
+<blockquote><p>Terminal users can also have a nice TUI too when it comes to cleaning up.</p>
+</blockquote>
+<h3>Getting started</h3>
+<pre><code class="lang-sh">sudo apt install ncdu  # Debian/Ubuntu
+brew install ncdu      # macOS
+</code></pre>
+<p>Run it directly with <code>ncdu</code> and it's very much intuitive to use.
+The TUI interface shows disk usage with sortable lists from the most bloated directory.
+Use arrow keys and <code>enter</code> to drill down.
+To delete the bloated files simply press <code>d</code> key.</p>
+<p>To avoid future issue with running out of disk space, I also added my terminal prompt with disk usage,  ⚓️️ docked at the right side of my terminal.</p>
+<p>A simple way to add disk usage information:</p>
+<pre><code class="lang-sh"># Inside my .zshrc file
+disk_usage() {
+  # Replace with the path (&#39;/&#39;) you want to check
+  df / | awk &#39;NR==2 {print $5}&#39;
+}
+
+# This is to dock at the right side
+RPROMPT=&#39;Disk: $(disk_usage)%&#39;
+</code></pre>
+<p><img src="my-prompt.png" alt="Terminal prompt with disk usage"></p>
+<h1>Key Takeaways</h1>
+<p>In the world of data science, disk space can be as valuable as compute power:</p>
+<ul>
+<li>Use <strong><code>ncdu</code></strong> to manage storage interactively and prevent annoying disk-related disruptions.</li>
+<li>Keep disk usage in check by displaying it directly in your <strong>terminal prompt</strong>.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
