@@ -1,0 +1,145 @@
+title: Getting Started with Rust
+---
+author: Ricky Lim
+---
+pub_date: 2025-09-21
+---
+main_image: image.png
+---
+body:
+
+Rust has been the backbone to speed up many of python tooling.
+Among them are: ruff, uv, and polars which are all written in Rust and have been significanly speed up our python workflows.
+`ruff` is used to format python code, and `uv` and `polars` are `pip` and `pandas` in steroid, respectively.
+
+With such speed improvement that I feel, I'm excited to explore Rust.
+First, I'd like to show you what it looks like to get started with Rust. So let's get started!
+
+## Installing Rust
+
+The control center for Rust is [rust-lang.org](https://www.rust-lang.org/). That's the official documentation.
+
+First, we need to install `rustup`, which is a Rust installer
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Once installed, check for stable release with `rustup update stable`.
+Check the version with `rustc --version`.
+
+## Hello Rust
+
+Let's create a simple hello world program, `hello-rust`.
+Our first step is to meet `cargo`, which we'll use often with Rust.
+`cargo` is like our `pip` in steroid for Rust.
+
+```sh
+# Start a new Rust project
+cargo new hello-rust
+cd hello-rust
+```
+
+The project is now created, we can directly go to `src/main.rs`.
+This is where our application code starts.
+
+```rust
+# Change to hello-rust
+fn main() {
+    println!("Hello, Rust!");
+}
+```
+
+To run the program, `cargo run`.
+This is similar to `python main.py` in python.
+
+The difference between Rust and python is that Rust is a compiled language, whereas python is an interpreted language.
+In the interpreted language, the code is executed by Python interpreter so it can be run directly.
+With Rust, the code is first compilied into machine code by `rustc` (Rust compiler). This process is also known as build as we're building the code into machine code.
+
+When we run `cargo run`, it will first build the code into machine code, which is located in `target/debug/hello-rust` and then run the machine code.
+It should print `Hello, Rust!` in the terminal.
+
+## A small CLI application
+
+Let's create a small CLI application that count the lines of a file.
+
+First, we will add a dependency to our application.
+We can find the dependency in [crates.io](https://crates.io/), which is the package registry for Rust, like `pypi.org` for python.
+
+To help parsing the command line arguments, we will use `clap` crate.
+
+In our `Cargo.toml` similar to `pyproject.toml` in python, we will add the dependency.
+
+```toml
+# Add this to your Cargo.toml
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+```
+
+Let's update our `src/main.rs` to use `clap` to parse the command line arguments.
+
+```rust
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(version, about = "Counting lines")]
+struct Cli {
+    // File path to read
+    path: std::path::PathBuf,
+}
+
+fn main() {
+    let args = Cli::parse();
+
+    let content = std::fs::read_to_string(&args.path).expect("File can not be read");
+    let result = content.lines().count();
+    println!("{}", result);
+}
+```
+
+Now we can run our application with `cargo run -- <file-path>`.
+The `--` is used to separate the arguments for `cargo` and the arguments for our application.
+
+For example, let's first check the `version` and `help` from our application.
+
+```sh
+$ cargo run -- --version
+hello-rust 0.1.0
+
+$ cargo run -- --help
+Counting lines
+
+Usage: hello-rust <PATH>
+
+Arguments:
+  <PATH>
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+```
+
+Let's now give it a spin,
+
+```sh
+cargo run -- src/main.rs
+```
+It should print the number of lines in `src/main.rs`.
+
+Huhu, so now we have written a CLI application in Rust to count lines with proper `--help` and `--version` flags.
+As you also may notice when run `cargo run`, we see that it is `unoptimized`.
+```sh
+  Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/hello-rust --help`
+```
+This is because we are running in `debug` mode and it is intended for development.
+
+When we are ready to ship our application, we can run `cargo build --release` to build the optimized version of our application.
+Now our application is shipped in `target/release/hello-rust` and we can run it directly with `./target/release/hello-rust <file-path>`.
+
+## Key takeaways
+
+- Rust is a compiled language, whereas python is an interpreted language.
+- Compiler would be both your friend and enemy when writing Rust code.
+- `cargo` is your friend and it is like `pip` that helps you manage your Rust project.
