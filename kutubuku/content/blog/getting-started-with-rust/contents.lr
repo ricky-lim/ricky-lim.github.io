@@ -8,16 +8,17 @@ main_image: image.png
 ---
 body:
 
-Rust has been the backbone to speed up many of python tooling.
-Among them are: ruff, uv, and polars which are all written in Rust and have been significanly speed up our python workflows.
-`ruff` is used to format python code, and `uv` and `polars` are `pip` and `pandas` in steroid, respectively.
+Rust has become the secret recipe behind some of the fastest tools in the Python ecosystem.
+You really can feel the boost like a goosebump when you start using these Rust-cooked tools.
+Among them are: ruff, uv, and polars which are fired by Rust and have been significantly 🚀 speed up our python workflows.
+`ruff` is used to format and lint your python code, and `uv` and `polars` can be thought as a faster, more ergonomic version of `pip` and `pandas`, respectively.
 
-With such speed improvement that I feel, I'm excited to explore Rust.
-First, I'd like to show you what it looks like to get started with Rust. So let's get started!
+The performance boost I’ve experienced has me genuinely excited to learn how to code with Rust.
+Coming from a python background, I want to share my journey of getting started with Rust. So let's jump right in!
 
 ## Installing Rust
 
-The control center for Rust is [rust-lang.org](https://www.rust-lang.org/). That's the official documentation.
+The ministry of documentation for Rust is [rust-lang.org](https://www.rust-lang.org/). That's the official documentation, like [python.org](https://www.python.org/) for python.
 
 First, we need to install `rustup`, which is a Rust installer
 
@@ -28,11 +29,35 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Once installed, check for stable release with `rustup update stable`.
 Check the version with `rustc --version`.
 
+With `rustup`, you can manage multiple Rust versions like with `uv` for python.
+For example, you can install a specific rust version for a project with:
+
+```sh
+rustup install 1.70.0
+rustup override set 1.70.0
+```
+
+Once Rust is installed, it comes also with `cargo`, it's like `pip` for python but with a few extra features.
+`ruff` equivalent in Rust is `cargo fmt` to format the code, and `cargo clippy` is like `ruff` to lint the code.
+fmt is to ensure that our code follows a consistent style or for me It's a lazy shortcut: I set my editior to automatically format on save and let `fmt` do the work for me.
+
+lint is always a confusing word for me, but in short it's a way to check for coding best practices.
+As a simple example if we have unused variables in our code, `clippy` will warn us.
+The nice thing, they also provide suggestions to fix the issue, which is to prefix the variable with an underscore `_`.
+
+```sh
+  --> src/main.rs:11:9
+   |
+11 |     let hello = "Hello";
+   |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_hello`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+```
+
 ## Hello Rust
 
 Let's create a simple hello world program, `hello-rust`.
-Our first step is to meet `cargo`, which we'll use often with Rust.
-`cargo` is like our `pip` in steroid for Rust.
+Our first step is to run `cargo`, which we'll use often with Rust.
 
 ```sh
 # Start a new Rust project
@@ -40,7 +65,7 @@ cargo new hello-rust
 cd hello-rust
 ```
 
-The project is now created, we can directly go to `src/main.rs`.
+The project is now created and we can directly go to `src/main.rs`.
 This is where our application code starts.
 
 ```rust
@@ -55,10 +80,13 @@ This is similar to `python main.py` in python.
 
 The difference between Rust and python is that Rust is a compiled language, whereas python is an interpreted language.
 In the interpreted language, the code is executed by Python interpreter so it can be run directly.
-With Rust, the code is first compilied into machine code by `rustc` (Rust compiler). This process is also known as build as we're building the code into machine code.
+With Rust, the code is first compiled into machine code by `rustc` (Rust compiler) in a build process.
 
-When we run `cargo run`, it will first build the code into machine code, which is located in `target/debug/hello-rust` and then run the machine code.
-It should print `Hello, Rust!` in the terminal.
+The advantage of compiled Rust is that the resulting program runs independently, without needing the Rust compiler installed, making distribution easier.
+On the other hand, running Python code requires the Python interpreter to be installed on the machine or server.
+
+When we run cargo run, Rust first compiles the code into machine code, which you can find at `target/debug/hello-rust`, and then executes it.
+You should see Hello, Rust! printed in the terminal.
 
 ## A small CLI application
 
@@ -81,22 +109,40 @@ Let's update our `src/main.rs` to use `clap` to parse the command line arguments
 
 ```rust
 use clap::Parser;
+use std::fs::read_to_string;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(version, about = "Counting lines")]
 struct Cli {
-    // File path to read
-    path: std::path::PathBuf,
+    path: PathBuf,
 }
 
 fn main() {
     let args = Cli::parse();
 
-    let content = std::fs::read_to_string(&args.path).expect("File can not be read");
+    let content = read_to_string(&args.path).expect("File cannot be read");
     let result = content.lines().count();
     println!("{}", result);
 }
 ```
+
+At the top of the file, we have a list of `use` statements like Python’s import. It brings external functionality into your code.
+The #[…] syntax is called an attribute in Rust.
+For now, you can think of it like a decorator in Python.
+In this example, #[derive(Parser)] automatically generates code so that our Cli struct can parse command-line arguments.
+The #[command(version, about = "Counting lines")] attribute adds metadata for a nice help message, including version info and description.
+
+A `struct` in Rust is similar to a Python dataclass; it's a way to create a custom data type.
+The struct `Cli` defines a custom data type similar to a Python dataclass, with `PathBuf` representing a filesystem path.
+
+Rust introduces ownership rules for memory safety while Python uses a garbage collector.
+Here, we use a reference `&args.path` so that our function borrows the path for temporary use.
+
+The `expect` method is used to handle errors gracefully.
+If `read_to_string` fails, the program will print "File cannot be read" instead of panicking with a generic message.
+
+### Running the application
 
 Now we can run our application with `cargo run -- <file-path>`.
 The `--` is used to separate the arguments for `cargo` and the arguments for our application.
@@ -129,11 +175,13 @@ It should print the number of lines in `src/main.rs`.
 
 Huhu, so now we have written a CLI application in Rust to count lines with proper `--help` and `--version` flags.
 As you also may notice when run `cargo run`, we see that it is `unoptimized`.
+
 ```sh
   Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
      Running `target/debug/hello-rust --help`
 ```
-This is because we are running in `debug` mode and it is intended for development.
+
+This is because we are running in `debug` mode and it is intended only for development.
 
 When we are ready to ship our application, we can run `cargo build --release` to build the optimized version of our application.
 Now our application is shipped in `target/release/hello-rust` and we can run it directly with `./target/release/hello-rust <file-path>`.
@@ -141,5 +189,6 @@ Now our application is shipped in `target/release/hello-rust` and we can run it 
 ## Key takeaways
 
 - Rust is a compiled language, whereas python is an interpreted language.
+- While Python comes with garbage collector, Rust uses ownership rules to manage memory safely without a garbage collector.
 - Compiler would be both your friend and enemy when writing Rust code.
 - `cargo` is your friend and it is like `pip` that helps you manage your Rust project.
