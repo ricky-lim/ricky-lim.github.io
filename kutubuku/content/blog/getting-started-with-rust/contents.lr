@@ -192,3 +192,4 @@ Now our application is shipped in `target/release/hello-rust` and we can run it 
 - While Python comes with garbage collector, Rust uses ownership rules to manage memory safely without a garbage collector.
 - Compiler would be both your friend and enemy when writing Rust code.
 - `cargo` is your friend and it is like `pip` that helps you manage your Rust project.
+- To learn more about Rust, rustup got you covered with `rustup doc --book` to read the official Rust book offline.
