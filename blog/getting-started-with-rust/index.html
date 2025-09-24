@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Getting Started with Rust — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Getting Started with Rust" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Getting Started with Rust</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-09-21
+  </p>
+  <p>Rust has become the secret recipe leveling up the performance of many tools in our Python ecosystem.
+You really can feel the boost like a goosebump ✨ when you start using these Rust-powered tools.
+Among them are: <code>ruff</code> 🐺 , <code>uv</code> ⚡, and <code>polars</code> ❄️ which are fired up by Rust and have been significantly 🚀 speed up our python workflows.
+<code>ruff</code> is used to format and lint your python code, and <code>uv</code> and <code>polars</code> can be thought as a faster, more ergonomic version of <code>pip</code> and <code>pandas</code>, respectively.</p>
+<p>The performance boost I’ve experienced has made me genuinely excited to learn Rust 🦀.
+Coming from a python 🐍 background, I want to share my journey of getting started with Rust. So let's jump right in!</p>
+<h2>Installing Rust</h2>
+<p>The official documentation for Rust is <a href="https://www.rust-lang.org/">rust-lang.org</a>.
+It's like <a href="https://www.python.org/">python.org</a> for python.</p>
+<p>First, we need to install <code>rustup</code>, which is a Rust installer</p>
+<pre><code class="lang-sh">curl --proto &#39;=https&#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh
+</code></pre>
+<p>Once installed, check for stable release with <code>rustup update stable</code>.
+Check the version with <code>rustc --version</code>.</p>
+<p>With <code>rustup</code>, you can manage multiple Rust versions like with <code>uv</code> for python.
+For example, you can install a specific rust version for a project with:</p>
+<pre><code class="lang-sh">rustup install 1.70.0
+rustup override set 1.70.0
+</code></pre>
+<p>Once Rust is installed, it comes also with <code>cargo</code>, it's like <code>pip</code> for python but with a few extra features.
+<code>ruff</code> equivalent in Rust is <code>cargo fmt</code> to format the code, and <code>cargo clippy</code> is like <code>ruff</code> to lint the code.
+<code>fmt</code> is to ensure that our code follows a consistent style or for me It's a lazy shortcut: I set my editor to automatically format on save and let <code>fmt</code> do the right thing.</p>
+<p>lint is always a confusing word for me, but in short it's a way to check for coding best practices.
+As a simple example if we have unused variables in our code, <code>clippy</code> will warn us.
+The nice thing, they also provide suggestions to fix the issue, which is to prefix the variable with an underscore <code>_</code>.</p>
+<pre><code class="lang-sh">  --&gt; src/main.rs:11:9
+   |
+11 |     let hello = &quot;Hello&quot;;
+   |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_hello`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+</code></pre>
+<h2>Hello Rust</h2>
+<p>Let's create a simple hello world program, <code>hello-rust</code>.
+Our first step is to run <code>cargo</code>, which we'll use often with Rust.</p>
+<pre><code class="lang-sh"># Start a new Rust project
+cargo new hello-rust
+cd hello-rust
+</code></pre>
+<p>The project is now created and we can directly go to <code>src/main.rs</code>.
+This is where our application code starts.</p>
+<pre><code class="lang-rust"># Change to hello-rust
+fn main() {
+    println!(&quot;Hello, Rust!&quot;);
+}
+</code></pre>
+<p>To run the program, <code>cargo run</code>.
+This is kind of similar to <code>python main.py</code> in python.</p>
+<p>The difference between Rust and python is that Rust is a compiled language, whereas python is an interpreted language.
+In the interpreted language, the code is executed by Python interpreter so it can be run directly.
+With Rust, the code is first compiled into machine code by <code>rustc</code> (Rust compiler) in a build process.</p>
+<p>The advantage of compiled Rust is that the resulting program runs independently, without needing the Rust compiler installed, making distribution easier.
+On the other hand, running Python code requires the Python interpreter to be installed on the machine or server.
+Rust compiler also helps catch many errors at compile time, making our code safe to run.
+With safety guarantee, the compiled code is run with lesser checks, thus boosting the performance of our code.</p>
+<p>When we run <code>cargo run</code>, Rust first compiles the code into machine code, which you can find at <code>target/debug/hello-rust</code>, and then executes it.
+You should see Hello, Rust! printed in the terminal.</p>
+<h2>A small CLI application</h2>
+<p>Let's create a small CLI application that count the lines of a file.</p>
+<p>First, we will add a dependency to our application.
+This is to help parsing the command line arguments, we will use <code>clap</code> crate.
+We can find the dependency in <a href="https://crates.io/">crates.io</a>, which is the package registry for Rust, like <code>pypi.org</code> for python.</p>
+<p>In our <code>Cargo.toml</code> similar to <code>pyproject.toml</code> in python, we will add the dependency.</p>
+<pre><code class="lang-toml"># Add this to your Cargo.toml
+[dependencies]
+clap = { version = &quot;4.0&quot;, features = [&quot;derive&quot;] }
+</code></pre>
+<p>Let's update our <code>src/main.rs</code> to use <code>clap</code> to parse the command line arguments.</p>
+<pre><code class="lang-rust">use clap::Parser;
+use std::fs::read_to_string;
+use std::path::PathBuf;
+
+#[derive(Parser)]
+#[command(version, about = &quot;Counting lines&quot;)]
+struct Cli {
+    path: PathBuf,
+}
+
+fn main() {
+    let args = Cli::parse();
+
+    let content = read_to_string(&amp;args.path).expect(&quot;File cannot be read&quot;);
+    let result = content.lines().count();
+    println!(&quot;{}&quot;, result);
+}
+</code></pre>
+<p>At the top of the file, we have a list of <code>use</code> statements like Python’s import. It brings external functionality into your code.
+The <code>#[…]</code> syntax is called an attribute in Rust.
+For now, you can think of it like a decorator (sort of) in Python.
+In this example, <code>#[derive(Parser)]</code> automatically generates code so that our Cli struct can parse command-line arguments.
+The <code>#[command(version, about = "Counting lines")]</code> attribute adds metadata for a nice help message, including version info and also description.</p>
+<p>A <code>struct</code> in Rust is similar to a Python dataclass; it's a way to create a custom data type.
+Our struct <code>Cli</code> defines a custom data type similar to a Python dataclass, with <code>PathBuf</code> representing a filesystem path.</p>
+<p>Rust introduces ownership rules for memory safety while Python uses a garbage collector.
+Here, we use a reference <code>&amp;args.path</code> so that our function borrows the path for temporary use.</p>
+<p>The <code>expect</code> method is used to handle errors gracefully.
+If <code>read_to_string</code> fails, the program will print <code>"File cannot be read"</code> instead of panicking with a generic message.</p>
+<h3>Running the application</h3>
+<p>Now we can run our application with <code>cargo run -- &lt;file-path&gt;</code>.
+The <code>--</code> is used to separate the arguments for <code>cargo</code> and the arguments for our application.</p>
+<p>For example, let's first check the <code>version</code> and <code>help</code> from our application.</p>
+<pre><code class="lang-sh">$ cargo run -- --version
+hello-rust 0.1.0
+
+$ cargo run -- --help
+Counting lines
+
+Usage: hello-rust &lt;PATH&gt;
+
+Arguments:
+  &lt;PATH&gt;
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+</code></pre>
+<p>Let's now give it a spin,</p>
+<pre><code class="lang-sh">cargo run -- src/main.rs
+</code></pre>
+<p>It should print the number of lines in <code>src/main.rs</code>.</p>
+<p>Huhu 🥳, so now we have written a CLI application in Rust to count lines with proper <code>--help</code> and <code>--version</code> flags.
+As you also may notice when run <code>cargo run</code>, we see that it is <code>unoptimized</code>.</p>
+<pre><code class="lang-sh">  Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/hello-rust --help`
+</code></pre>
+<p>This is because we are running in <code>debug</code> mode and it is intended only for development.</p>
+<p>When we are ready to ship our application, we can run <code>cargo build --release</code> to build the optimized version of our application.
+Now our application is shipped in <code>target/release/hello-rust</code> and we can run it directly with <code>./target/release/hello-rust &lt;file-path&gt;</code>.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Rust is a compiled language, whereas python is an interpreted language.</li>
+<li>While Python comes with garbage collector, Rust uses ownership rules to manage memory safely without a garbage collector.</li>
+<li>With the compiler, you’ll feel both love and frustration to ensure your code is safe and performant.</li>
+<li><code>cargo</code> is your friend and it is like <code>pip</code> that helps you manage your Rust project.</li>
+<li>To learn more about Rust, <code>rustup</code> got you covered with <code>rustup doc --book</code> to read the official Rust book free and offline.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
