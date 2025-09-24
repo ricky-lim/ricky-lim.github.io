@@ -8,17 +8,18 @@ main_image: image.png
 ---
 body:
 
-Rust has become the secret recipe behind some of the fastest tools in the Python ecosystem.
-You really can feel the boost like a goosebump when you start using these Rust-cooked tools.
-Among them are: ruff, uv, and polars which are fired by Rust and have been significantly 🚀 speed up our python workflows.
+Rust has become the secret recipe leveling up the performance of many tools in our Python ecosystem.
+You really can feel the boost like a goosebump ✨ when you start using these Rust-powered tools.
+Among them are: `ruff` 🐺 , `uv` ⚡, and `polars` ❄️ which are fired up by Rust and have been significantly 🚀 speed up our python workflows.
 `ruff` is used to format and lint your python code, and `uv` and `polars` can be thought as a faster, more ergonomic version of `pip` and `pandas`, respectively.
 
-The performance boost I’ve experienced has me genuinely excited to learn how to code with Rust.
-Coming from a python background, I want to share my journey of getting started with Rust. So let's jump right in!
+The performance boost I’ve experienced has made me genuinely excited to learn Rust 🦀.
+Coming from a python 🐍 background, I want to share my journey of getting started with Rust. So let's jump right in!
 
 ## Installing Rust
 
-The ministry of documentation for Rust is [rust-lang.org](https://www.rust-lang.org/). That's the official documentation, like [python.org](https://www.python.org/) for python.
+The official documentation for Rust is [rust-lang.org](https://www.rust-lang.org/).
+It's like [python.org](https://www.python.org/) for python.
 
 First, we need to install `rustup`, which is a Rust installer
 
@@ -39,7 +40,7 @@ rustup override set 1.70.0
 
 Once Rust is installed, it comes also with `cargo`, it's like `pip` for python but with a few extra features.
 `ruff` equivalent in Rust is `cargo fmt` to format the code, and `cargo clippy` is like `ruff` to lint the code.
-fmt is to ensure that our code follows a consistent style or for me It's a lazy shortcut: I set my editior to automatically format on save and let `fmt` do the work for me.
+`fmt` is to ensure that our code follows a consistent style or for me It's a lazy shortcut: I set my editor to automatically format on save and let `fmt` do the right thing.
 
 lint is always a confusing word for me, but in short it's a way to check for coding best practices.
 As a simple example if we have unused variables in our code, `clippy` will warn us.
@@ -76,7 +77,7 @@ fn main() {
 ```
 
 To run the program, `cargo run`.
-This is similar to `python main.py` in python.
+This is kind of similar to `python main.py` in python.
 
 The difference between Rust and python is that Rust is a compiled language, whereas python is an interpreted language.
 In the interpreted language, the code is executed by Python interpreter so it can be run directly.
@@ -84,8 +85,10 @@ With Rust, the code is first compiled into machine code by `rustc` (Rust compile
 
 The advantage of compiled Rust is that the resulting program runs independently, without needing the Rust compiler installed, making distribution easier.
 On the other hand, running Python code requires the Python interpreter to be installed on the machine or server.
+Rust compiler also helps catch many errors at compile time, making our code safe to run.
+With safety guarantee, the compiled code is run with lesser checks, thus boosting the performance of our code.
 
-When we run cargo run, Rust first compiles the code into machine code, which you can find at `target/debug/hello-rust`, and then executes it.
+When we run `cargo run`, Rust first compiles the code into machine code, which you can find at `target/debug/hello-rust`, and then executes it.
 You should see Hello, Rust! printed in the terminal.
 
 ## A small CLI application
@@ -93,9 +96,8 @@ You should see Hello, Rust! printed in the terminal.
 Let's create a small CLI application that count the lines of a file.
 
 First, we will add a dependency to our application.
+This is to help parsing the command line arguments, we will use `clap` crate.
 We can find the dependency in [crates.io](https://crates.io/), which is the package registry for Rust, like `pypi.org` for python.
-
-To help parsing the command line arguments, we will use `clap` crate.
 
 In our `Cargo.toml` similar to `pyproject.toml` in python, we will add the dependency.
 
@@ -128,19 +130,19 @@ fn main() {
 ```
 
 At the top of the file, we have a list of `use` statements like Python’s import. It brings external functionality into your code.
-The #[…] syntax is called an attribute in Rust.
-For now, you can think of it like a decorator in Python.
-In this example, #[derive(Parser)] automatically generates code so that our Cli struct can parse command-line arguments.
-The #[command(version, about = "Counting lines")] attribute adds metadata for a nice help message, including version info and description.
+The `#[…]` syntax is called an attribute in Rust.
+For now, you can think of it like a decorator (sort of) in Python.
+In this example, `#[derive(Parser)]` automatically generates code so that our Cli struct can parse command-line arguments.
+The `#[command(version, about = "Counting lines")]` attribute adds metadata for a nice help message, including version info and also description.
 
 A `struct` in Rust is similar to a Python dataclass; it's a way to create a custom data type.
-The struct `Cli` defines a custom data type similar to a Python dataclass, with `PathBuf` representing a filesystem path.
+Our struct `Cli` defines a custom data type similar to a Python dataclass, with `PathBuf` representing a filesystem path.
 
 Rust introduces ownership rules for memory safety while Python uses a garbage collector.
 Here, we use a reference `&args.path` so that our function borrows the path for temporary use.
 
 The `expect` method is used to handle errors gracefully.
-If `read_to_string` fails, the program will print "File cannot be read" instead of panicking with a generic message.
+If `read_to_string` fails, the program will print `"File cannot be read"` instead of panicking with a generic message.
 
 ### Running the application
 
@@ -173,7 +175,7 @@ cargo run -- src/main.rs
 ```
 It should print the number of lines in `src/main.rs`.
 
-Huhu, so now we have written a CLI application in Rust to count lines with proper `--help` and `--version` flags.
+Huhu 🥳, so now we have written a CLI application in Rust to count lines with proper `--help` and `--version` flags.
 As you also may notice when run `cargo run`, we see that it is `unoptimized`.
 
 ```sh
@@ -190,6 +192,6 @@ Now our application is shipped in `target/release/hello-rust` and we can run it 
 
 - Rust is a compiled language, whereas python is an interpreted language.
 - While Python comes with garbage collector, Rust uses ownership rules to manage memory safely without a garbage collector.
-- Compiler would be both your friend and enemy when writing Rust code.
+- With the compiler, you’ll feel both love and frustration to ensure your code is safe and performant.
 - `cargo` is your friend and it is like `pip` that helps you manage your Rust project.
-- To learn more about Rust, rustup got you covered with `rustup doc --book` to read the official Rust book offline.
+- To learn more about Rust, `rustup` got you covered with `rustup doc --book` to read the official Rust book free and offline.
