@@ -1,0 +1,275 @@
+title: Python and Rust on Mutable Defaults
+---
+author: Ricky Lim
+---
+pub_date: 2025-09-28
+---
+main_image: image.png
+---
+body:
+
+One of the source of bugs I have encountered in Python is related to defaul arguments that are mutable.
+In this blog post, let's explore this issue and see how we can handle this issue in both Python and Rust.
+
+## Python: The Mutable Default: Bad Practice
+
+As an illustration, consider the following Python class to manage a dataset:
+
+```python
+class MagicDataset:
+    def __init__(self, records=[]):
+        self.records = records
+
+    def add(self, record):
+        self.records.append(record)
+
+    def drop(self, record):
+        self.records.remove(record)
+````
+
+This code seems to be fine but it's not safe.
+So let's use this class:
+
+```python
+>>> data1 = MagicDataset([1, 2, 3])
+
+>>> data1.records
+[1, 2, 3]
+
+>>> data1.add(5)
+
+>>> data1.drop(3)
+
+>>> data1.records
+[1, 2, 5]
+
+# data1 is working fine, let's create another instance
+>>> data2 = MagicDataset()
+
+>>> data2.add(10)
+
+>>> data3 = MagicDataset()
+
+>>> data3.add(10)
+
+>>> data3.add(20)
+
+# Now, let's check the records of data2 and data3
+>>> data2.records
+[10, 10, 20]
+>>> data3.records
+[10, 10, 20]
+>>> data2.records is data3.records
+True
+```
+As you can see the **problem** is that our data1 and data2 are now sharing to the same list object.
+
+Why is that happening?
+This issue is caused by the default parameter `records=[]` in the `__init__` method.
+The `[]` is a mutable list object created once when the class is defined, not each time an instance is created.
+In `data1` we pass an explicit list `[1, 2, 3]`, but for `data2` and `data3`, we don't pass any list, so they both use the same default list object.
+This results in both `data2` and `data3` sharing the same list, leading to unexpected behavior when we modify it.
+
+### How to fix it
+
+We can use `None` as the default value and create a new list if `records` is `None`:
+
+```python
+class PracticallySafeDataset:
+    def __init__(self, records=None):
+        if records is None:
+            records = []
+        self.records = records
+
+    def add(self, record):
+        self.records.append(record)
+
+    def drop(self, record):
+        self.records.remove(record)
+```
+
+Let's try out:
+
+```python
+>>> primes = [2, 3, 5, 7, 11]
+
+>>> dataset = PracticallySafeDataset(primes)
+>>> dataset.add(-1)
+>>> dataset.drop(11)
+>>> dataset.records
+[2, 3, 5, 7, -1]
+
+>>> primes # Surprise that our prime list is also modified!
+[2, 3, 5, 7, -1]
+```
+
+The problem here is that Python allows both aliasing and mutability at the same time.
+The root of the issue is from `self.records = records` in the `__init__` method.
+Here we alias to the list that is passed to the `__init__` method and this list can also be modified internally.
+Most of the time, this is not an intended behavior that a change in class instance `dataset` can change the original `primes` list.
+In Python it's not obvious that `primes` creates a pointer to data within `PracticallySafeDataset`.
+To fix this, we should create a copy of the list:
+
+```python
+class SafeDataset:
+    def __init__(self, records=None):
+        if records is None:
+            records = []
+        self.records = list(records)  # Create a copy of the list
+
+    def add(self, record):
+        self.records.append(record)
+
+    def drop(self, record):
+        self.records.remove(record)
+```
+
+## Rust
+
+In Rust, default parameters are not supported so it completely avoids the mutable default argument issue.
+We can translate the `Dataset` class to a Rust struct like this:
+
+The following Rust code is equivalent to the `SafeDataset` class in Python:
+
+```rust
+struct Dataset {
+    records: Vec<i32>,
+}
+
+impl Dataset {
+    fn new(records: Option<&Vec<i32>>) -> Self {
+        match records {
+            Some(records) => Dataset {
+                records: records.clone(),
+            },
+            None => Dataset {
+                records: Vec::new(),
+            },
+        }
+    }
+
+    fn add(&mut self, record: i32) {
+        self.records.push(record);
+    }
+
+    fn drop(&mut self, record: i32) {
+        self.records.retain(|&x| x != record);
+    }
+}
+
+#[test]
+fn test_dataset() {
+    let primes = vec![2, 3, 5, 7, 11];
+
+    let mut dataset = Dataset::new(Some(&primes));
+    dataset.add(-1);
+    dataset.drop(11);
+
+    assert_eq!(dataset.records, vec![2, 3, 5, 7, -1]);
+    assert_eq!(primes, vec![2, 3, 5, 7, 11]);
+
+    let mut dataset2 = Dataset::new(None);
+    dataset2.add(10);
+    assert_eq!(dataset2.records, vec![10]);
+}
+
+```
+
+With this implementation, we explicitly make a copy of the mutable parameter, i.e, `records`.
+The Rust code unfortunately is more verbose than the Python code.
+To optionally pass a parameter in Rust, we use `Option<T>` type.
+This type is an enum that can be either `Some(T)` or `None`.
+If the records are provided, then we clone it. Otherwise, we create an empty vector.
+Also in our Dataset, we use `&Vec<i32>` to borrow the vector instead of taking ownership of it.
+The `add` method is similar to Python, whereas `drop` method is rather involved.
+In Rust, we will use functional programming style to filter out the record that we want to drop.
+
+Although now it provides safety, if our records are large, this can be inefficient.
+So we can use Rust's borrowing principle as such we can borrow the records instead of copying it, aka aliasing.
+To ensure the safety of our data, Rust does not allow aliasing and mutability at the same time.
+
+Here is how we can implement it:
+
+```rust
+// Lifetime annotation `'a` to ensure the borrowed data lives long enough
+struct ZeroCloneDataset<'a> {
+    records: &'a mut Vec<i32>,
+}
+
+impl<'a> ZeroCloneDataset<'a> {
+    fn new(records: &'a mut Vec<i32>) -> Self {
+        ZeroCloneDataset { records }
+    }
+
+    fn add(&mut self, record: i32) {
+        self.records.push(record);
+    }
+
+    fn drop(&mut self, record: i32) {
+        if let Some(pos) = self.records.iter().position(|&x| x == record) {
+            self.records.remove(pos);
+        }
+    }
+}
+
+#[test]
+fn test_zero_clone_dataset() {
+    let mut large_numbers = vec![1; 1_000_000];
+    let mut dataset = ZeroCloneDataset {
+        records: &mut large_numbers,
+    };
+
+    large_numbers.push(2); // 1. This will fail to compile if uncommented
+
+    dataset.add(2);
+    println!("Dataset length: {}", dataset.records.len()); // Dataset length: 1_000_001
+    println!("Original length: {}", large_numbers.len()); // Original length: 1_000_001
+
+    large_numbers.push(2); // 2. This will be fine given the previous line is commented out
+
+}
+```
+
+The test function would not be compiled because we are still aliasing `large_number` as mutable in `ZeroCloneDataset` and we are trying to modify it directly.
+This would violate Rust's borrowing rules, which allow only either aliasing or mutability, but not both at the same time.
+The error prevents data races at compile time, therefore Rust not only provides memory efficient code but also safe code.
+Once we commented out the line with `// 1.`, the code would compile and run fine.
+The `// 2` line would be accepted by the compiler because we are no longer aliasing only mutating.
+
+## Key Takeaways
+
+- Watch out with mutable default arguments in Python and most of the time it's better to avoid them.
+- If you must, use `None` as the default value and create a new mutable object inside the function or method.
+- Rust comes with no default parameter support, so the problem is non-existent.
+- Rust pattern match `Option<T>` to handle optional parameters, make it explicit to handle optional arguments.
+- If needed to be memory efficient, use borrowing instead of cloning and Rust's ownership and borrowing rules ensure safety at compile time.
+- Rust ownership is a safe concept but also rather strange for Python programmers, and it takes time to get used to it.
+
+### Tip
+
+As Rust is a compiled language, one way to experiment in Rust is to use test functions in the `main.rs` file.
+Here how you can set it up:
+
+
+```sh
+cargo new dataset
+cd dataset
+# Open vscode
+code .
+```
+
+To get the most experience out of Rust, consider installing the Rust Analyzer extension in VSCode.
+Also add the keyboard shortcut in your `keybindings.json` to run the code easily:
+
+```json
+...
+    {
+        "key": "shift+cmd+enter",
+        "command": "rust-analyzer.run"
+    },
+...
+```
+
+
+Then, edit the `src/main.rs` file to include your code and test functions.
+Type `tfn` it would automagically create a test function for you.
