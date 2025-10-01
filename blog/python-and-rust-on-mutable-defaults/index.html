@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Python and Rust on Mutable Defaults — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Python and Rust on Mutable Defaults" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Python and Rust on Mutable Defaults</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-09-28
+  </p>
+  <p>One common source of <strong>subtle</strong> bugs I’ve run into in Python, is related to using mutable default arguments in functions or methods.
+Let's explore this issue and see how we can handle this issue in both Python 🐍 and Rust 🦀.</p>
+<h2>Python: The Mutable Default: Bad Practice</h2>
+<p>As an illustration, consider the following Python class to manage a dataset:</p>
+<pre><code class="lang-python">class MagicDataset:
+    # Here we use empty list as default value
+    def __init__(self, records=[]):
+        self.records = records
+
+    def add(self, record):
+        self.records.append(record)
+
+    def drop(self, record):
+        self.records.remove(record)
+`
+</code></pre>
+<p>This code looks fine but <strong>is it safe ? </strong>
+So let's use this class:</p>
+<pre><code class="lang-python">&gt;&gt;&gt; data1 = MagicDataset([1, 2, 3])
+
+&gt;&gt;&gt; data1.records
+[1, 2, 3]
+
+&gt;&gt;&gt; data1.add(5)
+
+&gt;&gt;&gt; data1.drop(3)
+
+# data1 is working fine
+&gt;&gt;&gt; data1.records
+[1, 2, 5]
+
+# let&#39;s create another instance
+&gt;&gt;&gt; data2 = MagicDataset()
+
+&gt;&gt;&gt; data2.add(10)
+
+# let&#39;s create yet another instance
+&gt;&gt;&gt; data3 = MagicDataset()
+
+&gt;&gt;&gt; data3.add(10)
+
+&gt;&gt;&gt; data3.add(20)
+
+# Now, let&#39;s check the records of data2 and data3 🤯
+&gt;&gt;&gt; data2.records
+[10, 10, 20]
+&gt;&gt;&gt; data3.records
+[10, 10, 20]
+&gt;&gt;&gt; data2.records is data3.records
+True
+</code></pre>
+<p>As you can see 🤯 the <strong>problem</strong> is that our data1 and data2 are now sharing to the same list object.</p>
+<p><strong>Why is that happening?</strong></p>
+<p>This issue is caused by the default parameter <code>records=[]</code> in the <code>__init__</code> method.
+The <code>[]</code> is a mutable list object created once when the class is defined, not each time an instance is created.</p>
+<p>In <code>data1</code> we pass an explicit list <code>[1, 2, 3]</code>, <strong>BUT</strong> for <code>data2</code> and <code>data3</code>, we don't pass any list, so they both use the same default list object.
+This results in both <code>data2</code> and <code>data3</code> sharing the same list, leading to <strong>unsafe</strong> data manipulation.</p>
+<h3>How we can fix this ?</h3>
+<p>The use of <code>None</code> as a default value comes to the rescue! Only if the <code>records</code> is <code>None</code>, we create a new list.</p>
+<pre><code class="lang-python">class PracticallySafeDataset:
+    def __init__(self, records=None):
+        if records is None:
+            records = []
+        self.records = records
+
+    def add(self, record):
+        self.records.append(record)
+
+    def drop(self, record):
+        self.records.remove(record)
+</code></pre>
+<p>Let's try out:</p>
+<pre><code class="lang-python">&gt;&gt;&gt; primes = [2, 3, 5, 7, 11]
+
+&gt;&gt;&gt; dataset = PracticallySafeDataset(primes)
+&gt;&gt;&gt; dataset.add(-1)
+&gt;&gt;&gt; dataset.drop(11)
+&gt;&gt;&gt; dataset.records
+[2, 3, 5, 7, -1]
+
+# 🤯 Hmmm... surprise that our prime list is also modified!
+&gt;&gt;&gt; primes
+[2, 3, 5, 7, -1]
+</code></pre>
+<p>The problem here is that Python allows both <strong>aliasing</strong> and <strong>mutability</strong> at the same time.
+No bueno 😥.</p>
+<p>The root of this issue is from <code>self.records = records</code> in the <code>__init__</code> method.
+Here we alias to the list that is passed to the <code>__init__</code> method and this list can also be modified internally.</p>
+<p>Most of the time, this is <strong><em>not</em></strong> an intended behavior that a change in class instance <code>dataset</code> can change the original <code>primes</code> list.
+In Python it's not obvious that <code>primes</code> creates a pointer to data within <code>PracticallySafeDataset</code>.</p>
+<p>To fix this, we create a copy of the list:</p>
+<pre><code class="lang-python">class SafeDataset:
+    def __init__(self, records=None):
+        if records is None:
+            records = []
+        self.records = list(records)  # Create a copy of the list
+
+    def add(self, record):
+        self.records.append(record)
+
+    def drop(self, record):
+        self.records.remove(record)
+</code></pre>
+<h2>Does Rust have the same problem ?</h2>
+<p>In Rust, default parameters are <strong>not</strong> supported so the mutable default argument problem simply doesn’t exist 🎊.</p>
+<p>But... let's translate the <code>Dataset</code> class to a Rust struct like this:</p>
+<p>The following Rust code is equivalent to the <code>SafeDataset</code> class in Python:</p>
+<pre><code class="lang-rust">struct Dataset {
+    records: Vec&lt;i32&gt;,
+}
+
+impl Dataset {
+    fn new(records: Option&lt;&amp;Vec&lt;i32&gt;&gt;) -&gt; Self {
+        match records {
+            Some(records) =&gt; Dataset {
+                records: records.clone(),
+            },
+            None =&gt; Dataset {
+                records: Vec::new(),
+            },
+        }
+    }
+
+    fn add(&amp;mut self, record: i32) {
+        self.records.push(record);
+    }
+
+    fn drop(&amp;mut self, record: i32) {
+        self.records.retain(|&amp;x| x != record);
+    }
+}
+
+#[test]
+fn test_dataset() {
+    let primes = vec![2, 3, 5, 7, 11];
+
+    let mut dataset = Dataset::new(Some(&amp;primes));
+    dataset.add(-1);
+    dataset.drop(11);
+
+    assert_eq!(dataset.records, vec![2, 3, 5, 7, -1]);
+    assert_eq!(primes, vec![2, 3, 5, 7, 11]);
+
+    let mut dataset2 = Dataset::new(None);
+    dataset2.add(10);
+    assert_eq!(dataset2.records, vec![10]);
+}
+</code></pre>
+<p>With this implementation, we explicitly make a copy of the mutable parameter, i.e, <code>records</code>.
+The Rust code unfortunately is more verbose than the Python code.</p>
+<p>To optionally pass a parameter in Rust, we use <code>Option&lt;T&gt;</code> type.
+This type is an enum that can be either <code>Some(T)</code> or <code>None</code>.
+If the records are provided, then we make a copy. Otherwise, we create an empty vector.</p>
+<p>In our Dataset, we use <code>&amp;Vec&lt;i32&gt;</code> to borrow the vector instead of taking ownership.
+The <code>add</code> method is similar to Python, whereas <code>drop</code> method is more complex.
+In Rust, we can also apply functional programming style to filter out the record that we want to drop, which I also find elegant to use.</p>
+<p>Although now it provides safety, if our records are <strong>large</strong> , this can be <strong>inefficient</strong> with copying.
+So we can use Rust's borrowing principle as such we can borrow the records instead of copying it, aka aliasing.
+To ensure the safety of our data, Rust does <strong>NOT</strong> allow aliasing and mutability at the same time.</p>
+<p>Here is how we can implement it:</p>
+<pre><code class="lang-rust">// Lifetime annotation `&#39;a` to ensure the borrowed data lives long enough
+struct ZeroCloneDataset&lt;&#39;a&gt; {
+    records: &amp;&#39;a mut Vec&lt;i32&gt;,
+}
+
+impl&lt;&#39;a&gt; ZeroCloneDataset&lt;&#39;a&gt; {
+    fn new(records: &amp;&#39;a mut Vec&lt;i32&gt;) -&gt; Self {
+        ZeroCloneDataset { records }
+    }
+
+    fn add(&amp;mut self, record: i32) {
+        self.records.push(record);
+    }
+
+    fn drop(&amp;mut self, record: i32) {
+        if let Some(pos) = self.records.iter().position(|&amp;x| x == record) {
+            self.records.remove(pos);
+        }
+    }
+}
+
+#[test]
+fn test_zero_clone_dataset() {
+    let mut large_numbers = vec![1; 1_000_000];
+    let mut dataset = ZeroCloneDataset {
+        records: &amp;mut large_numbers,
+    };
+
+    large_numbers.push(2); // 1. This will fail to compile if uncommented 😱
+
+    dataset.add(2);
+    println!(&quot;Dataset length: {}&quot;, dataset.records.len()); // Dataset length: 1_000_001
+    println!(&quot;Original length: {}&quot;, large_numbers.len()); // Original length: 1_000_001
+
+    large_numbers.push(2); // 2. This will be fine given the previous line is commented out 👌
+}
+</code></pre>
+<p>This test function is to show when we violate 🚫 Rust's borrowing rules, which enforce that a value can be either aliased or mutable—but never both at once.
+When this happens, Rust compiler will refuse to compile.</p>
+<p>The violation happened when we are still aliasing <code>large_number</code> as mutable in <code>ZeroCloneDataset</code> and we are also trying to modify it directly.
+Such compile-time errors prevents us from possible data races at runtime.
+Therefore Rust not only provides memory efficient code but also safe code.</p>
+<p>After commenting out line // 1., the code compiles and runs correctly.
+Line // 2. is accepted because at that point we are only mutating, not aliasing.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Watch out with mutable default arguments in Python and most of the time it's better to avoid them.</li>
+<li>If you must, use <code>None</code> as the default value and create a new copy of mutable object inside the function or method.</li>
+<li>Rust comes with no default parameter support, so the problem is non-existent.</li>
+<li>Optional parameters in Rust are handled explicitly by pattern matching on <code>Option&lt;T&gt;</code>, making the handling of optional arguments clear and intentional</li>
+<li>If needed to be memory efficient, use borrowing instead of cloning and Rust's ownership and borrowing rules ensure data safety at compile time.</li>
+</ul>
+<h3>Tip</h3>
+<p>As Rust is a compiled language, one way to experiment in Rust is to use test functions in the <code>main.rs</code> file.
+Here how you can set it up:</p>
+<pre><code class="lang-sh">cargo new dataset
+cd dataset
+# Open vscode
+code .
+</code></pre>
+<p>To get the most experience out of Rust, consider installing the Rust Analyzer extension in VSCode.
+Also add the keyboard shortcut in your <code>keybindings.json</code> to run the code easily.
+For example, add this to your <code>keybindings.json</code>:</p>
+<pre><code class="lang-json">...
+    {
+        &quot;key&quot;: &quot;shift+cmd+enter&quot;,
+        &quot;command&quot;: &quot;rust-analyzer.run&quot;
+    },
+...
+</code></pre>
+<p>Then, edit the <code>src/main.rs</code> file to include your code and test functions.
+Type <code>tfn</code> it would automagically create a test function for you.
+Then run the test function by pressing <code>Shift + Cmd + Enter</code> (or your chosen shortcut).</p>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
