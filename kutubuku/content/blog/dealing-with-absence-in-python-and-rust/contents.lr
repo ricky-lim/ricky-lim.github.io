@@ -9,9 +9,9 @@ main_image: image.png
 body:
 
 The idea of null pointers was created by Tony Hoare and he later called it his "billion-dollar mistake".
-This "absence" concept has been a source of many bugs, security vulnerabilities, and system crashes for decades.
-The concept of null itself is not harmful, as to represent an absence of something.
-It becomes problematic when it is not handled properly.
+This "absence" concept has been a source of many bugs, security vulnerabilities, and system crashes for decades 😱.
+The concept of null itself is not **harmful** 😷, as to represent an ***absence*** of something.
+It becomes a problem when it is ***not*** handled properly.
 
 To represent absence, Python has `None`, and Rust has the `Option` enum.
 Let's explore how these languages handle the absence of values and how to work with them safely.
@@ -19,26 +19,26 @@ Let's explore how these languages handle the absence of values and how to work w
 # Python's `None`
 
 In Python, `None` is a special constant that represents the absence of a value.
-
 Many common issues I encountered when `None` is not handled properly include:
 
-### Getting environment variables
+### Retrieving unset environment variables 😖
 
 ```python
 value = os.environ["MY_ENV_VAR"]
 # This will fail fast with a KeyError if MY_ENV_VAR is not set
 ```
-Another safer way:
+
+A safer way:
 
 ```python
-value = os.getenv("MY_ENV_VAR") # returns None if MY_ENV_VAR is not set
+value = os.getenv("MY_ENV_VAR")
 
 # Handle the None case
 if value is None:
-    raise ValueError("MY_ENV_VAR is not set")
+    raise ValueError("Environment variable 'MY_ENV_VAR' is not set")
 ```
 
-### Functions that crash if the value is absent
+### Functions that crash if the value is absent 💥
 
 ```python
 def find_file(directory, name):
@@ -46,7 +46,7 @@ def find_file(directory, name):
     os.stat(file_path)  # This will raise FileNotFoundError if the file does not exist
     return file_path
 ```
-This function will return the filepath if it exists, but if it doesn't it will crash with `FileNotFoundError`.
+This function will return the `file_path` if it exists, but if it doesn't it will crash with `FileNotFoundError`.
 This is quite common in many libraries, such as `boto3` with `head_object`.
 
 Let's handle it properly:
@@ -55,9 +55,9 @@ Let's handle it properly:
 def find_file_if_present(directory, name):
     file_path = os.path.join(directory, name)
     try:
-        os.stat(file_path)  # This will raise FileNotFoundError if the file does not exist
+        os.stat(file_path)
         return file_path
-    except FileNotFoundError:
+    except FileNotFoundError: # This handles the absence of the file
         return None  # File does not exist
 ```
 
@@ -66,13 +66,13 @@ Returning `None` can be beneficial in certain situations, as it allows for more 
 ```python
 my_file_path = find_file_if_present(directory, name)
 if my_file_path is None:
-    # Handle the absence of the object gracefully
+    # Handle the absence of the file gracefully
     print("File is not found")
 else:
     print("File is found:", my_file_path)
 ```
 
-### Functions that returns `None` implicitly
+### Functions that returns `None` implicitly ⚠️
 
 ```python
 def process_data(data):
@@ -80,14 +80,14 @@ def process_data(data):
     print("Processing data:", data)
     result = [d * 2 for d in data]
 
-    return result.sort() # This returns None
+    return result.sort() # This returns None ‼️
 
 >>> data = [1, 2, 3]
 >>> result = process_data(data)
->>> print(len(result))  # This will raise TypeError: object of type 'NoneType' has no len()
+>>> print(len(result))  # This will raise TypeError: object of type 'NoneType' has no len() ‼️
 ```
 
-This is because `sort` sorts the list in place and returns `None`. To fix this, we can return the sorted list instead:
+This happens because `sort` modifies the list in **place** and returns `None` ☣️. To fix it, return a sorted copy instead:
 
 ```python
 def process_data_safe(data):
@@ -97,13 +97,14 @@ def process_data_safe(data):
     # Do some processing
     print("Processing data:", data)
     result = [d * 2 for d in data]
-    return sorted(result)  # This returns a new sorted list
+    return sorted(result)  # This returns a new sorted list ✅
 
 >>> data = [1, 2, 3]
 >>> result = process_data_safe(data)
->>> print(len(result))  # This will work as expected
+>>> print(len(result))  # This will work as expected ✅
+```
 
-Watch out for functions that mutate data in place and return `None`.
+> Be cautious with functions that ***mutate*** data in place and return `None`.
 
 ## Python's Defensive Strategy
 
@@ -111,7 +112,7 @@ In addition to check for `None`, two effective strategies that I often use are:
 
 - Type hints: Use type hints to indicate when a function can return `None`.
 This helps with static analysis and improves code readability.
-If you enable static checker like `mypy` in your IDE, you will get warnings when you try to use a value that could be `None` without checking it first.
+If you enable static checker like `mypy` in your IDE, you will get warnings ☣️ when you try to use a value that could be `None` without checking it first.
 
 ```python
 def process_data_safe(data: list[int] | None) -> list[int] | None:
@@ -123,7 +124,7 @@ def process_data_safe(data: list[int] | None) -> list[int] | None:
     return sorted(result)
 ```
 
-- Unit tests: as python is dynamically typed and to ensure our code works as expected at runtime, always include unit tests that cover cases with `None` values.
+- Unit tests: since Python is dynamically typed, errors often appear only at runtime, which is sad 😢. That’s why unit tests are essential — make sure to include tests that cover `None` values.
 
 ```python
 def test_process_data_safe():
@@ -132,9 +133,9 @@ def test_process_data_safe():
     assert process_data_safe([1, 2, 3]) == [2, 4, 6]
 ```
 
-#### Concise `None` checking
+#### Concise `None` checking with the walrus operator
 
-A way to shorten our code check when dealing with `None` is to use the walrus operator (`:=`).
+The walrus operator (`:=`) lets you assign and test for None in one step, for example:
 
 ```python
 def compare_objects(bucket, name1, name2):
@@ -147,7 +148,7 @@ def compare_objects(bucket, name1, name2):
 
 # Dealing with Absence in Rust
 
-In Rust, the null pointer does not exist.
+In Rust, the null pointer does not exist 👏.
 Instead, Rust uses the `Option` enum to represent a value that can be either something (`Some`) or nothing (`None`).
 
 ```Rust
@@ -179,13 +180,13 @@ fn test_process_data() {
 }
 ```
 
-The way to handle `Option` in Rust is also very explicit.
-You can use the `?` operator for early returns, but also pattern matching.
+The way to handle `Option` in Rust is also very explicit, yet elegant 👌.
+You can use the `?` operator for early returns, but also **pattern matching**.
 
-Pattern matching in Rust is really elegant when it combines with its enum.
-I wish that this feature is available in Python as well.
+**Pattern matching** in Rust is elegant, especially when used with `enum`.
+I wish Python had something similar.
 
-In Rust, enum is not only to represent variant types, but also it can have different values associated with each variant.
+In Rust, `enum` is not only to represent variant types, but also it can have different values associated with each variant, which is awesome 🤩.
 
 For example, we can define an enum to represent different states of data and handle them accordingly with pattern matching:
 
@@ -200,6 +201,7 @@ enum DataState {
 fn handle_data(state: DataState) -> String {
     match state {
         DataState::Present(data) => {
+            // Process the data if present
             if let Some(v) = process_data(Some(&data)) {
                 format!("Processed data: {:?}", v)
             } else {
@@ -238,14 +240,15 @@ fn test_handle_data() {
 
 Also Rust compiler ensure that pattern matching is exhaustive, meaning we have to handle all possible cases of the enum.
 This ensures the safety of our code.
-In addition to '?' operator, we can also use the `if let` syntax for more concise handling of `Option`.
-`if let` is handy if we have only one case to handle.
-In this example we use it to check if the data is present and process it accordingly.
+In addition to `?` operator, we can also use the `if let` syntax for more concise handling of `Option`.
+`if let` is handy if we only have one case to handle.
+In this example we use it to check if the data is present and only then we process it.
+
 
 ## Key Takeaways
 
-- The issue of null pointers is not the concept but how we handle it.
+- The issue of null pointers is not its concept but how we handle it.
 - Python has `None` and Rust has `Option` enum to represent absence.
-- In Python, use type hints and unit tests to handle `None` safely. Watch out for functions that mutate data in place and return `None`.
-- In Rust, use `Option` and pattern matching to handle absence explicitly.
-- Rust's enum and pattern matching provide an elegant and safe way to handle different states.
+- In Python, use type hints and **unit tests** ‼️ to handle `None` safely. Watch out for functions that mutate data in place and return `None` ⚠️.
+- In Rust, we can use `Option` and pattern matching to handle absence explicitly.
+- Rust's enum and pattern matching provide an elegant and safe way to handle different states of our custom data types.
