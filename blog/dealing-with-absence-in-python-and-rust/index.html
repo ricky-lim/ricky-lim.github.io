@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Dealing with Absence in Python and Rust — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Dealing with Absence in Python and Rust" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Dealing with Absence in Python and Rust</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-10-05
+  </p>
+  <p>The idea of null pointers was created by Tony Hoare and he later called it his "billion-dollar mistake".
+This "absence" concept has been a source of many bugs, security vulnerabilities, and system crashes for decades 😱.
+The concept of null itself is not <strong>harmful</strong> 😷, as to represent an <strong><em>absence</em></strong> of something.
+It becomes a problem when it is <strong><em>not</em></strong> handled properly.</p>
+<p>To represent absence, Python has <code>None</code>, and Rust has the <code>Option</code> enum.
+Let's explore how these languages handle the absence of values and how to work with them safely.</p>
+<h1>Python's <code>None</code></h1>
+<p>In Python, <code>None</code> is a special constant that represents the absence of a value.
+Many common issues I encountered when <code>None</code> is not handled properly include:</p>
+<h3>Retrieving unset environment variables 😖</h3>
+<pre><code class="lang-python">value = os.environ[&quot;MY_ENV_VAR&quot;]
+# This will fail fast with a KeyError if MY_ENV_VAR is not set
+</code></pre>
+<p>A safer way:</p>
+<pre><code class="lang-python">value = os.getenv(&quot;MY_ENV_VAR&quot;)
+
+# Handle the None case
+if value is None:
+    raise ValueError(&quot;Environment variable &#39;MY_ENV_VAR&#39; is not set&quot;)
+</code></pre>
+<h3>Functions that crash if the value is absent 💥</h3>
+<pre><code class="lang-python">def find_file(directory, name):
+    file_path = os.path.join(directory, name)
+    os.stat(file_path)  # This will raise FileNotFoundError if the file does not exist
+    return file_path
+</code></pre>
+<p>This function will return the <code>file_path</code> if it exists, but if it doesn't it will crash with <code>FileNotFoundError</code>.
+This is quite common in many libraries, such as <code>boto3</code> with <code>head_object</code>.</p>
+<p>Let's handle it properly:</p>
+<pre><code class="lang-python">def find_file_if_present(directory, name):
+    file_path = os.path.join(directory, name)
+    try:
+        os.stat(file_path)
+        return file_path
+    except FileNotFoundError: # This handles the absence of the file
+        return None  # File does not exist
+</code></pre>
+<p>Returning <code>None</code> can be beneficial in certain situations, as it allows for more flexible error handling.</p>
+<pre><code class="lang-python">my_file_path = find_file_if_present(directory, name)
+if my_file_path is None:
+    # Handle the absence of the file gracefully
+    print(&quot;File is not found&quot;)
+else:
+    print(&quot;File is found:&quot;, my_file_path)
+</code></pre>
+<h3>Functions that returns <code>None</code> implicitly ⚠️</h3>
+<pre><code class="lang-python">def process_data(data):
+    # Do some processing
+    print(&quot;Processing data:&quot;, data)
+    result = [d * 2 for d in data]
+
+    return result.sort() # This returns None ‼️
+
+&gt;&gt;&gt; data = [1, 2, 3]
+&gt;&gt;&gt; result = process_data(data)
+&gt;&gt;&gt; print(len(result))  # This will raise TypeError: object of type &#39;NoneType&#39; has no len() ‼️
+</code></pre>
+<p>This happens because <code>sort</code> modifies the list in <strong>place</strong> and returns <code>None</code> ☣️. To fix it, return a sorted copy instead:</p>
+<pre><code class="lang-python">def process_data_safe(data):
+    if data is None:
+        raise ValueError(&quot;data should not be None&quot;)
+
+    # Do some processing
+    print(&quot;Processing data:&quot;, data)
+    result = [d * 2 for d in data]
+    return sorted(result)  # This returns a new sorted list ✅
+
+&gt;&gt;&gt; data = [1, 2, 3]
+&gt;&gt;&gt; result = process_data_safe(data)
+&gt;&gt;&gt; print(len(result))  # This will work as expected ✅
+</code></pre>
+<blockquote><p>Be cautious with functions that <strong><em>mutate</em></strong> data in place and return <code>None</code>.</p>
+</blockquote>
+<h2>Python's Defensive Strategy</h2>
+<p>In addition to check for <code>None</code>, two effective strategies that I often use are:</p>
+<ul>
+<li>Type hints: Use type hints to indicate when a function can return <code>None</code>.
+This helps with static analysis and improves code readability.
+If you enable static checker like <code>mypy</code> in your IDE, you will get warnings ☣️ when you try to use a value that could be <code>None</code> without checking it first.</li>
+</ul>
+<pre><code class="lang-python">def process_data_safe(data: list[int] | None) -&gt; list[int] | None:
+    if data is None or len(data) == 0:
+        return None
+    # Do some processing
+    print(&quot;Processing data:&quot;, data)
+    result = [d * 2 for d in data]
+    return sorted(result)
+</code></pre>
+<ul>
+<li>Unit tests: since Python is dynamically typed, errors often appear only at runtime, which is sad 😢. That’s why unit tests are essential — make sure to include tests that cover <code>None</code> values.</li>
+</ul>
+<pre><code class="lang-python">def test_process_data_safe():
+    assert process_data_safe(None) is None
+    assert process_data_safe([]) is None
+    assert process_data_safe([1, 2, 3]) == [2, 4, 6]
+</code></pre>
+<h4>Concise <code>None</code> checking with the walrus operator</h4>
+<p>The walrus operator (<code>:=</code>) lets you assign and test for None in one step, for example:</p>
+<pre><code class="lang-python">def compare_objects(bucket, name1, name2):
+    if (obj1 := find_object_key_if_present(bucket, name1)) is not None and \
+       (obj2 := find_object_key_if_present(bucket, name2)) is not None:
+        return obj1 == obj2
+
+    return False
+</code></pre>
+<h1>Dealing with Absence in Rust</h1>
+<p>In Rust, the null pointer does not exist 👏.
+Instead, Rust uses the <code>Option</code> enum to represent a value that can be either something (<code>Some</code>) or nothing (<code>None</code>).</p>
+<pre><code class="lang-Rust">enum Option&lt;T&gt; {
+    None,
+    Some(T),
+}
+</code></pre>
+<p>For example:</p>
+<pre><code class="lang-Rust">fn process_data(data: Option&lt;&amp;Vec&lt;i32&gt;&gt;) -&gt; Option&lt;Vec&lt;i32&gt;&gt; {
+    let data = data?; // Early return None if data is None
+    if data.is_empty() {
+        return None;
+    }
+
+    let mut result: Vec&lt;i32&gt; = data.iter().map(|d| d * 2).collect();
+    result.sort(); // Sort in place
+    Some(result) // Return the sorted result wrapped in Some
+}
+
+#[test]
+fn test_process_data() {
+    assert_eq!(process_data(None), None);
+    assert_eq!(process_data(Some(&amp;vec![])), Some(vec![]));
+    assert_eq!(process_data(Some(&amp;vec![1,2,3])), Some(vec![2, 4, 6]));
+}
+</code></pre>
+<p>The way to handle <code>Option</code> in Rust is also very explicit, yet elegant 👌.
+You can use the <code>?</code> operator for early returns, but also <strong>pattern matching</strong>.</p>
+<p><strong>Pattern matching</strong> in Rust is elegant, especially when used with <code>enum</code>.
+I wish Python had something similar.</p>
+<p>In Rust, <code>enum</code> is not only to represent variant types, but also it can have different values associated with each variant, which is awesome 🤩.</p>
+<p>For example, we can define an enum to represent different states of data and handle them accordingly with pattern matching:</p>
+<pre><code class="lang-Rust">#[derive(Debug)]
+enum DataState {
+    Present(Vec&lt;i32&gt;), // Contains the data
+    Missing,           // Data is absent
+    Invalid(String),   // Contains an error message
+}
+
+fn handle_data(state: DataState) -&gt; String {
+    match state {
+        DataState::Present(data) =&gt; {
+            // Process the data if present
+            if let Some(v) = process_data(Some(&amp;data)) {
+                format!(&quot;Processed data: {:?}&quot;, v)
+            } else {
+                return &quot;No data to process&quot;.to_string()
+            }
+        }
+        DataState::Missing =&gt; {
+            return &quot;Data is missing&quot;.to_string()
+        }
+        DataState::Invalid(err) =&gt; {
+            format!(&quot;Data is invalid: {}&quot;, err)
+        }
+    }
+}
+
+#[test]
+fn test_handle_data() {
+    assert_eq!(
+        handle_data(DataState::Present(vec![1, 2, 3])),
+        &quot;Processed data: [2, 4, 6]&quot;
+    );
+    assert_eq!(
+        handle_data(DataState::Present(vec![])),
+        &quot;No data to process&quot;
+    );
+    assert_eq!(
+        handle_data(DataState::Missing),
+        &quot;Data is missing&quot;
+    );
+    assert_eq!(
+        handle_data(DataState::Invalid(&quot;Missing valid data&quot;.to_string())),
+        &quot;Data is invalid: Missing valid data&quot;
+    );
+}
+</code></pre>
+<p>Also Rust compiler ensure that pattern matching is exhaustive, meaning we have to handle all possible cases of the enum.
+This ensures the safety of our code.
+In addition to <code>?</code> operator, we can also use the <code>if let</code> syntax for more concise handling of <code>Option</code>.
+<code>if let</code> is handy if we only have one case to handle.
+In this example we use it to check if the data is present and only then we process it.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>The issue of null pointers is not its concept but how we handle it.</li>
+<li>Python has <code>None</code> and Rust has <code>Option</code> enum to represent absence.</li>
+<li>In Python, use type hints and <strong>unit tests</strong> ‼️ to handle <code>None</code> safely. Watch out for functions that mutate data in place and return <code>None</code> ⚠️.</li>
+<li>In Rust, we can use <code>Option</code> and pattern matching to handle absence explicitly.</li>
+<li>Rust's enum and pattern matching provide an elegant and safe way to handle different states of our custom data types.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
