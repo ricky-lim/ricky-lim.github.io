@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Unit Testing with Rust — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Unit Testing with Rust" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Unit Testing with Rust</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-10-12
+  </p>
+  <p>Coming from a <strong><em>non-software</em></strong> background, testing was not something I learned from school.
+When I started my journey in data science, testing honestly was not something I paid much attention to.
+However, as I progressed in my career, I realized that I started running into the same kinds of issues over and over again.
+A small data change would break my code, and a small change that looks harmless would make my data pipeline fail 💔.
+This experience made me realize the importance of testing, and started to learn more about it 💡.</p>
+<p>I’m definitely <strong><em>not</em></strong> an expert in testing, and when I first started learning, it was both exciting and also kind of overwhelming.
+Here, I’d like to share a concept that really helped me navigate the complexity of testing.
+And since I’m currently a bit obsessed by Rust, I’ll also include a simple example in Rust as well.</p>
+<h2>Testing Pyramid</h2>
+<p>The concept that helped me navigate is the <strong>testing pyramid</strong>.
+It helps me to break down the complexity of testing, and also start simple.</p>
+<p>In the testing pyramid, we have three main types of tests: <strong>end-to-end tests</strong>, <strong>integration tests</strong>, and <strong>unit tests</strong>.
+This concept simplifies the complexity of testing as we look into the cost and speed of running the tests.</p>
+<pre><code> cost ↑                ┌───────────────┐
+      │                │ End-to-End    │  ← Highest cost, slowest
+      │                └───────────────┘
+      │             ┌─────────────────────┐
+      │             │ Integration Tests   │
+      │             └─────────────────────┘
+      │         ┌─────────────────────────────┐
+      │         │      Unit Tests             │  ← Lowest cost, fastest
+      │         └─────────────────────────────┘
+      └─────────────────────────────────────────────→ speed ↑
+</code></pre>
+<p>At the top of the pyramid, we have <strong>end-to-end tests</strong>.
+These tests cover the way we expect our users to use our application.
+These tests come at the highest cost, and also the slowest to run as we need to have our system like frontend, backend, and database up and running 🔛.
+However, these tests provide the highest level of confidence that our system works as expected and are less likely to change throughout development.</p>
+<p>In the middle of the pyramid, we have <strong>integration tests</strong>.
+These tests focus on a particular part of our application, for example, a particular backend service.</p>
+<p>At the bottom of the pyramid, we have <strong>unit tests</strong>, which is the <strong>foundation</strong>.
+These tests focus on the lowest unit of our application, like, a particular <code>function</code>.
+As being foundation of the pyramid, these tests are the <strong><em>most essential</em></strong>, ensuring our business logic is correct.</p>
+<p>Let's look into each type of tests from a ticketing application example.
+Here is the high-level diagram of our application.</p>
+<pre><code>        ┌─────────────┐
+        │    User     │
+        └─────┬───────┘
+              │
+              ▼
+        ┌─────────────┐
+        │  Frontend   │
+        └─────┬───────┘
+              │
+   ┌──────────┴───────────┐
+   │          │           │
+   ▼          ▼           ▼
+┌────────┐ ┌────────┐ ┌────────┐
+│Backend │ │Backend │ │Backend │
+│  A     │ │  B     │ │  C     │
+└───┬────┘ └───┬────┘ └───┬────┘
+    │          │          │
+    ▼          ▼          ▼
+┌───────┐  ┌───────┐  ┌────────────┐
+│Database│ │Database│ │Other System│
+└───────┘  └───────┘  └────────────┘
+</code></pre>
+<h2>End-to-end tests</h2>
+<p>An example of an end-to-end test is testing a complete user journey.
+One such journey is creating a ticket.</p>
+<p>In this flow, the user first authenticates, then creates a ticket through the frontend.
+The frontend calls Backend A to create the ticket, and Backend A stores it in the database.
+During the ticket creation process, we also calls Backend B to fetch additional information.
+Meanwhile, during authentication, Backend C is called to handle user authentication and authorization.</p>
+<h2>Integration tests</h2>
+<p>In the integration tests, we put our focus on a particular part of the system.
+In this case, we divide the system into three parts.</p>
+<pre><code>Integration Test A      Integration Test B      Integration Test C
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│  Frontend   │         │  Frontend   │         │  Frontend   │
+└─────┬───────┘         └─────┬───────┘         └─────┬───────┘
+      │                       │                       │
+      ▼                       ▼                       ▼
+┌──────────┐            ┌──────────┐             ┌──────────┐
+│Backend A │            │Backend B │             │Backend C │
+└─────┬────┘            └─────┬────┘             └─────┬────┘
+      │                       │                        │
+      ▼                       ▼                        ▼
+┌──────────┐            ┌──────────┐             ┌──────────┐
+│Database A│            │Database B│             │Database C│
+└──────────┘            └──────────┘             └──────────┘
+</code></pre>
+<p>Integration Test A focuses on the create, read, update, delete (CRUD) operations of tickets.
+Integration Test B focuses on the integration with application B via REST API.
+Integration Test C focuses on the integration with authentication / authorization system.</p>
+<h2>Unit tests</h2>
+<p>In unit tests, we zoom in further, for example on Backend A.
+This backend adopts the Model-View-Controller (MVC) pattern, as shown below.</p>
+<pre><code>┌─────────────┐
+│ Controller  │  (Backend A)
+└─────┬───────┘
+      │
+      ▼
+┌─────────────┐
+│   Model     │
+└─────┬───────┘
+      │
+      ▼
+┌─────────────┐
+│ Repository  │
+└─────┬───────┘
+      │
+      ▼
+┌─────────────┐
+│ Database A  │
+└─────────────┘
+</code></pre>
+<p>Here we can have unit tests for each component of the MVC pattern.
+Example here is the model for our ticketing application.</p>
+<pre><code class="lang-rust">#[derive(Debug)]
+struct Card {
+    summary: Option&lt;String&gt;,
+    card_type: Type,
+    status: Status,
+    reporter: Option&lt;String&gt;,
+    assignee: Option&lt;String&gt;,
+    description: Option&lt;String&gt;,
+    id: Option&lt;u32&gt;,
+}
+
+impl Default for Card {
+    fn default() -&gt; Self {
+        Card {
+            summary: None,
+            card_type: Type::default(),
+            status: Status::default(),
+            reporter: None,
+            assignee: None,
+            description: None,
+            id: None,
+        }
+    }
+}
+
+impl PartialEq for Card {
+    fn eq(&amp;self, other: &amp;Self) -&gt; bool {
+        self.summary == other.summary
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum Status {
+    TODO,
+    INPROGRESS,
+    DONE,
+    CANCELLED,
+}
+
+impl Default for Status {
+    fn default() -&gt; Self {
+        Status::TODO
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum Type {
+    STORY,
+    TASK,
+    BUG,
+}
+
+impl Default for Type {
+    fn default() -&gt; Self {
+        Type::TASK
+    }
+}
+</code></pre>
+<p>Here, we’re working with a Card struct — basically a model that represents a ticket.
+It also has a bit of business logic for comparing one card with another.</p>
+<p>Here, we implement <code>PartialEq</code> trait to compare two cards and say they are equal if their summaries are the same.
+For our enums, we use macros derive <code>PartialEq</code> to simplify the comparison logic.
+Our unit tests will focus on this piece: the Card struct itself and how that comparison logic works.</p>
+<pre><code class="lang-rust">#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_defaults() {
+        let c = Card::default();
+        assert_eq!(c.summary, None);
+        assert_eq!(c.card_type, Type::TASK);
+        assert_eq!(c.status, Status::TODO);
+        assert_eq!(c.reporter, None);
+        assert_eq!(c.assignee, None);
+        assert_eq!(c.description, None);
+        assert_eq!(c.id, None);
+    }
+
+    #[test]
+    fn test_equality() {
+        let c1 = Card {
+            summary: Some(&quot;something&quot;.to_string()),
+            ..Default::default()
+        };
+        let c2 = Card {
+            summary: Some(&quot;something&quot;.to_string()),
+            ..Default::default()
+        };
+        assert_eq!(c1, c2);
+    }
+
+    #[test]
+    fn test_equality_with_diff_ids() {
+        let c1 = Card {
+            id: Some(123),
+            ..Default::default()
+        };
+        let c2 = Card {
+            id: Some(456),
+            ..Default::default()
+        };
+        assert_eq!(c1, c2);
+    }
+
+    #[test]
+    fn test_inequality() {
+        let c1 = Card {
+            summary: Some(&quot;something 1&quot;.to_string()),
+            ..Default::default()
+        };
+        let c2 = Card {
+            summary: Some(&quot;something 2&quot;.to_string()),
+            ..Default::default()
+        };
+        assert_ne!(c1, c2);
+    }
+}
+</code></pre>
+<p>For unit-tests, Rust comes with these basic asserting macros:</p>
+<ul>
+<li><code>assert!</code> to assert a boolean expression is true, <code>assert!(boolean, "optional message")</code></li>
+<li><code>assert_eq!</code> to assert two values are equal, <code>assert_eq!(left, right, "optional message")</code></li>
+<li><code>assert_ne!</code> to assert two values are not equal, <code>assert_ne!(left, right, "optional message")</code></li>
+</ul>
+<p>Here we have four unit tests.</p>
+<ol>
+<li><code>test_defaults</code> to test the default values of the <code>Card</code> struct.</li>
+<li><code>test_equality</code> to test two cards with the same summary are equal.</li>
+<li><code>test_equality_with_diff_ids</code> to test two cards with different IDs but same summary are equal.</li>
+<li><code>test_inequality</code> to test two cards with different summaries are not equal.</li>
+</ol>
+<p>In Rust, the convention is to put unit tests in the same file as the code itself.
+I think this is a good practice, as it makes it easy to find the tests related to the code and also serves as documentation for the code itself.</p>
+<p>We can group the tests as a test module by annotating with <code>#[cfg(test)]</code>.
+The nice thing about this annotation is that the test module is only compiled when we run <code>cargo test</code>, and excluded in <code>cargo build</code>.
+As such our test codes are <strong><em>not</em></strong> shipped to production - which is neat.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Focus on unit tests where is cheap and fast to run while enforcing the business logic is correct.</li>
+<li>Unit tests are also the better documentation for our code than <code>README.md</code> because it's synced and executable.</li>
+<li>In Rust, we put unit tests in the same file as the code itself.</li>
+</ul>
+<h3>📚 References</h3>
+<p>Books that I found helpful during my learning journey:</p>
+<ul>
+<li><strong>Effective Software Testing: A Developer's Guide</strong> by Maurício Aniche</li>
+<li><strong>Python Testing with pytest</strong> by Brian Okken</li>
+<li><strong>Specification by Example</strong> by Gojko Adzic</li>
+</ul>
+<p>I’m still learning and always on the lookout for other great resources — so if you know any to recommend, please share them!</p>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
