@@ -9,19 +9,22 @@ main_image: image.png
 body:
 
 
-Coming from a non-software background, testing was not something I learned from school.
+Coming from a ***non-software*** background, testing was not something I learned from school.
 When I started my journey in data science, testing honestly was not something I paid much attention to.
-My main focus was on getting the data in right shape, building models and creating stories from data.
-
 However, as I progressed in my career, I realized that I started running into the same kinds of issues over and over again.
-A small data change would break my code, and a small change that looks harmless would make my data pipeline fail.
-This experience made me realize the importance of testing, and started to learn more about it.
+A small data change would break my code, and a small change that looks harmless would make my data pipeline fail 💔.
+This experience made me realize the importance of testing, and started to learn more about it 💡.
 
-I'm by far from an expert in testing and when I started learning about testing, it can be both excited but also overwhelming.
+I’m definitely ***not*** an expert in testing, and when I first started learning, it was both exciting and also kind of overwhelming.
+Here, I’d like to share a concept that really helped me navigate the complexity of testing.
+And since I’m currently a bit obsessed by Rust, I’ll also include a simple example in Rust as well.
+
+## Testing Pyramid
+
 The concept that helped me navigate is the **testing pyramid**.
 It helps me to break down the complexity of testing, and also start simple.
 
-In the testing pyramid, we have three main types of tests: end-to-end tests, integration tests, and unit tests.
+In the testing pyramid, we have three main types of tests: **end-to-end tests**, **integration tests**, and **unit tests**.
 This concept simplifies the complexity of testing as we look into the cost and speed of running the tests.
 
 ```
@@ -37,17 +40,17 @@ This concept simplifies the complexity of testing as we look into the cost and s
       └─────────────────────────────────────────────→ speed ↑
 ```
 
-At the top of the pyramid, we have end-to-end tests.
+At the top of the pyramid, we have **end-to-end tests**.
 These tests cover the way we expect our users to use our application.
-These tests come at the highest cost, and also the slowest to run as we need to have our system like frontend, backend, and database up and running.
-However, these tests are also give the most confidence that our system works as expected and less likely to change in the course of development.
+These tests come at the highest cost, and also the slowest to run as we need to have our system like frontend, backend, and database up and running 🔛.
+However, these tests provide the highest level of confidence that our system works as expected and are less likely to change throughout development.
 
-In the middle of the pyramid, we have integration tests.
+In the middle of the pyramid, we have **integration tests**.
 These tests focus on a particular part of our application, for example, a particular backend service.
 
-At the bottom of the pyramid, we have unit tests, which is the foundation.
-These tests focus on the lowest unit of our application, like, a particular function or class.
-As being foundation of the pyramid, these tests are also essential.
+At the bottom of the pyramid, we have **unit tests**, which is the **foundation**.
+These tests focus on the lowest unit of our application, like, a particular `function`.
+As being foundation of the pyramid, these tests are the ***most essential***, ensuring our business logic is correct.
 
 Let's look into each type of tests from a ticketing application example.
 Here is the high-level diagram of our application.
@@ -77,11 +80,13 @@ Here is the high-level diagram of our application.
 ```
 
 ## End-to-end tests
-Example of end-to-end test is testing the whole user journeys.
-One of the journey is creating a ticket.
-The user authenticates -> create a ticket in the frontend -> frontend calls backend A to create the ticket -> backend A stores the ticket in the database.
-While creating the ticket -> call Backend B to get some additional information.
-During user authentication -> call Backend C to authenticate/authorize the user.
+An example of an end-to-end test is testing a complete user journey.
+One such journey is creating a ticket.
+
+In this flow, the user first authenticates, then creates a ticket through the frontend.
+The frontend calls Backend A to create the ticket, and Backend A stores it in the database.
+During the ticket creation process, we also calls Backend B to fetch additional information.
+Meanwhile, during authentication, Backend C is called to handle user authentication and authorization.
 
 ## Integration tests
 
@@ -136,7 +141,7 @@ This backend adopts the Model-View-Controller (MVC) pattern, as shown below.
 ```
 
 Here we can have unit tests for each component of the MVC pattern.
-For example here is the model for our ticketing application.
+Example here is the model for our ticketing application.
 
 ```rust
 #[derive(Debug)]
@@ -198,8 +203,11 @@ impl Default for Type {
 }
 ```
 
-Here, we’re working with a Card struct — basically a small model that represents a ticket.
+Here, we’re working with a Card struct — basically a model that represents a ticket.
 It also has a bit of business logic for comparing one card with another.
+
+Here, we implement `PartialEq` trait to compare two cards and say they are equal if their summaries are the same.
+For our enums, we use macros derive `PartialEq` to simplify the comparison logic.
 Our unit tests will focus on this piece: the Card struct itself and how that comparison logic works.
 
 ```rust
@@ -259,6 +267,10 @@ mod tests {
     }
 }
 ```
+For unit-tests, Rust comes with these basic asserting macros:
+- `assert!` to assert a boolean expression is true, `assert!(boolean, "optional message")`
+- `assert_eq!` to assert two values are equal, `assert_eq!(left, right, "optional message")`
+- `assert_ne!` to assert two values are not equal, `assert_ne!(left, right, "optional message")`
 
 Here we have four unit tests.
 1. `test_defaults` to test the default values of the `Card` struct.
@@ -267,21 +279,25 @@ Here we have four unit tests.
 4. `test_inequality` to test two cards with different summaries are not equal.
 
 In Rust, the convention is to put unit tests in the same file as the code itself.
+I think this is a good practice, as it makes it easy to find the tests related to the code and also serves as documentation for the code itself.
+
 We can group the tests as a test module by annotating with `#[cfg(test)]`.
 The nice thing about this annotation is that the test module is only compiled when we run `cargo test`, and excluded in `cargo build`.
-As such our test codes are not shipped to production.
+As such our test codes are ***not*** shipped to production - which is neat.
 
-The use of `super` in `use super::*;` is to bring all the items from the parent module into the scope of the test module.
-
-Rust comes with basic asserting macros:
-- `assert!` to assert a boolean expression is true, `assert!(boolean, "optional message")`
-- `assert_eq!` to assert two values are equal, `assert_eq!(left, right, "optional message")`
-- `assert_ne!` to assert two values are not equal, `assert_ne!(left, right, "optional message")`
 
 ## Key takeaways
 
-- At the start of the project, focus on automating unit tests to ensure first our business logic is correct, and the other tests can be manually run.
-- As the project evolves with different systems, by then we start adding integration tests.
-- Finally, when the system becomes mature with solid user base, we can add end-to-end tests.
 - Focus on unit tests where is cheap and fast to run while enforcing the business logic is correct.
-- In Rust, the convention is to put unit tests in the same file as the code itself.
+- Unit tests are also the better documentation for our code than `README.md` because it's synced and executable.
+- In Rust, we put unit tests in the same file as the code itself.
+
+### 📚 References
+
+Books that I found helpful during my learning journey:
+
+- **Effective Software Testing: A Developer's Guide** by Maurício Aniche
+- **Python Testing with pytest** by Brian Okken
+- **Specification by Example** by Gojko Adzic
+
+I’m still learning and always on the lookout for other great resources — so if you know any to recommend, please share them!
