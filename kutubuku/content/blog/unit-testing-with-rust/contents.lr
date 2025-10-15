@@ -1,0 +1,303 @@
+title: Unit Testing with Rust
+---
+author: Ricky Lim
+---
+pub_date: 2025-10-12
+---
+main_image: image.png
+---
+body:
+
+
+Coming from a ***non-software*** background, testing was not something I learned from school.
+When I started my journey in data science, testing honestly was not something I paid much attention to.
+However, as I progressed in my career, I realized that I started running into the same kinds of issues over and over again.
+A small data change would break my code, and a small change that looks harmless would make my data pipeline fail 💔.
+This experience made me realize the importance of testing, and started to learn more about it 💡.
+
+I’m definitely ***not*** an expert in testing, and when I first started learning, it was both exciting and also kind of overwhelming.
+Here, I’d like to share a concept that really helped me navigate the complexity of testing.
+And since I’m currently a bit obsessed by Rust, I’ll also include a simple example in Rust as well.
+
+## Testing Pyramid
+
+The concept that helped me navigate is the **testing pyramid**.
+It helps me to break down the complexity of testing, and also start simple.
+
+In the testing pyramid, we have three main types of tests: **end-to-end tests**, **integration tests**, and **unit tests**.
+This concept simplifies the complexity of testing as we look into the cost and speed of running the tests.
+
+```
+ cost ↑                ┌───────────────┐
+      │                │ End-to-End    │  ← Highest cost, slowest
+      │                └───────────────┘
+      │             ┌─────────────────────┐
+      │             │ Integration Tests   │
+      │             └─────────────────────┘
+      │         ┌─────────────────────────────┐
+      │         │      Unit Tests             │  ← Lowest cost, fastest
+      │         └─────────────────────────────┘
+      └─────────────────────────────────────────────→ speed ↑
+```
+
+At the top of the pyramid, we have **end-to-end tests**.
+These tests cover the way we expect our users to use our application.
+These tests come at the highest cost, and also the slowest to run as we need to have our system like frontend, backend, and database up and running 🔛.
+However, these tests provide the highest level of confidence that our system works as expected and are less likely to change throughout development.
+
+In the middle of the pyramid, we have **integration tests**.
+These tests focus on a particular part of our application, for example, a particular backend service.
+
+At the bottom of the pyramid, we have **unit tests**, which is the **foundation**.
+These tests focus on the lowest unit of our application, like, a particular `function`.
+As being foundation of the pyramid, these tests are the ***most essential***, ensuring our business logic is correct.
+
+Let's look into each type of tests from a ticketing application example.
+Here is the high-level diagram of our application.
+
+```
+        ┌─────────────┐
+        │    User     │
+        └─────┬───────┘
+              │
+              ▼
+        ┌─────────────┐
+        │  Frontend   │
+        └─────┬───────┘
+              │
+   ┌──────────┴───────────┐
+   │          │           │
+   ▼          ▼           ▼
+┌────────┐ ┌────────┐ ┌────────┐
+│Backend │ │Backend │ │Backend │
+│  A     │ │  B     │ │  C     │
+└───┬────┘ └───┬────┘ └───┬────┘
+    │          │          │
+    ▼          ▼          ▼
+┌───────┐  ┌───────┐  ┌────────────┐
+│Database│ │Database│ │Other System│
+└───────┘  └───────┘  └────────────┘
+```
+
+## End-to-end tests
+An example of an end-to-end test is testing a complete user journey.
+One such journey is creating a ticket.
+
+In this flow, the user first authenticates, then creates a ticket through the frontend.
+The frontend calls Backend A to create the ticket, and Backend A stores it in the database.
+During the ticket creation process, we also calls Backend B to fetch additional information.
+Meanwhile, during authentication, Backend C is called to handle user authentication and authorization.
+
+## Integration tests
+
+In the integration tests, we put our focus on a particular part of the system.
+In this case, we divide the system into three parts.
+
+```
+Integration Test A      Integration Test B      Integration Test C
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│  Frontend   │         │  Frontend   │         │  Frontend   │
+└─────┬───────┘         └─────┬───────┘         └─────┬───────┘
+      │                       │                       │
+      ▼                       ▼                       ▼
+┌──────────┐            ┌──────────┐             ┌──────────┐
+│Backend A │            │Backend B │             │Backend C │
+└─────┬────┘            └─────┬────┘             └─────┬────┘
+      │                       │                        │
+      ▼                       ▼                        ▼
+┌──────────┐            ┌──────────┐             ┌──────────┐
+│Database A│            │Database B│             │Database C│
+└──────────┘            └──────────┘             └──────────┘
+```
+
+Integration Test A focuses on the create, read, update, delete (CRUD) operations of tickets.
+Integration Test B focuses on the integration with application B via REST API.
+Integration Test C focuses on the integration with authentication / authorization system.
+
+## Unit tests
+
+In unit tests, we zoom in further, for example on Backend A.
+This backend adopts the Model-View-Controller (MVC) pattern, as shown below.
+
+```
+┌─────────────┐
+│ Controller  │  (Backend A)
+└─────┬───────┘
+      │
+      ▼
+┌─────────────┐
+│   Model     │
+└─────┬───────┘
+      │
+      ▼
+┌─────────────┐
+│ Repository  │
+└─────┬───────┘
+      │
+      ▼
+┌─────────────┐
+│ Database A  │
+└─────────────┘
+```
+
+Here we can have unit tests for each component of the MVC pattern.
+Example here is the model for our ticketing application.
+
+```rust
+#[derive(Debug)]
+struct Card {
+    summary: Option<String>,
+    card_type: Type,
+    status: Status,
+    reporter: Option<String>,
+    assignee: Option<String>,
+    description: Option<String>,
+    id: Option<u32>,
+}
+
+impl Default for Card {
+    fn default() -> Self {
+        Card {
+            summary: None,
+            card_type: Type::default(),
+            status: Status::default(),
+            reporter: None,
+            assignee: None,
+            description: None,
+            id: None,
+        }
+    }
+}
+
+impl PartialEq for Card {
+    fn eq(&self, other: &Self) -> bool {
+        self.summary == other.summary
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum Status {
+    TODO,
+    INPROGRESS,
+    DONE,
+    CANCELLED,
+}
+
+impl Default for Status {
+    fn default() -> Self {
+        Status::TODO
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum Type {
+    STORY,
+    TASK,
+    BUG,
+}
+
+impl Default for Type {
+    fn default() -> Self {
+        Type::TASK
+    }
+}
+```
+
+Here, we’re working with a Card struct — basically a model that represents a ticket.
+It also has a bit of business logic for comparing one card with another.
+
+Here, we implement `PartialEq` trait to compare two cards and say they are equal if their summaries are the same.
+For our enums, we use macros derive `PartialEq` to simplify the comparison logic.
+Our unit tests will focus on this piece: the Card struct itself and how that comparison logic works.
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_defaults() {
+        let c = Card::default();
+        assert_eq!(c.summary, None);
+        assert_eq!(c.card_type, Type::TASK);
+        assert_eq!(c.status, Status::TODO);
+        assert_eq!(c.reporter, None);
+        assert_eq!(c.assignee, None);
+        assert_eq!(c.description, None);
+        assert_eq!(c.id, None);
+    }
+
+    #[test]
+    fn test_equality() {
+        let c1 = Card {
+            summary: Some("something".to_string()),
+            ..Default::default()
+        };
+        let c2 = Card {
+            summary: Some("something".to_string()),
+            ..Default::default()
+        };
+        assert_eq!(c1, c2);
+    }
+
+    #[test]
+    fn test_equality_with_diff_ids() {
+        let c1 = Card {
+            id: Some(123),
+            ..Default::default()
+        };
+        let c2 = Card {
+            id: Some(456),
+            ..Default::default()
+        };
+        assert_eq!(c1, c2);
+    }
+
+    #[test]
+    fn test_inequality() {
+        let c1 = Card {
+            summary: Some("something 1".to_string()),
+            ..Default::default()
+        };
+        let c2 = Card {
+            summary: Some("something 2".to_string()),
+            ..Default::default()
+        };
+        assert_ne!(c1, c2);
+    }
+}
+```
+For unit-tests, Rust comes with these basic asserting macros:
+- `assert!` to assert a boolean expression is true, `assert!(boolean, "optional message")`
+- `assert_eq!` to assert two values are equal, `assert_eq!(left, right, "optional message")`
+- `assert_ne!` to assert two values are not equal, `assert_ne!(left, right, "optional message")`
+
+Here we have four unit tests.
+1. `test_defaults` to test the default values of the `Card` struct.
+2. `test_equality` to test two cards with the same summary are equal.
+3. `test_equality_with_diff_ids` to test two cards with different IDs but same summary are equal.
+4. `test_inequality` to test two cards with different summaries are not equal.
+
+In Rust, the convention is to put unit tests in the same file as the code itself.
+I think this is a good practice, as it makes it easy to find the tests related to the code and also serves as documentation for the code itself.
+
+We can group the tests as a test module by annotating with `#[cfg(test)]`.
+The nice thing about this annotation is that the test module is only compiled when we run `cargo test`, and excluded in `cargo build`.
+As such our test codes are ***not*** shipped to production - which is neat.
+
+
+## Key takeaways
+
+- Focus on unit tests where is cheap and fast to run while enforcing the business logic is correct.
+- Unit tests are also the better documentation for our code than `README.md` because it's synced and executable.
+- In Rust, we put unit tests in the same file as the code itself.
+
+### 📚 References
+
+Books that I found helpful during my learning journey:
+
+- **Effective Software Testing: A Developer's Guide** by Maurício Aniche
+- **Python Testing with pytest** by Brian Okken
+- **Specification by Example** by Gojko Adzic
+
+I’m still learning and always on the lookout for other great resources — so if you know any to recommend, please share them!
