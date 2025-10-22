@@ -1,0 +1,220 @@
+title: Multithreading in Rust
+---
+author: Ricky Lim
+---
+pub_date: 2025-10-19
+---
+main_image: image.png
+---
+body:
+
+Two main approaches to get things done faster. First, we can run tasks in **parallel**. Or, we can run tasks **concurrently**.
+Think about these two approaches like when we have dinner at a restaurant.
+
+When we eat concurrently, we eat then we drink, we also entertain our wifes/husband/kids/friends.
+We switch between eating, drinking, and chatting, so this in essence what **concurrent** processing is about.
+
+Another approach is to eat in **parallel**. To finish our meal faster, we can divide the meal into multiple portions and have multiple people eat at the same time.
+This is also known as **embarrassingly parallel processing** and where processing in **multiple threads** shine.
+
+In this blog, we will explore how to use **multiple threads in Rust** to achieve parallelism, to get things done faster.
+
+## What is a thread ?
+
+When we run a program, like Microsoft Excel, our operating system creates a process for it.
+Within the process, multiple threads are created to handle multiple different tasks, such as showing the cells, performing calculations, and etc.
+These threads run ***independently*** to each other, but share the same memory space within the process, as shown below.
+
+```
++---------------------------------------------------------+
+|                 Process                                 |
+|                                                         |
+|   +-----------+     +-------------+     +-----------+   |
+|   | Thread 1  | <-> |  Memory     | <-> | Thread 2  |   |
+|   +-----------+     +-------------+     +-----------+   |
+|                                                         |
++---------------------------------------------------------+
+```
+
+The advantage of using threads is that it's cheaper (consume less memory and faster to create) and also easier to communicate with each others compared to processes.
+
+## Creating threads in Rust
+
+To spawn a thread in Rust, is as simple as calling the `std::thread::spawn` function and passing a closure to it.
+In a simplified way, Closure is an anonymous function like lambda in Python, that we can create our logic within it and can be executed in a thread.
+
+For example:
+
+```rust
+// A simple closure that adds two numbers
+let add = |x, y| { x + y };
+add(2, 3); // returns 5
+```
+
+‼️ Closure borrows the reference of the value. For example:
+
+```rust
+let h = "hello".to_string();
+let f = || { println!("{}", h); };
+```
+
+If we try to pass this closure to a new thread like below, Rust compiler will complain 😡️:
+
+```rust
+let h = "hello".to_string();
+let f = || { println!("{}", h); };
+thread::spawn(f);
+```
+
+This is because the closure `f` is borrowing the reference of `h` from the main thread.
+As a consequence, when a new thread is spawned, it may **outlive** the main thread.
+Because the thread runs independently in the background.
+
+To be clear, the problem occurs when `h` is dropped as soon the main thread ends, then our thread is trying to access a value that is no longer exists.
+No bueno!😞
+This issue is infamously known as a **dangling NULL pointer**.
+
+To fix this, we will use the `move` keyword to transfer the ownership of `h` to the new thread.
+
+```rust
+let h = "hello".to_string();
+let f = move || { println!("{}", h); };
+thread::spawn(f);
+```
+
+## Threads in action
+
+Within our application, we can spawned many threads to perform tasks in parallel.
+As example, we will use **prime check** from a previous blog post [Speed up Python without GIL](https://ricky-lim.github.io/blog/speed-up-python-without-gil/)
+and re-implement it in Rust with multithreading.
+
+Here is the `main.rs` code:
+
+```rust
+use std::thread;
+
+const PRIME_TEST_CASES: &[(u64, bool)] = &[
+    (2, true),
+    (142702110479723, true),
+    (299593572317531, true),
+    (3333333333333301, true),
+    (3333333333333333, false),
+    (3333335652092209, false),
+    (4444444444444423, true),
+    (4444444444444444, false),
+    (4444444488888889, false),
+    (5555553133149889, false),
+    (5555555555555503, true),
+    (5555555555555555, false),
+    (6666666666666666, false),
+    (6666666666666719, true),
+    (6666667141414921, false),
+    (7777777536340681, false),
+    (7777777777777753, true),
+    (7777777777777777, false),
+    (9999999999999917, true),
+    (9999999999999999, false),
+    (11111111111111131, false),
+    (22222222222222243, false),
+    (33333333333333353, false),
+    (44444444444444459, false),
+    (55555555555555561, false),
+    (66666666666666671, false),
+    (77777777777777773, false),
+    (88888888888888889, true),
+    (99999999999999997, true),
+    (12345678901234567, false),
+];
+
+struct IsPrimeWorker {
+    n: u64,
+    result: Option<bool>,
+}
+
+impl IsPrimeWorker {
+    fn new(n: u64) -> Self {
+        Self { n, result: None }
+    }
+
+    fn run(mut self) -> Self {
+        self.result = Some(is_prime(self.n));
+        self
+    }
+}
+
+fn is_prime(n: u64) -> bool {
+    if n < 2 {
+        return false;
+    }
+
+    if n == 2 {
+        return true;
+    }
+
+    if n % 2 == 0 {
+        return false;
+    }
+
+    let root = (n as f64).sqrt() as u64;
+    for i in (3..=root).step_by(2) {
+        if n % i == 0 {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn main() {
+    // Extract obly numbers from test cases
+    let numbers: Vec<u64> = PRIME_TEST_CASES.iter().map(|(n, _)| *n).collect();
+
+    // Spawn a thread per number and run the prime check
+    let handles: Vec<_> = numbers
+        .into_iter()
+        .map(|n| thread::spawn(move || IsPrimeWorker::new(n).run()))
+        .collect();
+
+    // Wait for threads to finish and collect the results
+    let workers: Vec<IsPrimeWorker> = handles
+        .into_iter()
+        .map(|h| h.join().expect("Thread failed"))
+        .collect();
+
+    // Verify results against the expected values
+    for ((n, expected), worker) in PRIME_TEST_CASES.iter().zip(workers.iter()) {
+        let res = worker.result.expect("Compute result failed");
+        assert_eq!(
+            res,
+            *expected,
+            "Expected {} to be {} but got {}",
+            n,
+            if *expected { "prime" } else { "not prime" },
+            res
+        );
+    }
+    println!("All {} tests passed!", PRIME_TEST_CASES.len());
+}
+```
+
+When we compile this code using `cargo build --release` and run it, let's compare the perfomance against the previous python performance.
+
+
+| Metric           | Python 3.14 (GIL) | Python 3.14t (No GIL) | Rust (Multithreaded) | Improvement Rust vs GIL | Improvement Rust vs No GIL |
+|------------------|-------------------|-----------------------|----------------------|------------------------|---------------------------|
+| **Wall Time**    | 12.57 s           | 4.79 s                | 0.17 s               | **74× faster**         | **28× faster**            |
+| **CPU Usage**    | 100 %             | 570 %                 | 625 %                | **6.25× cores used**   | Comparable (1.1×)         |
+| **Memory Usage** | 15.6 MB           | 23.9 MB               | 1.9 MB               | **8.2× less memory**   | **12.5× less memory**     |
+
+Rust completes our prime tests under a second in just **0.17 seconds**, blazingly fast than Python running with or without GIL.
+What's more impressive is that Rust uses significantly less memory about **10x less** than Python.
+
+With faster performance and lower memory footprint, Rust could be a great choice for building high-performance multithreaded applications.
+For example if you have an event-driven lambda function that processes data with CPU-bound tasks.
+Rewriting it in Rust with or without multithreading could save you significant amount of cost incurred from **memory usage and execution time**.
+
+## Key takeaways
+
+- Threads allow parallel execution of tasks within the same process
+- In Rust, use the `std::thread::spawn` function along with `move` closures to create threads safely.
+- Rewriting CPU-bound tasks in Rust from Python can yield significant performance and reduced memory usage.
