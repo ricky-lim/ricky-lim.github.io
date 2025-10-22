@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Multithreading in Rust — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Multithreading in Rust" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Multithreading in Rust</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-10-19
+  </p>
+  <p>Two main approaches to get things done faster. First, we can run tasks in <strong>parallel</strong>. Or, we can run tasks <strong>concurrently</strong>.
+Think about these two approaches like when we have dinner at a restaurant.</p>
+<p>When we eat concurrently, we eat then we drink, we also entertain our wifes/husband/kids/friends.
+We switch between eating, drinking, and chatting, so this in essence what <strong>concurrent</strong> processing is about.</p>
+<p>Another approach is to eat in <strong>parallel</strong>. To finish our meal faster, we can divide the meal into multiple portions and have multiple people eat at the same time.
+This is also known as <strong>embarrassingly parallel processing</strong> and where processing in <strong>multiple threads</strong> shine.</p>
+<p>In this blog, we will explore how to use <strong>multiple threads in Rust</strong> to achieve parallelism, to get things done faster.</p>
+<h2>What is a thread ?</h2>
+<p>When we run a program, like Microsoft Excel, our operating system creates a process for it.
+Within the process, multiple threads are created to handle multiple different tasks, such as showing the cells, performing calculations, and etc.
+These threads run <strong><em>independently</em></strong> to each other, but share the same memory space within the process, as shown below.</p>
+<pre><code>+---------------------------------------------------------+
+|                 Process                                 |
+|                                                         |
+|   +-----------+     +-------------+     +-----------+   |
+|   | Thread 1  | &lt;-&gt; |  Memory     | &lt;-&gt; | Thread 2  |   |
+|   +-----------+     +-------------+     +-----------+   |
+|                                                         |
++---------------------------------------------------------+
+</code></pre>
+<p>The advantage of using threads is that it's cheaper (consume less memory and faster to create) and also easier to communicate with each others compared to processes.</p>
+<h2>Creating threads in Rust</h2>
+<p>To spawn a thread in Rust, is as simple as calling the <code>std::thread::spawn</code> function and passing a closure to it.
+In a simplified way, Closure is an anonymous function like lambda in Python, that we can create our logic within it and can be executed in a thread.</p>
+<p>For example:</p>
+<pre><code class="lang-rust">// A simple closure that adds two numbers
+let add = |x, y| { x + y };
+add(2, 3); // returns 5
+</code></pre>
+<p>‼️ Closure borrows the reference of the value. For example:</p>
+<pre><code class="lang-rust">let h = &quot;hello&quot;.to_string();
+let f = || { println!(&quot;{}&quot;, h); };
+</code></pre>
+<p>If we try to pass this closure to a new thread like below, Rust compiler will complain 😡️:</p>
+<pre><code class="lang-rust">let h = &quot;hello&quot;.to_string();
+let f = || { println!(&quot;{}&quot;, h); };
+thread::spawn(f);
+</code></pre>
+<p>This is because the closure <code>f</code> is borrowing the reference of <code>h</code> from the main thread.
+As a consequence, when a new thread is spawned, it may <strong>outlive</strong> the main thread.
+Because the thread runs independently in the background.</p>
+<p>To be clear, the problem occurs when <code>h</code> is dropped as soon the main thread ends, then our thread is trying to access a value that is no longer exists.
+No bueno!😞
+This issue is infamously known as a <strong>dangling NULL pointer</strong>.</p>
+<p>To fix this, we will use the <code>move</code> keyword to transfer the ownership of <code>h</code> to the new thread.</p>
+<pre><code class="lang-rust">let h = &quot;hello&quot;.to_string();
+let f = move || { println!(&quot;{}&quot;, h); };
+thread::spawn(f);
+</code></pre>
+<h2>Threads in action</h2>
+<p>Within our application, we can spawned many threads to perform tasks in parallel.
+As example, we will use <strong>prime check</strong> from a previous blog post <a href="https://ricky-lim.github.io/blog/speed-up-python-without-gil/">Speed up Python without GIL</a>
+and re-implement it in Rust with multithreading.</p>
+<p>Here is the <code>main.rs</code> code:</p>
+<pre><code class="lang-rust">use std::thread;
+
+const PRIME_TEST_CASES: &amp;[(u64, bool)] = &amp;[
+    (2, true),
+    (142702110479723, true),
+    (299593572317531, true),
+    (3333333333333301, true),
+    (3333333333333333, false),
+    (3333335652092209, false),
+    (4444444444444423, true),
+    (4444444444444444, false),
+    (4444444488888889, false),
+    (5555553133149889, false),
+    (5555555555555503, true),
+    (5555555555555555, false),
+    (6666666666666666, false),
+    (6666666666666719, true),
+    (6666667141414921, false),
+    (7777777536340681, false),
+    (7777777777777753, true),
+    (7777777777777777, false),
+    (9999999999999917, true),
+    (9999999999999999, false),
+    (11111111111111131, false),
+    (22222222222222243, false),
+    (33333333333333353, false),
+    (44444444444444459, false),
+    (55555555555555561, false),
+    (66666666666666671, false),
+    (77777777777777773, false),
+    (88888888888888889, true),
+    (99999999999999997, true),
+    (12345678901234567, false),
+];
+
+struct IsPrimeWorker {
+    n: u64,
+    result: Option&lt;bool&gt;,
+}
+
+impl IsPrimeWorker {
+    fn new(n: u64) -&gt; Self {
+        Self { n, result: None }
+    }
+
+    fn run(mut self) -&gt; Self {
+        self.result = Some(is_prime(self.n));
+        self
+    }
+}
+
+fn is_prime(n: u64) -&gt; bool {
+    if n &lt; 2 {
+        return false;
+    }
+
+    if n == 2 {
+        return true;
+    }
+
+    if n % 2 == 0 {
+        return false;
+    }
+
+    let root = (n as f64).sqrt() as u64;
+    for i in (3..=root).step_by(2) {
+        if n % i == 0 {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn main() {
+    // Extract obly numbers from test cases
+    let numbers: Vec&lt;u64&gt; = PRIME_TEST_CASES.iter().map(|(n, _)| *n).collect();
+
+    // Spawn a thread per number and run the prime check
+    let handles: Vec&lt;_&gt; = numbers
+        .into_iter()
+        .map(|n| thread::spawn(move || IsPrimeWorker::new(n).run()))
+        .collect();
+
+    // Wait for threads to finish and collect the results
+    let workers: Vec&lt;IsPrimeWorker&gt; = handles
+        .into_iter()
+        .map(|h| h.join().expect(&quot;Thread failed&quot;))
+        .collect();
+
+    // Verify results against the expected values
+    for ((n, expected), worker) in PRIME_TEST_CASES.iter().zip(workers.iter()) {
+        let res = worker.result.expect(&quot;Compute result failed&quot;);
+        assert_eq!(
+            res,
+            *expected,
+            &quot;Expected {} to be {} but got {}&quot;,
+            n,
+            if *expected { &quot;prime&quot; } else { &quot;not prime&quot; },
+            res
+        );
+    }
+    println!(&quot;All {} tests passed!&quot;, PRIME_TEST_CASES.len());
+}
+</code></pre>
+<p>When we compile this code using <code>cargo build --release</code> and run it, let's compare the perfomance against the previous python performance.</p>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Python 3.14 (GIL)</th>
+<th>Python 3.14t (No GIL)</th>
+<th>Rust (Multithreaded)</th>
+<th>Improvement Rust vs GIL</th>
+<th>Improvement Rust vs No GIL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Wall Time</strong></td>
+<td>12.57 s</td>
+<td>4.79 s</td>
+<td>0.17 s</td>
+<td><strong>74× faster</strong></td>
+<td><strong>28× faster</strong></td>
+</tr>
+<tr>
+<td><strong>CPU Usage</strong></td>
+<td>100 %</td>
+<td>570 %</td>
+<td>625 %</td>
+<td><strong>6.25× cores used</strong></td>
+<td>Comparable (1.1×)</td>
+</tr>
+<tr>
+<td><strong>Memory Usage</strong></td>
+<td>15.6 MB</td>
+<td>23.9 MB</td>
+<td>1.9 MB</td>
+<td><strong>8.2× less memory</strong></td>
+<td><strong>12.5× less memory</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Rust completes our prime tests under a second in just <strong>0.17 seconds</strong>, blazingly fast than Python running with or without GIL.
+What's more impressive is that Rust uses significantly less memory about <strong>10x less</strong> than Python.</p>
+<p>With faster performance and lower memory footprint, Rust could be a great choice for building high-performance multithreaded applications.
+For example if you have an event-driven lambda function that processes data with CPU-bound tasks.
+Rewriting it in Rust with or without multithreading could save you significant amount of cost incurred from <strong>memory usage and execution time</strong>.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Threads allow parallel execution of tasks within the same process</li>
+<li>In Rust, use the <code>std::thread::spawn</code> function along with <code>move</code> closures to create threads safely.</li>
+<li>Rewriting CPU-bound tasks in Rust from Python can yield significant performance and reduced memory usage.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
