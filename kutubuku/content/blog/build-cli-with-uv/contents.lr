@@ -1,0 +1,367 @@
+title: Build CLI with UV
+---
+author: Ricky Lim
+---
+pub_date: 2025-10-26
+---
+main_image: image.png
+---
+body:
+
+No Docker, no virtualenv, no pip install, no drama. Just pure UV. Let's build a CLI.
+
+If you don't have `uv` yet, you can install it with:
+
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# To update
+uv self update
+```
+
+For a simple example, we will build a CLI to count a frequency of a word in a text file.
+I will call this CLI `pyfreq`.
+
+## Start the project
+
+First thing first, we need somewhere to start our project.
+
+```
+uv init pyfreq
+```
+
+This will create a starting directory `pyfreq`.
+Then we can start working ...
+if you use vscode, `code pyfreq`.
+Or any editor of your choice should work too.
+
+## Now we're creating a package
+
+A package is a way we can organize our code.
+Think like a folder that contains related files.
+
+Let's create a package!
+
+```
+mkdir -p src/pyfreq/ # Create the package directory
+touch src/pyfreq/__init__.py # this is to make it a package
+```
+
+That's how simple it is to create a package by just creating a directory and adding an `__init__.py` file.
+
+## Create a CLI entry point
+
+Next, we will create an entry point.
+The entry point is like a door to our application, so users can run our CLI from the command line.
+
+```sh
+touch src/pyfreq/main.py
+rm main.py # We don't need this file, so we can remove it.
+```
+
+As a starter, let's add a simple print to `main.py` to make sure our entry point works.
+
+```python
+def main():
+    print("Hello pyfreq")
+```
+
+Then we will add the entry point in `pyproject.toml`
+
+```toml
+[project]
+name = "pyfreq"
+version = "0.1.0"
+description = "Simple freq implementation in Python"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+# Entry point for the CLI
+[project.scripts]
+pyfreq = "pyfreq.main:main"
+
+# Add this to tell uv how to build our package
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+```
+
+## Let's test it
+
+Simply run:
+
+```
+uv run pyfreq
+```
+
+> Yes that's it! No need to install python or create virtual environment manually.
+Thanks to `uv`, it will handle those boring stuffs for us.
+The good thing is, if we modify our code, we can also see the changes **immediately** without reinstalling the package.
+No need to run `pip install -e .`
+Because `uv` will install the package in editable mode by default.
+
+From my experience, this is really a blessing not to worry about those boring stuffs. **Awesome** UV 🤩.
+
+Let's go down to the business!
+
+## Implement CLI functionality
+
+1\. Let's add the parser logic in `main.py`
+
+```python
+import argparse
+import sys
+
+from importlib.metadata import version
+from pathlib import Path
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--version", "-v", action="version", version=f"{version('pyfreq')}"
+    )
+    parser.add_argument("word", type=str, help="Word to count")
+    parser.add_argument("file_path", type=Path, help="Text file to search")
+
+    # Show help message when no arguments are provided
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
+    return parser.parse_args()
+```
+
+As a start, we implement a parser that shows the version of our CLI.
+
+Having a version is a bare minimum for a CLI, right?
+Since we use `uv`, we can easily get the version from `pyproject.toml`.
+And when we update the version, `uv` will take care that the new version will be updated automagically.
+
+Then we parse two positional arguments: `word` and `file`.
+I think it's also a good practice to always show the help message when no arguments are provided.
+
+Now we can run: `uv run pyfreq` and it will print the help message.
+
+Let's continue implementing the logic in our `main.py`.
+
+Our cli should do the following steps:
+- ✅ parse the args
+- ☑️ get the word and file path
+- ☑️ count the word in the file
+
+Let's first refactor our `main` function. As our `main` function is now only responsible to parse the args.
+Let's move this logic to a separate function `collect_args`.
+
+```python
+def main() -> None:
+    args = collect_args()
+
+
+def collect_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--version", "-v", action="version", version=f"{version('pygrep')}"
+    )
+    parser.add_argument("query", type=str, help="Search query!")
+    parser.add_argument("file_path", type=Path, help="Text file to search")
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
+    return parser.parse_args()
+
+```
+
+Refactor done! It's always nice to keep refactoring at the start.
+The less code we have the easier to refactor it.
+
+Now we will implement the logic to count the word in a file.
+For this logic we need to get the word and file path as our application config.
+As these parameters are closely related, we will create a dataclass to hold these values **together**.
+
+```python
+@dataclass
+class Config:
+    word: str
+    file_path: Path
+
+    @classmethod
+    def build(cls, args: argparse.Namespace) -> "Config":
+        if args.word is None:
+            raise ValueError("Word is not provided")
+        if args.file_path is None:
+            raise ValueError("A file path is not provided")
+
+        return cls(word=args.word, file_path=args.file_path)
+```
+
+This dataclass has a simple logic to build from the parsed args and within this build method we can also validate the args.
+
+Let's update our `main` function to:
+
+```python
+def main() -> None:
+    args = collect_args()
+    config = Config.build(args)
+```
+
+The next step is to implement the count logic.
+As it is the core domain logic, we will create a separate module for it, i.e. `lib.py`.
+This is to keep our code as pristine as possible, protecting from spagetti-code invaders 😂
+
+To create the file: `touch src/pyfreq/lib.py`. Within `lib.py`, we start implementing the `count` function.
+
+```python
+def count(word: str, content: str) -> dict[str, int]:
+    raise NotImplementedError
+```
+
+Start as minimum as possible just to have the function signature, that we can test.
+And welcome to **test-driven development** (TDD).
+
+## Write tests first
+
+Create a directory for tests: `mkdir tests`.
+Then create the test file `touch tests/test_lib.py`.
+
+Let's also add `pytest` as our development dependency: `uv add --dev pytest`
+
+Note that we add `--dev` flag to add it as a development dependency.
+It means that `pytest` will only be installed in the development environment not in production.
+Our CLI is still a pure blood without any dependencies.
+
+```python
+from pyfreq.lib import count
+
+
+def test_count_word():
+    word = "python"
+    content = """
+Why Python developers don't get bitten?
+Because python has no fangs, just indentation errors.
+Life is short, use Python!
+"""
+
+    assert {"python": 1} == count(word, content)
+
+
+def test_count_non_existent_word():
+    word = "rust"
+    content = """
+Why Python developers don't get bitten?
+Because python has no fangs, just indentation errors.
+Life is short, use Python!
+"""
+
+    assert {"rust": 0} == count(word, content)
+```
+
+Run the test with `uv run -m pytest`.
+This **must fail** as we haven't implemented the logic yet.
+The failure should contain:
+
+```sh
+...
+def count(word: str, content: str) -> dict:
+>       raise NotImplementedError
+E       NotImplementedError
+...
+```
+
+This is the first experience with TDD, a failing test.
+Having it failed is a good sign to celebrate as it shows that our test is working as expected.
+Because if for the first time it passes, then something is wrong.
+
+Now let's implement the logic in `lib.py` to make the tests pass.
+
+```python
+def count(word: str, content: str) -> dict[str, int]:
+    result = {word: 0}
+
+    for w in content.split():
+        if w == word:
+            result[word] += 1
+
+    return result
+```
+
+And run the test again with `uv run -m pytest`. This time it should pass 🎉.
+
+> And that's all about TDD: write tests first, see them fail, implement the logic, and see them pass.
+
+
+As we have tests, we can refactor our code with confidence.
+Let's also optimize our logic to be more pythonic using dict comprehension.
+
+```python
+def count(word: str, content: str) -> dict[str, int]:
+    word_count = sum(1 for w in content.split() if w == word)
+    return {word: word_count}
+```
+
+Then run the tests again to make sure everything is still working.
+
+Ok now we can go back to `main.py` to implement the remaining step to read the file and call the `count` function.
+
+```python
+def run(config: Config):
+    with open(config.file_path, "r") as f:
+        content = f.read()
+
+    result = count(config.word, content)
+    print(result)
+```
+
+Finally, we can update our `main` function to call the `run` function.
+
+```python
+def main() -> None:
+    args = collect_args()
+    config = Config.build(args)
+    run(config)
+```
+
+So now our CLI is ready to use.
+Let's create a sample text. `touch jokes.txt`
+
+```
+Why did the Python developer go broke?
+
+Because he kept using "import this" instead of "import cash".
+
+```
+
+Now we can run our CLI to search for "cash" in `jokes.txt`
+
+```sh
+❯ uv run pyfreq cash jokes.txt
+{'cash': 1}
+```
+
+Congratulations! You've built a CLI with only UV.
+
+Our structure now looks like the following:
+
+```sh
+.
+├── jokes.txt
+├── pyproject.toml
+├── README.md
+├── src
+│   └── pyfreq
+│       ├── __init__.py
+│       ├── lib.py
+│       └── main.py
+├── tests
+│   └── test_lib.py
+└── uv.lock
+```
+
+The code is available at: [GitHub Repository](https://github.com/ricky-lim/pyfreq)
+
+## Key takeaways
+
+`uv` makes it easy to build CLI tools without worrying about Python, virtual environments and package installations, simply `uv run`
