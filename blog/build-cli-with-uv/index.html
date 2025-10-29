@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Build CLI with UV — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Build CLI with UV" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Build CLI with UV</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-10-26
+  </p>
+  <p>No Docker, no virtualenv, no pip install, no drama. Just pure UV. Let's build a CLI from scratch together!</p>
+<p>If you don't have <code>uv</code> yet, 📣 please fix it now:</p>
+<pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# To get the latest and greatest version
+uv self update
+</code></pre>
+<p>For a simple example, we will build a CLI to count a frequency of a word in a text file.
+I will call this CLI <code>pyfreq</code>.</p>
+<h2>1. Project Setup</h2>
+<p>First thing first, we'll create a new project folder using <code>UV</code>. Open your terminal and run:</p>
+<pre><code>uv init pyfreq
+</code></pre>
+<p>This creates a directory called <code>pyfreq</code> with everything you need to get started.</p>
+<p>Tip: If you use vscode, open the folder with <code>code pyfreq</code>. Any editor works too!</p>
+<h2>2. Create a Python Package</h2>
+<p>A package helps organize your code. Let's make one:</p>
+<pre><code>mkdir -p src/pyfreq/
+touch src/pyfreq/__init__.py
+</code></pre>
+<p>Just like that, you have a Python package!</p>
+<h2>3. Add a CLI Entry Point</h2>
+<p>The entry point is the “door” to your CLI. Let’s create it:</p>
+<pre><code class="lang-sh">touch src/pyfreq/main.py
+rm main.py # We don&#39;t need this file, so we can remove it if it exists
+</code></pre>
+<p>Add a simple function to test your setup. Open <code>src/pyfreq/main.py</code> and write:</p>
+<pre><code class="lang-python">def main():
+    print(&quot;Hello pyfreq&quot;)
+</code></pre>
+<h2>4. Register the CLI in pyproject.toml</h2>
+<p>Open <code>pyproject.toml</code> and add the following configuration:</p>
+<pre><code class="lang-toml">[project]
+name = &quot;pyfreq&quot;
+version = &quot;0.1.0&quot;
+description = &quot;Simple freq implementation in Python&quot;
+readme = &quot;README.md&quot;
+requires-python = &quot;&gt;=3.12&quot;
+dependencies = []
+
+# Entry point for the CLI
+[project.scripts]
+pyfreq = &quot;pyfreq.main:main&quot;
+
+# Add this to tell uv how to build our package
+[build-system]
+requires = [&quot;uv_build&quot;]
+build-backend = &quot;uv_build&quot;
+</code></pre>
+<h2>5. Run Your CLI</h2>
+<p>Ready to try it out?</p>
+<pre><code>uv run pyfreq
+</code></pre>
+<p>You should see <code>"Hello pyfreq"</code> printed. <code>UV</code> handles Python setup and editable installs for you. No manual pip or venv needed!</p>
+<p>From my experience, this is really a blessing not to worry about those boring stuffs. <strong>Awesome</strong> UV 🤩.</p>
+<h2>6. Add Argument Parsing</h2>
+<p>Let’s make your CLI useful. We’ll use <code>argparse</code> to parse command-line arguments.</p>
+<p>Edit <code>src/pyfreq/main.py</code>:</p>
+<pre><code class="lang-python">import argparse
+import sys
+
+from importlib.metadata import version
+from pathlib import Path
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        &quot;--version&quot;, &quot;-v&quot;, action=&quot;version&quot;, version=f&quot;{version(&#39;pyfreq&#39;)}&quot;
+    )
+    parser.add_argument(&quot;word&quot;, type=str, help=&quot;Word to count&quot;)
+    parser.add_argument(&quot;file_path&quot;, type=Path, help=&quot;Text file to search&quot;)
+
+    # Show help message when no arguments are provided
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
+    return parser.parse_args()
+</code></pre>
+<p>As a start, we implement a parser that shows the version of our CLI.
+In my opinion, having a version is a bare minimum for a CLI.
+Since we use <code>uv</code>, we can easily get the version from <code>pyproject.toml</code>.
+And when we update the version, <code>uv</code> will take care that the new version will be updated 🪄 automagically.</p>
+<p>Then we parse two positional arguments: <code>word</code> and <code>file</code>.
+I think it's also a good practice to always show the help message when no arguments are provided.</p>
+<p>Now we can run: <code>uv run pyfreq</code> and it will print the help message.</p>
+<h2>7. Refactor for Better Structure</h2>
+<p>Let’s organize the code for easier maintenance. Split argument parsing into its own function:</p>
+<pre><code class="lang-python">def collect_args() -&gt; argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        &quot;--version&quot;, &quot;-v&quot;, action=&quot;version&quot;, version=f&quot;{version(&#39;pygrep&#39;)}&quot;
+    )
+    parser.add_argument(&quot;query&quot;, type=str, help=&quot;Search query!&quot;)
+    parser.add_argument(&quot;file_path&quot;, type=Path, help=&quot;Text file to search&quot;)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
+    return parser.parse_args()
+
+def main() -&gt; None:
+    args = collect_args()
+    print(args)
+</code></pre>
+<p>Refactor done! It's always nice to keep refactoring at the start.
+The less code we have the easier the refactoring.</p>
+<h2>8. Create a Config</h2>
+<p>Now we will implement the logic to count the word in a file.
+For this logic we need to get the word and file path as our application config.
+As these parameters are closely related, we will create a dataclass to hold these values <strong>together</strong>.</p>
+<pre><code class="lang-python">@dataclass
+class Config:
+    word: str
+    file_path: Path
+
+    @classmethod
+    def build(cls, args: argparse.Namespace) -&gt; &quot;Config&quot;:
+        if args.word is None:
+            raise ValueError(&quot;Word is not provided&quot;)
+        if args.file_path is None:
+            raise ValueError(&quot;A file path is not provided&quot;)
+
+        return cls(word=args.word, file_path=args.file_path)
+</code></pre>
+<p>This dataclass has a simple logic to build from the parsed args and within this build method we can also validate the args.</p>
+<p>Update <code>main</code>:</p>
+<pre><code class="lang-python">def main() -&gt; None:
+    args = collect_args()
+    config = Config.build(args)
+    print(config)
+</code></pre>
+<h2>9. Implement the Counting Logic</h2>
+<p>As it is the core domain logic, we will create a separate module for it, i.e. <code>lib.py</code>.
+This is to keep our code as pristine as possible, protecting from spagetti-code invaders 😂</p>
+<p>To create the file: <code>touch src/pyfreq/lib.py</code>. Within <code>lib.py</code>, we start implementing the <code>count</code> function.</p>
+<pre><code class="lang-python">def count(word: str, content: str) -&gt; dict[str, int]:
+    raise NotImplementedError
+</code></pre>
+<p>Start as minimum as possible just to have the function signature, that we can test.
+And welcome to <strong>test-driven development</strong> (TDD).</p>
+<h2>10. Add Tests (Test-Driven Development)</h2>
+<p>Create a <code>tests</code> folder and <code>tests/test_lib.py</code>:</p>
+<pre><code class="lang-python">from pyfreq.lib import count
+
+
+def test_count_word():
+    word = &quot;python&quot;
+    content = &quot;&quot;&quot;
+Why Python developers don&#39;t get bitten?
+Because python has no fangs, just indentation errors.
+Life is short, use Python!
+&quot;&quot;&quot;
+
+    assert {&quot;python&quot;: 1} == count(word, content)
+
+
+def test_count_non_existent_word():
+    word = &quot;rust&quot;
+    content = &quot;&quot;&quot;
+Why Python developers don&#39;t get bitten?
+Because python has no fangs, just indentation errors.
+Life is short, use Python!
+&quot;&quot;&quot;
+
+    assert {&quot;rust&quot;: 0} == count(word, content)
+</code></pre>
+<p>Add <code>pytests</code> as a development dependency.
+It means that <code>pytest</code> will only be installed in the development environment <strong>not in production</strong>.</p>
+<pre><code class="lang-sh">uv add --dev pytest
+</code></pre>
+<p>Run your tests:</p>
+<pre><code class="lang-sh">uv run -m pytest
+</code></pre>
+<p>This <strong>must fail</strong> as we haven't implemented the logic yet.
+The failure should look like this:</p>
+<pre><code class="lang-sh">...
+def count(word: str, content: str) -&gt; dict:
+&gt;       raise NotImplementedError
+E       NotImplementedError
+...
+</code></pre>
+<p>Having it failed is a good sign 👌 to celebrate as it shows that our test is working as expected.
+Because if for the first time our tests pass, then something is wrong 😑.</p>
+<p>Now let's implement the logic in <code>lib.py</code> to make the tests pass.</p>
+<pre><code class="lang-python">def count(word: str, content: str) -&gt; dict[str, int]:
+    result = {word: 0}
+
+    for w in content.split():
+        if w == word:
+            result[word] += 1
+
+    return result
+</code></pre>
+<p>Run the test again with <code>uv run -m pytest</code>. This time it should pass 🎉.</p>
+<p>And that's all about TDD: write tests first, see them fail, implement the logic, and see them pass.</p>
+<p>As we have tests, we can refactor our code with confidence.
+Let's also optimize our logic to be more pythonic using dict comprehension.</p>
+<pre><code class="lang-python">def count(word: str, content: str) -&gt; dict[str, int]:
+    word_count = sum(1 for w in content.split() if w == word)
+    return {word: word_count}
+</code></pre>
+<p>Then run the tests again to make sure everything is still working.</p>
+<h2>11. Wire Everything Together</h2>
+<p>Update <code>main.py</code> to read the file and count the word:</p>
+<pre><code class="lang-python">def run(config: Config):
+    with open(config.file_path, &quot;r&quot;) as f:
+        content = f.read()
+
+    result = count(config.word, content)
+    print(result)
+
+def main() -&gt; None:
+    args = collect_args()
+    config = Config.build(args)
+    run(config)
+</code></pre>
+<h2>12. Try Your CLI!</h2>
+<p>Let's create a sample text. <code>touch jokes.txt</code></p>
+<pre><code class="lang-txt">Why did the Python developer go broke?
+
+Because he kept using &quot;import this&quot; instead of &quot;import cash&quot;.
+</code></pre>
+<p>Now we can run our CLI to search for "developer" in <code>jokes.txt</code></p>
+<pre><code class="lang-sh">❯ uv run pyfreq developer jokes.txt
+{&#39;developer&#39;: 1}
+</code></pre>
+<p>Congratulations! You’ve just built a CLI from scratch—congratulations with UV! 🎉</p>
+<p>Thank you for reading this far. I hope you found it helpful!</p>
+<p>Our structure now looks like the following:</p>
+<pre><code class="lang-sh">.
+├── jokes.txt
+├── pyproject.toml
+├── README.md
+├── src
+│   └── pyfreq
+│       ├── __init__.py
+│       ├── lib.py
+│       └── main.py
+├── tests
+│   └── test_lib.py
+└── uv.lock
+</code></pre>
+<p>To explore more, check out the full code on <a href="https://github.com/ricky-lim/pyfreq">GitHub Repository</a></p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Use <code>uv init</code> to create a new project.</li>
+<li>Use <code>uv run</code> to run your code during development - no need to install Python, virtual environments, or packages manually.</li>
+<li>Use <code>uv add --dev</code> to add development dependencies</li>
+<li>Use <code>uv run -m pytest</code> to run tests. Always start by writing failing tests before implementing the logic - that's the essence of Test-Driven Development (TDD).</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
