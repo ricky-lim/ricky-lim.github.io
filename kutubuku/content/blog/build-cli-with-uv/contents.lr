@@ -8,65 +8,62 @@ main_image: image.png
 ---
 body:
 
-No Docker, no virtualenv, no pip install, no drama. Just pure UV. Let's build a CLI.
+No Docker, no virtualenv, no pip install, no drama. Just pure UV. Let's build a CLI from scratch together!
 
-If you don't have `uv` yet, you can install it with:
+If you don't have `uv` yet, 📣 please fix it now:
 
 ```
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# To update
+# To get the latest and greatest version
 uv self update
 ```
 
 For a simple example, we will build a CLI to count a frequency of a word in a text file.
 I will call this CLI `pyfreq`.
 
-## Start the project
+## 1\. Project Setup
 
-First thing first, we need somewhere to start our project.
+First thing first, we'll create a new project folder using `UV`. Open your terminal and run:
 
 ```
 uv init pyfreq
 ```
 
-This will create a starting directory `pyfreq`.
-Then we can start working ...
-if you use vscode, `code pyfreq`.
-Or any editor of your choice should work too.
+This creates a directory called `pyfreq` with everything you need to get started.
 
-## Now we're creating a package
+Tip: If you use vscode, open the folder with `code pyfreq`. Any editor works too!
 
-A package is a way we can organize our code.
-Think like a folder that contains related files.
+## 2\. Create a Python Package
 
-Let's create a package!
+A package helps organize your code. Let's make one:
 
 ```
-mkdir -p src/pyfreq/ # Create the package directory
-touch src/pyfreq/__init__.py # this is to make it a package
+mkdir -p src/pyfreq/
+touch src/pyfreq/__init__.py
 ```
 
-That's how simple it is to create a package by just creating a directory and adding an `__init__.py` file.
+Just like that, you have a Python package!
 
-## Create a CLI entry point
+## 3\. Add a CLI Entry Point
 
-Next, we will create an entry point.
-The entry point is like a door to our application, so users can run our CLI from the command line.
+The entry point is the “door” to your CLI. Let’s create it:
 
 ```sh
 touch src/pyfreq/main.py
-rm main.py # We don't need this file, so we can remove it.
+rm main.py # We don't need this file, so we can remove it if it exists
 ```
 
-As a starter, let's add a simple print to `main.py` to make sure our entry point works.
+Add a simple function to test your setup. Open `src/pyfreq/main.py` and write:
 
 ```python
 def main():
     print("Hello pyfreq")
 ```
 
-Then we will add the entry point in `pyproject.toml`
+## 4\. Register the CLI in pyproject.toml
+
+Open `pyproject.toml` and add the following configuration:
 
 ```toml
 [project]
@@ -87,27 +84,24 @@ requires = ["uv_build"]
 build-backend = "uv_build"
 ```
 
-## Let's test it
+## 5\. Run Your CLI
 
-Simply run:
+Ready to try it out?
 
 ```
 uv run pyfreq
 ```
 
-> Yes that's it! No need to install python or create virtual environment manually.
-Thanks to `uv`, it will handle those boring stuffs for us.
-The good thing is, if we modify our code, we can also see the changes **immediately** without reinstalling the package.
-No need to run `pip install -e .`
-Because `uv` will install the package in editable mode by default.
+You should see `"Hello pyfreq"` printed. `UV` handles Python setup and editable installs for you. No manual pip or venv needed!
 
 From my experience, this is really a blessing not to worry about those boring stuffs. **Awesome** UV 🤩.
 
-Let's go down to the business!
+## 6\. Add Argument Parsing
 
-## Implement CLI functionality
 
-1\. Let's add the parser logic in `main.py`
+Let’s make your CLI useful. We’ll use `argparse` to parse command-line arguments.
+
+Edit `src/pyfreq/main.py`:
 
 ```python
 import argparse
@@ -134,31 +128,21 @@ def main():
 ```
 
 As a start, we implement a parser that shows the version of our CLI.
-
-Having a version is a bare minimum for a CLI, right?
+In my opinion, having a version is a bare minimum for a CLI.
 Since we use `uv`, we can easily get the version from `pyproject.toml`.
-And when we update the version, `uv` will take care that the new version will be updated automagically.
+And when we update the version, `uv` will take care that the new version will be updated 🪄 automagically.
 
 Then we parse two positional arguments: `word` and `file`.
 I think it's also a good practice to always show the help message when no arguments are provided.
 
 Now we can run: `uv run pyfreq` and it will print the help message.
 
-Let's continue implementing the logic in our `main.py`.
 
-Our cli should do the following steps:
-- ✅ parse the args
-- ☑️ get the word and file path
-- ☑️ count the word in the file
+## 7\. Refactor for Better Structure
 
-Let's first refactor our `main` function. As our `main` function is now only responsible to parse the args.
-Let's move this logic to a separate function `collect_args`.
+Let’s organize the code for easier maintenance. Split argument parsing into its own function:
 
 ```python
-def main() -> None:
-    args = collect_args()
-
-
 def collect_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -173,10 +157,17 @@ def collect_args() -> argparse.Namespace:
 
     return parser.parse_args()
 
+def main() -> None:
+    args = collect_args()
+    print(args)
+
 ```
 
 Refactor done! It's always nice to keep refactoring at the start.
-The less code we have the easier to refactor it.
+The less code we have the easier the refactoring.
+
+
+## 8\. Create a Config
 
 Now we will implement the logic to count the word in a file.
 For this logic we need to get the word and file path as our application config.
@@ -200,15 +191,17 @@ class Config:
 
 This dataclass has a simple logic to build from the parsed args and within this build method we can also validate the args.
 
-Let's update our `main` function to:
+Update `main`:
 
 ```python
 def main() -> None:
     args = collect_args()
     config = Config.build(args)
+    print(config)
 ```
 
-The next step is to implement the count logic.
+## 9\. Implement the Counting Logic
+
 As it is the core domain logic, we will create a separate module for it, i.e. `lib.py`.
 This is to keep our code as pristine as possible, protecting from spagetti-code invaders 😂
 
@@ -222,16 +215,9 @@ def count(word: str, content: str) -> dict[str, int]:
 Start as minimum as possible just to have the function signature, that we can test.
 And welcome to **test-driven development** (TDD).
 
-## Write tests first
+## 10\. Add Tests (Test-Driven Development)
 
-Create a directory for tests: `mkdir tests`.
-Then create the test file `touch tests/test_lib.py`.
-
-Let's also add `pytest` as our development dependency: `uv add --dev pytest`
-
-Note that we add `--dev` flag to add it as a development dependency.
-It means that `pytest` will only be installed in the development environment not in production.
-Our CLI is still a pure blood without any dependencies.
+Create a `tests` folder and `tests/test_lib.py`:
 
 ```python
 from pyfreq.lib import count
@@ -259,9 +245,21 @@ Life is short, use Python!
     assert {"rust": 0} == count(word, content)
 ```
 
-Run the test with `uv run -m pytest`.
+Add `pytests` as a development dependency.
+It means that `pytest` will only be installed in the development environment **not in production**.
+
+```sh
+uv add --dev pytest
+```
+
+Run your tests:
+
+```sh
+uv run -m pytest
+```
+
 This **must fail** as we haven't implemented the logic yet.
-The failure should contain:
+The failure should look like this:
 
 ```sh
 ...
@@ -271,9 +269,8 @@ E       NotImplementedError
 ...
 ```
 
-This is the first experience with TDD, a failing test.
-Having it failed is a good sign to celebrate as it shows that our test is working as expected.
-Because if for the first time it passes, then something is wrong.
+Having it failed is a good sign 👌 to celebrate as it shows that our test is working as expected.
+Because if for the first time our tests pass, then something is wrong 😑.
 
 Now let's implement the logic in `lib.py` to make the tests pass.
 
@@ -288,9 +285,9 @@ def count(word: str, content: str) -> dict[str, int]:
     return result
 ```
 
-And run the test again with `uv run -m pytest`. This time it should pass 🎉.
+Run the test again with `uv run -m pytest`. This time it should pass 🎉.
 
-> And that's all about TDD: write tests first, see them fail, implement the logic, and see them pass.
+And that's all about TDD: write tests first, see them fail, implement the logic, and see them pass.
 
 
 As we have tests, we can refactor our code with confidence.
@@ -304,7 +301,10 @@ def count(word: str, content: str) -> dict[str, int]:
 
 Then run the tests again to make sure everything is still working.
 
-Ok now we can go back to `main.py` to implement the remaining step to read the file and call the `count` function.
+
+## 11\. Wire Everything Together
+
+Update `main.py` to read the file and count the word:
 
 ```python
 def run(config: Config):
@@ -313,35 +313,34 @@ def run(config: Config):
 
     result = count(config.word, content)
     print(result)
-```
 
-Finally, we can update our `main` function to call the `run` function.
-
-```python
 def main() -> None:
     args = collect_args()
     config = Config.build(args)
     run(config)
 ```
 
-So now our CLI is ready to use.
+## 12\. Try Your CLI!
+
 Let's create a sample text. `touch jokes.txt`
 
-```
+```txt
 Why did the Python developer go broke?
 
 Because he kept using "import this" instead of "import cash".
 
 ```
 
-Now we can run our CLI to search for "cash" in `jokes.txt`
+Now we can run our CLI to search for "developer" in `jokes.txt`
 
 ```sh
-❯ uv run pyfreq cash jokes.txt
-{'cash': 1}
+❯ uv run pyfreq developer jokes.txt
+{'developer': 1}
 ```
 
-Congratulations! You've built a CLI with only UV.
+Congratulations! You’ve just built a CLI from scratch—congratulations with UV! 🎉
+
+Thank you for reading this far. I hope you found it helpful!
 
 Our structure now looks like the following:
 
@@ -360,8 +359,11 @@ Our structure now looks like the following:
 └── uv.lock
 ```
 
-The code is available at: [GitHub Repository](https://github.com/ricky-lim/pyfreq)
+To explore more, check out the full code on [GitHub Repository](https://github.com/ricky-lim/pyfreq)
 
 ## Key takeaways
 
-`uv` makes it easy to build CLI tools without worrying about Python, virtual environments and package installations, simply `uv run`
+- Use `uv init` to create a new project.
+- Use `uv run` to run your code during development - no need to install Python, virtual environments, or packages manually.
+- Use `uv add --dev` to add development dependencies
+- Use `uv run -m pytest` to run tests. Always start by writing failing tests before implementing the logic - that's the essence of Test-Driven Development (TDD).
