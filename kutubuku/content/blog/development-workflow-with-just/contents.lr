@@ -1,0 +1,317 @@
+title: Development Workflow with Just
+---
+author: Ricky Lim
+---
+pub_date: 2025-11-02
+---
+main_image: image.png
+---
+body:
+
+We will continue improving our previous project `pyfreq` from [Build CLI with UV](https://ricky-lim.github.io/blog/build-cli-with-uv/) with `Just`.
+In this blog post, I will introduce a tool called `just` and how we can use it to make our development workflow easier.
+
+## Why `just`?
+
+`make` is a great tool. I also wrote a short blog about it [here](https://ricky-lim.github.io/blog/makefiles-for-scientists-a-guide-to-automation/).
+The simplicity of `make` provides a foundation for further development of many tools. One of them is `just`.
+
+> I also want to emphasize that this isn’t about criticizing make, but rather celebrating how it has inspired the evolution of new tools and ideas.
+
+`make` has been around quite a while and mainly used in C/C++ projects when we need to compile code.
+So the target audience is more towards system programmers.
+While `just` is more focused on running just commands which I think more suitable for python developers.
+
+For example, using `make` for python developers we often need to add `.PHONY` targets to ensure that the commands run every time.
+This is actually not the intended use of `make` because `make` is designed to also track the created files.
+As such if files were created and nothing changed, `make` will skip the commands.
+However most of our python development either in data science or web developemnt, we often just want to run commands again and again and therefore we add `.PHONY` to all targets.
+
+Another reason I like `just` is because of the `arguments` feature which is not available in `make`.
+The third cool feature is also `just` can be called not only from where the `Justfile` is located but also from subdirectories, so no need to `cd` back to the root directory to run commands.
+
+## 1\. Install `just`
+
+There are many ways to install `just`. My favourite way is using `cargo`: `cargo install just`.
+For other installation methods, please refer to: https://github.com/casey/just
+
+To verify the installation, always check its version:
+
+```
+$ just --version
+just 1.43.0
+```
+
+If it shows the version, installation is good to go!
+
+## 2\. Add editor support [optional]
+
+If you use `vscode`, I'd recommend `vscode-just` extension. But it's optional.
+
+## 3\. Create a `Justfile`
+
+Create a file named `Justfile` in the root of your project where your `pyproject.toml` is located.
+
+```sh
+touch Justfile
+```
+
+Same like when we created `Makefile`, now we create `Justfile`.
+
+Try it out ?
+
+```
+$ just
+error: Justfile contains no recipes.
+```
+
+It works 🎉! with a very nice error message.
+
+Now we can start our development lifecycle tasks as recipes in `Justfile`.
+
+## 1\. Add a `default` recipe
+
+```Justfile
+@_:
+    just --list
+```
+
+The `@` symbol like in `Makefile` to indicates that the command should be silent (not printed to the terminal).
+The default behavior of `just` is to print the command to the stderror before executing it.
+
+The `_` symbol means that it's private recipe and should should not be listed
+
+In short this is a private recipe as it's on the top line it will be used as a default recipe when we run `just`
+
+```
+$ just
+Available recipes:
+```
+
+## 2\. Add the `install` recipe
+
+To ensure that our project can be easily setup, we will add the recipe for that.
+
+```Justfile
+# Recreate project from nothing
+fresh: clean install
+
+# Remove temporary files
+clean:
+    rm -rf \
+        .venv .pytest_cache \
+        .mypy_cache .ruff_cache \
+        .coverage htmlcov
+    find . \
+        -type d \
+        -name "__pycache__" \
+        -exec rm -rf {} +
+
+
+# Ensure project virtualenv is up to date
+install:
+    uv sync
+```
+
+Now we can just run `just fresh` to (re)create our project from scratch.
+Since `uv` is blazingly fast, this will be done before we even sip our coffee ☕.
+
+
+## 3\. Add a `run` and `test` recipe
+
+To make it easy, to run our CLI we can add the following recipes to run our CLI and test:
+
+```Justfile
+# Run our CLI
+run *args :
+    uv run pyfreq {{ args }}
+
+
+# Run test
+test *args:
+    uv run -m pytest {{ args }}
+```
+
+Now we can run our CLI using:
+
+```
+# Show our CLI version
+$ just run -v
+uv run pyfreq -v
+0.1.0
+```
+
+## 4\. Add a `lint`, `type` and `cov` test recipes
+
+To ensure code quality, we will add recipes for linting, type checking, and test code coverage.
+
+We will first install the development dependencies:
+
+```
+uv add --dev ruff mypy pytest-cov
+```
+
+```Justfile
+# Run linting
+lint:
+    - uv run -m ruff check --fix --unsafe-fixes .
+    - uv run -m ruff format .
+
+# Run typing
+typing:
+    uv run -m mypy src
+
+# Run tests coverage
+@cov:
+    just _cov erase
+    just _cov run -m pytest
+    just _cov report
+    just _cov html
+
+_cov *args:
+    uv run -m coverage {{ args }}
+```
+
+Now our `just` has the following recipe:
+
+```sh
+Available recipes:
+    clean   # Remove temporary files
+    cov     # Run tests coverage
+    fresh   # Recreate project from nothing
+    install # Ensure project virtualenv is up to date
+    lint    # Run linting
+    typing  # Run typing
+```
+
+## 5\. Organize the recipes
+
+`just` also makes it easy to organize recipes with a decorator `[group(<name>)]`.
+
+For example we want to group our clean and install recipes under `setup` group.
+
+```Justfile
+# Remove temporary files
+[group('setup')]
+clean:
+    rm -rf \
+        .venv .pytest_cache \
+        .mypy_cache .ruff_cache \
+        .coverage htmlcov
+    find . \
+        -type d \
+        -name "__pycache__" \
+        -exec rm -rf {} +
+
+
+# Ensure project virtualenv is up to date
+[group('setup')]
+install:
+    uv sync
+```
+
+We further annotate our recipes.
+
+This is how our `Justfile` looks like:
+
+```Justfile
+@_:
+    just --list
+
+
+# Recreate project from nothing
+[group('setup')]
+fresh: clean install
+
+
+# Remove temporary files
+[group('setup')]
+clean:
+    rm -rf \
+        .venv .pytest_cache \
+        .mypy_cache .ruff_cache \
+        .coverage htmlcov
+    find . \
+        -type d \
+        -name "__pycache__" \
+        -exec rm -rf {} +
+
+
+# Ensure project virtualenv is up to date
+[group('setup')]
+install:
+    uv sync
+
+
+# Run our CLI
+[group('dev')]
+run *args :
+    uv run pyfreq {{ args}}
+
+
+# Run test
+[group('dev')]
+test *args:
+    uv run -m pytest {{ args }}
+
+
+# Perform all quality check
+[group('quality')]
+check-all: lint cov typing
+
+
+# Run linting
+[group('quality')]
+lint:
+    - uv run -m ruff check --fix --unsafe-fixes .
+    - uv run -m ruff format .
+
+
+# Run typing
+[group('quality')]
+typing:
+    uv run -m mypy src
+
+
+# Run tests coverage
+[group('quality')]
+@cov:
+    just _cov erase
+    just _cov run -m pytest
+    just _cov report
+    just _cov html
+
+
+_cov *args:
+    uv run -m coverage {{ args }}
+
+```
+
+This is now how it looks like when we run `just`:
+
+```sh
+➜ just
+Available recipes:
+    [dev]
+    run *args  # Run our CLI
+    test *args # Run test
+
+    [quality]
+    check-all  # Perform all quality check
+    cov        # Run tests coverage
+    lint       # Run linting
+    typing     # Run typing
+
+    [setup]
+    clean      # Remove temporary files
+    fresh      # Recreate project from nothing
+    install    # Ensure project virtualenv is up to date
+```
+
+This is very neat so we can help ourselves and others to navigate the development lifecycle of our project, as smooth as possible.
+Then we can simplify our `README.md` to include the `just` commands for development .
+With `Justfile` in place, our `README.md` should be as lean as possible to save ourselves and others time to get started.
+
+## Key Takeaways
+
+With `just` we can automate our development lifecycle to make it easy for ourselves and others to develop our project.
