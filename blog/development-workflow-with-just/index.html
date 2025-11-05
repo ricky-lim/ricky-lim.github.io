@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Development Workflow with Just — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Development Workflow with Just" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Development Workflow with Just</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-11-05
+  </p>
+  <p>As your Python projects grow, running the same commands <strong><em>over and over</em></strong> again can be <strong>less fun</strong> 😩.
+Things like installing dependencies 💼 , running tests 🛂 or cleaning up temporary files 🧹.</p>
+<p><strong>Wouldn't it be great if we can automate these repetitive tasks with simple, easy to remember commands?</strong></p>
+<blockquote><p>Yes, we can! and that's where Just 🤖 comes to the rescue.</p>
+</blockquote>
+<p>In this post, I'll introduce <code>just</code> 📣, as my go-to task runner at the moment, to help you automate the boring stuff.
+We will continue building on our previous project <code>pyfreq</code> from <a href="https://ricky-lim.github.io/blog/build-cli-with-uv/">Build CLI with UV</a>.
+And see how <code>Just</code> can make our development workflow smoother, and maybe even make it a bit just more fun!</p>
+<h2>Why use <code>just</code>?</h2>
+<p>You might be familiar with <code>make</code>, a classic tool for automating tasks especially in C/C++ projects.
+I also wrote a short blog about it <a href="https://ricky-lim.github.io/blog/makefiles-for-scientists-a-guide-to-automation/">here</a>.
+While <code>make</code> is powerful, it was designed for tracking file dependencies and building software, not for running <strong><em>repetitive</em></strong> development commands.</p>
+<p>For Python projects, we often just want to run scripts, tests, or clean up files <strong><em>regardless</em></strong> of whether anything has changed.
+With <code>make</code>, you have to add <code>.PHONY</code> to every target just to force commands to always run, which can feel awkward and cluttered.</p>
+<p>That’s where <code>just</code> shines ☀️:</p>
+<ul>
+<li><strong>Simple syntax:</strong> Recipes are easy to write and read, with no need for <code>.PHONY</code> hacks.</li>
+<li><strong>Flexible arguments:</strong> You can pass arguments to your recipes, making them much more dynamic than typical Makefile targets.</li>
+<li><strong>Runs from anywhere:</strong> You don’t have to be in the project root. <code>just</code> will find your <code>Justfile</code> from subdirectories.</li>
+<li><strong>Just can also run just</strong>: This allows you to <strong>recursively</strong> run <code>just</code> commands within just recipes, making it powerful to avoid duplicating commands.</li>
+<li><strong>Parallel execution</strong>: You can run multiple recipes in <strong>parallel</strong> to just speed up your workflow. Your multiple cores will thank you for it.</li>
+</ul>
+<p>In short: if you want a task runner that’s easy, flexible, and fits ergonomically into your Python projects, just give <code>just</code> a try!</p>
+<h2>1. Install <code>just</code> 🤖</h2>
+<p>If you do not have <code>just</code> yet, please fix it now.
+There are many ways to install <code>just</code>. My favourite way is using <code>cargo</code>: simply <code>cargo install just</code>.
+For other installation methods, please refer to: <a href="https://github.com/casey/just">https://github.com/casey/just</a></p>
+<p>To verify the installation, always check its version:</p>
+<pre><code>$ just --version
+just 1.43.0
+</code></pre>
+<p>If it shows the version, you are good to go!</p>
+<h2>2. Add editor support [optional]</h2>
+<p>If you use <code>vscode</code>, I'd recommend <code>vscode-just</code> extension. But it's optional.</p>
+<h2>3. Create a <code>Justfile</code></h2>
+<p>Create a file named <code>Justfile</code> in the root of your project where your <code>pyproject.toml</code> is located.</p>
+<pre><code class="lang-sh">touch Justfile
+</code></pre>
+<p>Same like when we created <code>Makefile</code>, now we create <code>Justfile</code>.</p>
+<p>Try it out ?</p>
+<pre><code>$ just
+error: Justfile contains no recipes.
+</code></pre>
+<p>It works 🎉! with a very nice error message.</p>
+<p>With that setup, we can start organizing our development workflow into recipes within the <code>Justfile</code>.</p>
+<h2>1. Add a <code>default</code> recipe</h2>
+<pre><code>@_:
+    just --list --unsorted
+</code></pre>
+<p>The <code>@</code> symbol like in <code>Makefile</code> to indicates that the command should be silent (not printed to the terminal).
+The default behavior of <code>just</code> is to print the command to the <code>stderror</code> before executing it.</p>
+<p>The <code>_</code> symbol means that it's private recipe and should not be listed.</p>
+<p>In short this is a private recipe as it's on the top line it will be used as a default recipe when we run <code>just</code>.
+The extra flags <code>--list --unsorted</code> are to list all recipes without sorting them alphabetically, as it appears in the <code>Justfile</code>.
+The <code>--unsorted</code> option is purely a matter of personal preference. I kind of like to see the recipes in the order I wrote them.</p>
+<pre><code>$ just
+Available recipes:
+</code></pre>
+<h2>2. Add the <code>install</code> recipe</h2>
+<p>To make it easy for anyone to set up the project, we’ll add a recipe for that.</p>
+<pre><code># Recreate project from nothing
+fresh: clean install
+
+# Remove temporary files
+clean:
+    rm -rf \
+        .venv .pytest_cache \
+        .mypy_cache .ruff_cache \
+        .coverage htmlcov
+    find . \
+        -type d \
+        -name "__pycache__" \
+        -exec rm -rf {} +
+
+
+# Ensure project virtualenv is up to date
+install:
+    uv sync
+</code></pre>
+<p>The recipe is <code>fresh</code> which depends on <code>clean</code> and <code>install</code> recipes.
+So now we can run <code>just fresh</code> to (re)create our project from scratch.
+Since <code>uv</code> is blazingly fast, it'll finish before you even take a sip of your coffee ☕.</p>
+<h2>3. Add a <code>run</code> and <code>test</code> recipe</h2>
+<p>To simplify running our CLI and tests, we’ll add the following recipes.</p>
+<pre><code># Run our CLI
+[no-exit-message]
+run *args :
+    uv run pyfreq {{ args }}
+
+
+# Run test
+test *args:
+    uv run -m pytest {{ args }}
+</code></pre>
+<p>We annotate the <code>run</code> recipe with <code>[no-exit-message]</code> decorator to suppress Just's exit messages when the CLI fails or exits with non-zero code.
+This keeps our terminal outputt less cluttered and focused on the CLI only.</p>
+<p>By using <code>*args</code>, we can forward any arguments to our CLI, also in the test recipe.
+Now, we can run our CLI using:</p>
+<pre><code># Show our CLI version
+$ just run -v
+uv run pyfreq -v
+0.1.0
+
+# Run the example command
+$ just run develop jokes.txt
+uv run pyfreq develop jokes.txt
+{'develop': 0}
+
+# Run the tests
+ just test
+uv run -m pytest
+=========================================test session starts ====================================================
+...
+</code></pre>
+<h2>4. Add a <code>lint</code>, <code>type</code> and <code>cov</code> test recipes</h2>
+<p>To maintain code quality in a good shape, we'll add recipes for linting, type checking, and test code coverage.</p>
+<p>First, let's install the development dependencies:</p>
+<pre><code># ruff for linting, mypy for type checking, pytest-cov for test coverage
+uv add --dev ruff mypy pytest-cov
+</code></pre>
+<p>Luckily we only need to do this once. After that anyone or even our AI agent can simply run <code>just install</code> and benefit from our coding sweat for free!</p>
+<pre><code class="lang-Justfile"># Run linting
+lint:
+    - uv run -m ruff check --fix --unsafe-fixes .
+    - uv run -m ruff format .
+
+# Run typing
+typing:
+    uv run -m mypy src
+
+# Run tests coverage
+@cov:
+    just _cov erase
+    just _cov run -m pytest
+    just _cov report
+    just _cov html
+
+_cov *args:
+    uv run -m coverage {{ args }}
+</code></pre>
+<p>In the <code>cov</code> recipe, we leverage <code>just</code> to call another recipe <code>_cov</code> to avoid duplicating the coverage commands, which is neat 😎!.</p>
+<h2>5. Organize the recipes</h2>
+<p><code>just</code> also makes it easy to organize recipes with a decorator ️<code>[group(&lt;name&gt;)]</code>.</p>
+<p>For example we can group our <code>clean</code> and <code>install</code> recipes under  <code>setup</code> group.</p>
+<pre><code class="lang-Justfile"># Remove temporary files
+[group(&#39;setup&#39;)]
+clean:
+    rm -rf \
+        .venv .pytest_cache \
+        .mypy_cache .ruff_cache \
+        .coverage htmlcov
+    find . \
+        -type d \
+        -name &quot;__pycache__&quot; \
+        -exec rm -rf {} +
+
+
+# Ensure project virtualenv is up to date
+[group(&#39;setup&#39;)]
+install:
+    uv sync
+</code></pre>
+<p>We further annotate our recipes.
+With these annotations in place, our <code>Justfile</code> now looks like this:</p>
+<pre><code>@_:
+    just --list
+
+
+# Recreate project from nothing
+[group('setup')
+fresh: clean install
+
+
+# Remove temporary files
+[group('setup')]
+clean:
+    rm -rf \
+        .venv .pytest_cache \
+        .mypy_cache .ruff_cache \
+        .coverage htmlcov
+    find . \
+        -type d \
+        -name "__pycache__" \
+        -exec rm -rf {} +
+
+
+# Ensure project virtualenv is up to date
+[group('setup')]
+install:
+    uv sync
+
+
+# Run our CLI
+[group('dev')]
+[no-exit-message]
+run *args :
+    uv run pyfreq {{ args}}
+
+
+# Run test
+[group('dev')]
+test *args:
+    uv run -m pytest {{ args }}
+
+
+# Perform all quality check
+[group('quality')]
+[parallel]
+check-all: lint cov typing
+check-all: lint cov typing
+
+
+# Run linting
+[group('quality')]
+lint:
+    - uv run -m ruff check --fix --unsafe-fixes .
+    - uv run -m ruff format .
+
+
+# Run typing
+[group('quality')]
+typing:
+    uv run -m mypy src
+
+
+# Run tests coverage
+[group('quality')]
+@cov:
+    just _cov erase
+    just _cov run -m pytest
+    just _cov report
+    just _cov html
+
+
+_cov *args:
+    uv run -m coverage {{ args }}
+</code></pre>
+<p>In addition to add the group decorators, we also annotate the <code>check-all</code> recipe with <code>[parallel]</code> decorator to run the linting, typing and coverage recipes in parallel to speed up our quality checks.</p>
+<p>Note that <code>parallel</code> use <code>gnu-parallel</code> behind the curtain so make sure you have it installed.</p>
+<p>Here’s what it looks like when we run <code>just</code>:</p>
+<pre><code class="lang-sh">$ just
+Available recipes:
+    [setup]
+    fresh      # Recreate project from nothing
+    clean      # Remove temporary files
+    install    # Ensure project virtualenv is up to date
+
+    [dev]
+    run *args  # Run our CLI
+    test *args # Run test
+
+    [quality]
+    check-all  # Perform all quality check
+    lint       # Run linting
+    typing     # Run typing
+    cov        # Run tests coverage
+</code></pre>
+<p>Thanks for sticking around ! I hope you find this useful.</p>
+<p>The Github repository for the complete code can be found <a href="https://github.com/ricky-lim/pyfreq/blob/blog/development-workflow-with-just/Justfile">here</a></p>
+<h2>Key Takeaways</h2>
+<p>With <code>just</code>, it's like a cheat code for anyone working on your project to quickly get up to speed with the development workflow.</p>
+<p><strong>Call to Action 📢:</strong></p>
+<p>Instead of writing long <code>README</code> instructions, try putting your instructions into a <code>Justfile</code>.
+This way you will save everyone spend less time reading and more time diving in!</p>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
