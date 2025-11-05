@@ -8,31 +8,41 @@ main_image: image.png
 ---
 body:
 
-We will continue improving our previous project `pyfreq` from [Build CLI with UV](https://ricky-lim.github.io/blog/build-cli-with-uv/) with `Just`.
-In this blog post, I will introduce a tool called `just` and how we can use it to make our development workflow easier.
+As your Python projects grow, running the same commands ***over and over*** again can be **less fun** 😩.
+Things like installing dependencies 💼 , running tests 🛂 or cleaning up temporary files 🧹.
 
-## Why `just`?
+**Wouldn't it be great if we can automate these repetitive tasks with simple, easy to remember commands?**
 
-`make` is a great tool. I also wrote a short blog about it [here](https://ricky-lim.github.io/blog/makefiles-for-scientists-a-guide-to-automation/).
-The simplicity of `make` provides a foundation for further development of many tools. One of them is `just`.
+> Yes, we can! and that's where Just 🤖 comes to the rescue.
 
-> I also want to emphasize that this isn’t about criticizing make, but rather celebrating how it has inspired the evolution of new tools and ideas.
+In this post, I'll introduce `just` 📣, as my go-to task runner at the moment, to help you automate the boring stuff.
+We will continue building on our previous project `pyfreq` from [Build CLI with UV](https://ricky-lim.github.io/blog/build-cli-with-uv/).
+And see how `Just` can make our development workflow smoother, and maybe even make it a bit just more fun!
 
-`make` has been around quite a while and mainly used in C/C++ projects when we need to compile code.
-So the target audience is more towards system programmers.
-While `just` is more focused on running just commands which I think more suitable for python developers.
 
-For example, using `make` for python developers we often need to add `.PHONY` targets to ensure that the commands run every time.
-This is actually not the intended use of `make` because `make` is designed to also track the created files.
-As such if files were created and nothing changed, `make` will skip the commands.
-However most of our python development either in data science or web developemnt, we often just want to run commands again and again and therefore we add `.PHONY` to all targets.
+## Why use `just`?
 
-Another reason I like `just` is because of the `arguments` feature which is not available in `make`.
-The third cool feature is also `just` can be called not only from where the `Justfile` is located but also from subdirectories, so no need to `cd` back to the root directory to run commands.
+You might be familiar with `make`, a classic tool for automating tasks especially in C/C++ projects.
+I also wrote a short blog about it [here](https://ricky-lim.github.io/blog/makefiles-for-scientists-a-guide-to-automation/).
+While `make` is powerful, it was designed for tracking file dependencies and building software, not for running ***repetitive*** development commands.
 
-## 1\. Install `just`
+For Python projects, we often just want to run scripts, tests, or clean up files ***regardless*** of whether anything has changed.
+With `make`, you have to add `.PHONY` to every target just to force commands to always run, which can feel awkward and cluttered.
 
-There are many ways to install `just`. My favourite way is using `cargo`: `cargo install just`.
+That’s where `just` shines ☀️:
+
+- **Simple syntax:** Recipes are easy to write and read, with no need for `.PHONY` hacks.
+- **Flexible arguments:** You can pass arguments to your recipes, making them much more dynamic than typical Makefile targets.
+- **Runs from anywhere:** You don’t have to be in the project root. `just` will find your `Justfile` from subdirectories.
+- **Just can also run just**: This allows you to **recursively** run `just` commands within just recipes, making it powerful to avoid duplicating commands.
+- **Parallel execution**: You can run multiple recipes in **parallel** to just speed up your workflow. Your multiple cores will thank you for it.
+
+In short: if you want a task runner that’s easy, flexible, and fits ergonomically into your Python projects, just give `just` a try!
+
+## 1\. Install `just` 🤖
+
+If you do not have `just` yet, please fix it now.
+There are many ways to install `just`. My favourite way is using `cargo`: simply `cargo install just`.
 For other installation methods, please refer to: https://github.com/casey/just
 
 To verify the installation, always check its version:
@@ -42,7 +52,8 @@ $ just --version
 just 1.43.0
 ```
 
-If it shows the version, installation is good to go!
+If it shows the version, you are good to go!
+
 
 ## 2\. Add editor support [optional]
 
@@ -67,21 +78,23 @@ error: Justfile contains no recipes.
 
 It works 🎉! with a very nice error message.
 
-Now we can start our development lifecycle tasks as recipes in `Justfile`.
+With that setup, we can start organizing our development workflow into recipes within the `Justfile`.
 
 ## 1\. Add a `default` recipe
 
-```Justfile
+```
 @_:
-    just --list
+    just --list --unsorted
 ```
 
 The `@` symbol like in `Makefile` to indicates that the command should be silent (not printed to the terminal).
-The default behavior of `just` is to print the command to the stderror before executing it.
+The default behavior of `just` is to print the command to the `stderror` before executing it.
 
-The `_` symbol means that it's private recipe and should should not be listed
+The `_` symbol means that it's private recipe and should not be listed.
 
-In short this is a private recipe as it's on the top line it will be used as a default recipe when we run `just`
+In short this is a private recipe as it's on the top line it will be used as a default recipe when we run `just`.
+The extra flags `--list --unsorted` are to list all recipes without sorting them alphabetically, as it appears in the `Justfile`.
+The `--unsorted` option is purely a matter of personal preference. I kind of like to see the recipes in the order I wrote them.
 
 ```
 $ just
@@ -90,9 +103,9 @@ Available recipes:
 
 ## 2\. Add the `install` recipe
 
-To ensure that our project can be easily setup, we will add the recipe for that.
+To make it easy for anyone to set up the project, we’ll add a recipe for that.
 
-```Justfile
+```
 # Recreate project from nothing
 fresh: clean install
 
@@ -113,16 +126,18 @@ install:
     uv sync
 ```
 
-Now we can just run `just fresh` to (re)create our project from scratch.
-Since `uv` is blazingly fast, this will be done before we even sip our coffee ☕.
+The recipe is `fresh` which depends on `clean` and `install` recipes.
+So now we can run `just fresh` to (re)create our project from scratch.
+Since `uv` is blazingly fast, it'll finish before you even take a sip of your coffee ☕.
 
 
 ## 3\. Add a `run` and `test` recipe
 
-To make it easy, to run our CLI we can add the following recipes to run our CLI and test:
+To simplify running our CLI and tests, we’ll add the following recipes.
 
-```Justfile
+```
 # Run our CLI
+[no-exit-message]
 run *args :
     uv run pyfreq {{ args }}
 
@@ -132,24 +147,43 @@ test *args:
     uv run -m pytest {{ args }}
 ```
 
-Now we can run our CLI using:
+We annotate the `run` recipe with `[no-exit-message]` decorator to suppress Just's exit messages when the CLI fails or exits with non-zero code.
+This keeps our terminal outputt less cluttered and focused on the CLI only.
+
+By using `*args`, we can forward any arguments to our CLI, also in the test recipe.
+Now, we can run our CLI using:
 
 ```
 # Show our CLI version
 $ just run -v
 uv run pyfreq -v
 0.1.0
+
+# Run the example command
+$ just run develop jokes.txt
+uv run pyfreq develop jokes.txt
+{'develop': 0}
+
+# Run the tests
+ just test
+uv run -m pytest
+=========================================test session starts ====================================================
+...
+
 ```
 
 ## 4\. Add a `lint`, `type` and `cov` test recipes
 
-To ensure code quality, we will add recipes for linting, type checking, and test code coverage.
+To maintain code quality in a good shape, we'll add recipes for linting, type checking, and test code coverage.
 
-We will first install the development dependencies:
+First, let's install the development dependencies:
 
 ```
+# ruff for linting, mypy for type checking, pytest-cov for test coverage
 uv add --dev ruff mypy pytest-cov
 ```
+
+Luckily we only need to do this once. After that anyone or even our AI agent can simply run `just install` and benefit from our coding sweat for free!
 
 ```Justfile
 # Run linting
@@ -172,23 +206,13 @@ _cov *args:
     uv run -m coverage {{ args }}
 ```
 
-Now our `just` has the following recipe:
-
-```sh
-Available recipes:
-    clean   # Remove temporary files
-    cov     # Run tests coverage
-    fresh   # Recreate project from nothing
-    install # Ensure project virtualenv is up to date
-    lint    # Run linting
-    typing  # Run typing
-```
+In the `cov` recipe, we leverage `just` to call another recipe `_cov` to avoid duplicating the coverage commands, which is neat 😎!.
 
 ## 5\. Organize the recipes
 
-`just` also makes it easy to organize recipes with a decorator `[group(<name>)]`.
+`just` also makes it easy to organize recipes with a decorator ️`[group(<name>)]`.
 
-For example we want to group our clean and install recipes under `setup` group.
+For example we can group our `clean` and `install` recipes under  `setup` group.
 
 ```Justfile
 # Remove temporary files
@@ -211,16 +235,15 @@ install:
 ```
 
 We further annotate our recipes.
+With these annotations in place, our `Justfile` now looks like this:
 
-This is how our `Justfile` looks like:
-
-```Justfile
+```
 @_:
     just --list
 
 
 # Recreate project from nothing
-[group('setup')]
+[group('setup')
 fresh: clean install
 
 
@@ -245,6 +268,7 @@ install:
 
 # Run our CLI
 [group('dev')]
+[no-exit-message]
 run *args :
     uv run pyfreq {{ args}}
 
@@ -257,6 +281,8 @@ test *args:
 
 # Perform all quality check
 [group('quality')]
+[parallel]
+check-all: lint cov typing
 check-all: lint cov typing
 
 
@@ -287,31 +313,40 @@ _cov *args:
 
 ```
 
-This is now how it looks like when we run `just`:
+In addition to add the group decorators, we also annotate the `check-all` recipe with `[parallel]` decorator to run the linting, typing and coverage recipes in parallel to speed up our quality checks.
+
+Note that `parallel` use `gnu-parallel` behind the curtain so make sure you have it installed.
+
+Here’s what it looks like when we run `just`:
 
 ```sh
-➜ just
+$ just
 Available recipes:
+    [setup]
+    fresh      # Recreate project from nothing
+    clean      # Remove temporary files
+    install    # Ensure project virtualenv is up to date
+
     [dev]
     run *args  # Run our CLI
     test *args # Run test
 
     [quality]
     check-all  # Perform all quality check
-    cov        # Run tests coverage
     lint       # Run linting
     typing     # Run typing
-
-    [setup]
-    clean      # Remove temporary files
-    fresh      # Recreate project from nothing
-    install    # Ensure project virtualenv is up to date
+    cov        # Run tests coverage
 ```
 
-This is very neat so we can help ourselves and others to navigate the development lifecycle of our project, as smooth as possible.
-Then we can simplify our `README.md` to include the `just` commands for development .
-With `Justfile` in place, our `README.md` should be as lean as possible to save ourselves and others time to get started.
+Thanks for sticking around ! I hope you find this useful.
+
 
 ## Key Takeaways
 
-With `just` we can automate our development lifecycle to make it easy for ourselves and others to develop our project.
+With `just`, it's like a cheat code for anyone working on your project to quickly get up to speed with the development workflow.
+
+
+**Call to Action 📢:**
+
+Instead of writing long `README` instructions, try putting your instructions into a `Justfile`.
+This way you will save everyone spend less time reading and more time diving in!
