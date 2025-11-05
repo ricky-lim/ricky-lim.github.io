@@ -2,7 +2,7 @@ title: Development Workflow with Just
 ---
 author: Ricky Lim
 ---
-pub_date: 2025-11-02
+pub_date: 2025-11-05
 ---
 main_image: image.png
 ---
@@ -339,6 +339,8 @@ Available recipes:
 ```
 
 Thanks for sticking around ! I hope you find this useful.
+
+The Github repository for the complete code can be found [here](https://github.com/ricky-lim/pyfreq/blob/blog/development-workflow-with-just/Justfile)
 
 
 ## Key Takeaways
