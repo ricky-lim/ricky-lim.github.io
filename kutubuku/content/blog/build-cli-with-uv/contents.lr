@@ -359,7 +359,7 @@ Our structure now looks like the following:
 └── uv.lock
 ```
 
-To explore more, check out the full code on [GitHub Repository](https://github.com/ricky-lim/pyfreq)
+To explore more, check out the full code on [GitHub Repository](https://github.com/ricky-lim/pyfreq/tree/blog/build-cli-with-uv)
 
 ## Key takeaways
 
