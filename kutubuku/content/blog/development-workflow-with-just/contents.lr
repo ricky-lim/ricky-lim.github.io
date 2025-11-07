@@ -283,7 +283,6 @@ test *args:
 [group('quality')]
 [parallel]
 check-all: lint cov typing
-check-all: lint cov typing
 
 
 # Run linting
