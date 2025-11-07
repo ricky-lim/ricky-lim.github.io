@@ -239,7 +239,7 @@ With these annotations in place, our `Justfile` now looks like this:
 
 ```
 @_:
-    just --list
+    just --list --unsorted
 
 
 # Recreate project from nothing
