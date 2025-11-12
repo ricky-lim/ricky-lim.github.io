@@ -1,0 +1,75 @@
+title: Podman on WSL as an Alternative to Docker Desktop
+---
+author: Ricky Lim
+---
+pub_date: 2025-11-12
+---
+main_image: image.png
+---
+body:
+
+Looking for a free, open-source alternative to Docker Desktop on Windows?
+Try Podman + WSL2!
+
+I’ve set it up myself and will share my experience here.
+
+## Why Podman with WSL ?
+
+- Open source & Free: Podman is an open-source container engine plus as a desktop application with no license restrictions.
+- WSL Integration: Leverage your existing Linux tooling on Windows with WSL2 integration.
+
+### Getting started: Step by Step
+
+1\. Install Podman Desktop
+
+First, download and install Podman Desktop from their official website.
+
+2\. Choose WSL2 during setup
+
+When installing Podman Desktop, **make sure to select the option to integrate with WSL2**.
+This will create a dedicated "Podman Machine" within WSL2 to run your containers.
+
+3\. Start your Podman Machine
+
+After installation, you might need to start the Podman machine manually.
+Head over to your WSL terminal and run:
+
+```sh
+podman machine start
+```
+
+Let's it spin up!
+
+4\. Find your podman machine's IP address [Optional]
+
+This is useful during web app development to access your containerized web apps.
+To get the IP address, run this command in your WSL terminal:
+
+```sh
+wsl -d podman-machine-default ip -4 addr show eth0 | grep inet
+```
+
+- `wsl -d podman-machine-default`: This tells WSL to execute the following command within the "podman-machine-default" distribution (which is where Podman creates its virtual machine). The name may vary slightly, but it usually includes podman-machine.
+- `ip -4 addr show eth0`: This command lists IP addresses of network interfaces. We're focusing on the primary interface (eth0).
+- `grep inet`: Filters the output to only show lines containing "inet," which indicate an IPv4 address.
+
+5\. Run your first Podman container
+
+Let’s See It In Action: Deploying a Basic Web Server:
+
+```sh
+podman run -p 8080:80 nginx
+```
+
+What's Happening? This command downloads a pre-built Nginx web server image from the internet.
+It also tells Podman to forward traffic coming in on port 8080 of your Windows machine to port 80 inside the container,
+allowing you to access it through your browser.
+
+6\. Test your container
+
+Open your web browser and navigate to `http://<PODMAN_MACHINE_IP>:8080` (replace `<PODMAN_MACHINE_IP>` with the IP address you obtained earlier).
+You should see the default Nginx welcome page, confirming that your container is up and running 🥳
+
+## Key Takeaways
+
+Podmand with WSL2 provides a free-to-use alternative to Docker Desktop, leveraging the benefits of containerization without the licensing restrictions.
