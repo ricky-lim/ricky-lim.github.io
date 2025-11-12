@@ -2,23 +2,23 @@ title: Podman on WSL as an Alternative to Docker Desktop
 ---
 author: Ricky Lim
 ---
-pub_date: 2025-11-09
+pub_date: 2025-11-12
 ---
 main_image: image.png
 ---
 body:
 
-Docker desktop has been the main tool for running Docker containers especially on Windows and Mac.
-However if you're restricted by the license constraints of Docker Desktop, Podman might be a great alternative to consider.
+Looking for a free, open-source alternative to Docker Desktop on Windows?
+Try Podman + WSL2!
 
-Here, I'll share my experience setting up Podman on WSL (Windows Subsytem for LInux). Let's get started!
+I’ve set it up myself and will share my experience here.
 
 ## Why Podman with WSL ?
 
-- Open source & Free: Podman is an open-source container engine and also desktop application that is currently not subject to license restrictions like Docker Desktop.
-- WSL Integration: WSL provides compatibility with Linux tools, making it an ideal environment for container development on Windows.
+- Open source & Free: Podman is an open-source container engine plus as a desktop application with no license restrictions.
+- WSL Integration: Leverage your existing Linux tooling on Windows with WSL2 integration.
 
-## Getting started: Step by Step
+### Getting started: Step by Step
 
 1\. Install Podman Desktop
 
@@ -40,10 +40,10 @@ podman machine start
 
 Let's it spin up!
 
-4\. Find your podman machine's IP address
+4\. Find your podman machine's IP address [Optional]
 
 This is useful during web app development to access your containerized web apps.
-Run this command in your WSL terminal:
+To get the IP address, run this command in your WSL terminal:
 
 ```sh
 wsl -d podman-machine-default ip -4 addr show eth0 | grep inet
@@ -55,13 +55,15 @@ wsl -d podman-machine-default ip -4 addr show eth0 | grep inet
 
 5\. Run your first Podman container
 
-Now, let's give it a try by running a simple Nginx web server:
+Let’s See It In Action: Deploying a Basic Web Server:
 
 ```sh
 podman run -p 8080:80 nginx
 ```
 
-This command pulls the Nginx image and maps port 80 in the container to port 8080 on your host machine.
+What's Happening? This command downloads a pre-built Nginx web server image from the internet.
+It also tells Podman to forward traffic coming in on port 8080 of your Windows machine to port 80 inside the container,
+allowing you to access it through your browser.
 
 6\. Test your container
 
@@ -70,4 +72,4 @@ You should see the default Nginx welcome page, confirming that your container is
 
 ## Key Takeaways
 
-Podmand with WSL2 provides a free-to-use alternative to Docker Desktop, leveraging the benefits of containerization without the licensing constraints.
+Podmand with WSL2 provides a free-to-use alternative to Docker Desktop, leveraging the benefits of containerization without the licensing restrictions.
