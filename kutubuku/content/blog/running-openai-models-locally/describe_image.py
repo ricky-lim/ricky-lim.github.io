@@ -12,7 +12,6 @@ model_name = "rlim-agent"
 
 prompt = """
 You are an AI model that describes images in JSON format.
-The JSON should contain two fields: "who" and "where".
 """
 
 json_schema = {

@@ -9,50 +9,67 @@ main_image: image.png
 body:
 
 Running open AI models locally offers several advantages, particularly when it comes to **data privacy**.
-Think about when you want to summarize your sensitive documents like your bank statements or medical records.
-Would you want to upload them to a third-party AI service? Probably not.
+Think about when you want to **summarize** or **parse** information from your sensitive documents like your bank statements or medical records.
+Would you want to upload them to a third-party AI service? Probably ***not***.
 
-In this post, I'll share my experience running OpenAI models locally.
+In this post, I'll share my experience running OpenAI models locally on my personal laptop using Ollama.
 
-## What is OpenAI models?
+## What are OpenAI models?
 
-The core idea of AI models are token generators that produce tokens after tokens.
-How does the model work given our input text?
+At their core, AI models are simply **token generators** that produce one token after another to produce text.
+Here's a simplified look at how they work:
 
-1\. Our input text is first **tokenized** into tokens. a word may be split into multiple tokens.
+**1\. Tokenization**
+
+Your input is first brokend down into tokens. A single word may be split into multiple tokens.
 Why tokens? Instead of human words that can be ambiguous with different languages, tokens are standardized units for the model to consume.
-The tokenization will output a list of token ids.
 
-2\. The tokens ids are then passed into the model.
-The model architecture looks like a stack of layers where every connection has weights.
+The tokenizer outputs a list of numerical **token ids**.
 
-3\. The model will then generate candidate output tokens.
-For example: "The most used programming language for data science is <python: 80%>, <R: 15%>, <Javascript: 5%>".
+**2\. Passing tokens through the model**
+
+These token IDs are consumed into the model, which consists of many interconnected layers like neurons.
+Each connection has a weight that was learned during training.
+
+**3\. Generating the next token**
+
+The model then generate candidate next tokens.
+
+For example:
+
+**"The most used programming language for data science is <python: 80%>, <R: 15%>, <Javascript: 5%>".**
+
 The percentage is the probability of each token to be selected and this can be configured within the model parameters.
-Then the output will be "The most used programming language for data science is python".
+
+Final output:
+
+**"The most used programming language for data science is python".**
 
 
-What do we mean by OpenAI models?
-The ones that are being opened are the model weights and architecture, not the training code or the training data.
-This means when we run the model locally, we just use the pre-trained weights.
+### What does "Open" mean in "OpenAI models"?
+
+"open" in this context mainly refers to the **model weights** being open sourced, not the training code or the training data.
+This means when you run the model locally, you're using these **pre-trained** weights.
+
+The good news is that the performance of Open AI models have caught up significantly, making them practical for local use.
 
 ## Can we run on my machine?
 
-The good news is the performanc of Open AI models have catched up significantly that is suitable for our local use.
-Thanks to the quantization techniques we can now run them without requiring massive virtual memory.
-Long story short, quantization is a technique that converts the model weights from floats to integers, which reduces the model size significantly(about 1/4).
+Thanks to quantization techniques, we can now run these models without requiring massive virtual memory.
 
-To quickly get the idea of lower-bound memory requirements for the model, I used this "back-of-the-envelope" formula:
+In short, quantization converts model weights from floats to integers, which shrinks the model size dramatically (about 1/4 of the original).
+
+To quickly estimate the lower-bound memory requirements for a model, I use this simple "back-of-the-envelope" rule:
 
 ```
 Memory (in GB) = (Model size in billions of parameters) x 3 GB
 ```
-For example `gemma3:27b` means the model has 27 billion parameters. So the memory requirement is approximately `27 x 3 = 81 GB`.
-With quantization, we can reduce it further to about 1/4, which is around `20 GB`.
+For example `gemma3:27b` has 27 billion parameters, so it requires roughly `27 x 3 = 81 GB`.
+With quantization, that drops to about 1/4, which is around `20 GB`.
 
-## How to run on my machine?
+## How do I run it on my machine?
 
-My current favourite tool is [Ollama](https://ollama.com/), which works like Docker for AI models.
+My go-to tool is [Ollama](https://ollama.com/), which works like Docker but for AI models.
 
 You can install Ollama from their [official website](https://ollama.com/download).
 
@@ -116,9 +133,10 @@ This shows the model information that we can tweak.
 
 The first information that is important is the `context length`, think about it like the memory of the model.
 The longer the context length, the more information the model will remember.
-The `context_length` shown here is actually the max context length not the one that the model is currently using.
-Let's configure the context length to 10,000 tokens.
-Watch out that the larger context length will consume more memory!
+Watch out ! The `context_length` shown here is actually the **maximum** context length **not** the one that the model is currently using ⚠️.
+
+Let's configure the context length to 10_000 tokens.
+Keep in mind that the larger context length will also consume more memory!
 
 ```sh
 >>> /set num_ctx 10000
@@ -129,6 +147,7 @@ Another parameter that I like to tweak is the `temperature`, controlling the ran
 A lower temperature means the model will be more deterministic, while the higher value means the model will be more creative.
 
 ```sh
+# Example to make it more deterministic
 >>> /set temperature 0.3
 ```
 
@@ -167,15 +186,15 @@ $ ollama run gemma3:27b-it-qat
 Your name is Ricky Lim. A rather straightforward question, and one easily answered given your prior statement.
 ```
 
-Nice! now my model session can remember my name.
+Awesome! now my model session can remember my name.
 
 ## How can I create my customized model?
 
 Customization of the model via ollama terminal can be done by setting the parameters interactively, but can we automate it?
 
-Yes, we can like `Dockerfile`, we can create a `Modelfile` to provide the blueprint of our customized model.
+Yes, we can! Like `Dockerfile`, we can create a `Modelfile` to provide the blueprint of our customized model.
 
-Here is an example of the `Modelfile`of our previous session:
+Here is an example of the `Modelfile` of our previous session:
 
 ```
 FROM gemma3:27b-it-qat
@@ -209,7 +228,8 @@ gemma3:27b-it-qat       29eb0b9aeda3    18 GB    25 hours ago
 
 As you can see now I have three models, the base model `gemma3:27b-it-qat`, my saved session `ricky-session` and my customized model `rlim-agent`.
 It looks like I have three models consuming about 54 GB of disk space.
-Luckily, this is not the case as Ollama uses a layered file system like Docker, so it saves only the delta between the derivative models and the base model.
+Luckily, **this is not the case** as Ollama uses a layered file system like Docker, so it saves only the delta between the derivative models and the base model.
+In other words, it's not really consuming 54 GB, but only about 18 GB + small deltas for the other two derivative models.
 
 Now we can run our customized model directly:
 
@@ -228,9 +248,10 @@ rlim-agent:latest    49858041cab9    23 GB    100% GPU     10000      4 minutes 
 ```
 Now we can see that the model is consuming about 23 GB of memory with 10,000 context length.
 Also the `UNTIL` column shows when the model will be unloaded from memory due to inactivity.
-Default is 5 minutes, but we can change it when run using the `--keepalive` flag.
+Default is 5 minutes, but we can change it. When running the model using the `--keepalive` flag.
 
 ```sh
+# Keep it alive for 60 minutes
 $ ollama run rlim-agent --keepalive 60m
 $ ollama ps
 NAME                 ID              SIZE     PROCESSOR    CONTEXT    UNTIL
@@ -239,8 +260,8 @@ rlim-agent:latest    49858041cab9    23 GB    100% GPU     10000      59 minutes
 
 ## Use case: Image description
 
-Since our customized model is also capabale of computer vision, we can use it to describe images locally without uploading them to third-party services.
-For this use case, I created a simple [python script](./describe_image.py) that uses the `ollama` python package to interact with the model.
+Since our customized model also supports computer vision, we can use it to describe images locally without uploading them to third-party services.
+For this, I created a simple [python script](./describe_image.py) that uses the `ollama` python package to interact with the model.
 
 Here is the script looks like:
 
@@ -249,7 +270,6 @@ model_name = "rlim-agent"
 
 prompt = """
 You are an AI model that describes images in JSON format.
-The JSON should contain two fields: "who" and "where".
 """
 
 json_schema = {
@@ -285,26 +305,33 @@ def describe(image_path):
 
 ```
 
-It is very straightforward, that we provide the following logics to the model:
+The script is quite straightforward. We provide the model with three key pieces of information:
 
-1\. The system prompt for the model instructions
-2\. The JSON schema so we can have a structured output
-3\. The image path to be described
+1\. **The system prompt** for the model instructions
+
+2\. **The JSON schema** so we can have a structured output
+
+3\. **The image path** for the model to describe
 
 You can run the script like this:
 
-This is `me.png` image:
+For example with a `me.png` image:
 
 ![](./me-small.png)
 
 ```sh
+# Before run ensure that the ollama server is running.
 $ uv run describe_image.py me.png
-{"who": "Ricky Lim", "where": "Emirates Stadium"}
+{
+  "who": "Ricky Lim",
+  "where": "Emirates Stadium, London, UK"
+}
 ```
 
-Voila! my customized model can describe my image!
+Voila 🥳! my customized model can describe my image at the home of Arsenal FC!
 
 ## Key takeaways
 
-- Thanks to quantization, we can now run Open AI models locally on our machines.
+- Thanks to quantization, we can now run Open AI models locally on our machines, keeping our data private.
 - Ollama makes it easy to run and customize OpenAI models locally.
+- Define your model customization using a `Modelfile`, like with `Dockerfile`.
