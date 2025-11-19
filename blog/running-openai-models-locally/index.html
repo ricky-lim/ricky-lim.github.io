@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Running OpenAI models locally — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Running OpenAI models locally" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Running OpenAI models locally</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-11-19
+  </p>
+  <p>Running open AI models locally offers several advantages, particularly when it comes to <strong>data privacy</strong>.
+Think about when you want to <strong>summarize</strong> or <strong>parse</strong> information from your sensitive documents like your bank statements or medical records.
+Would you want to upload them to a third-party AI service? Probably <strong><em>not</em></strong>.</p>
+<p>In this post, I'll share my experience running OpenAI models locally on my personal laptop using Ollama.</p>
+<h2>What are OpenAI models?</h2>
+<p>At their core, AI models are simply <strong>token generators</strong> that produce one token after another to produce text.
+Here's a simplified look at how they work:</p>
+<p><strong>1. Tokenization</strong></p>
+<p>Your input is first brokend down into tokens. A single word may be split into multiple tokens.
+Why tokens? Instead of human words that can be ambiguous with different languages, tokens are standardized units for the model to consume.</p>
+<p>The tokenizer outputs a list of numerical <strong>token ids</strong>.</p>
+<p><strong>2. Passing tokens through the model</strong></p>
+<p>These token IDs are consumed into the model, which consists of many interconnected layers like neurons.
+Each connection has a weight that was learned during training.</p>
+<p><strong>3. Generating the next token</strong></p>
+<p>The model then generate candidate next tokens.</p>
+<p>For example:</p>
+<p><strong>"The most used programming language for data science is &lt;python: 80%&gt;, &lt;R: 15%&gt;, &lt;Javascript: 5%&gt;".</strong></p>
+<p>The percentage is the probability of each token to be selected and this can be configured within the model parameters.</p>
+<p>Final output:</p>
+<p><strong>"The most used programming language for data science is python".</strong></p>
+<h3>What does "Open" mean in "OpenAI models"?</h3>
+<p>"open" in this context mainly refers to the <strong>model weights</strong> being open sourced, not the training code or the training data.
+This means when you run the model locally, you're using these <strong>pre-trained</strong> weights.</p>
+<p>The good news is that the performance of Open AI models have caught up significantly, making them practical for local use.</p>
+<h2>Can we run on my machine?</h2>
+<p>Thanks to quantization techniques, we can now run these models without requiring massive virtual memory.</p>
+<p>In short, quantization converts model weights from floats to integers, which shrinks the model size dramatically (about 1/4 of the original).</p>
+<p>To quickly estimate the lower-bound memory requirements for a model, I use this simple "back-of-the-envelope" rule:</p>
+<pre><code>Memory (in GB) = (Model size in billions of parameters) x 3 GB
+</code></pre>
+<p>For example <code>gemma3:27b</code> has 27 billion parameters, so it requires roughly <code>27 x 3 = 81 GB</code>.
+With quantization, that drops to about 1/4, which is around <code>20 GB</code>.</p>
+<h2>How do I run it on my machine?</h2>
+<p>My go-to tool is <a href="https://ollama.com/">Ollama</a>, which works like Docker but for AI models.</p>
+<p>You can install Ollama from their <a href="https://ollama.com/download">official website</a>.</p>
+<p>Once installed, you can now run OpenAI models locally.</p>
+<pre><code>$ ollama run gemma3:27b-it-qat
+</code></pre>
+<p>If you run it for the first time, it will pull the model from their registry and load it into memory to run.</p>
+<p>Once run, you can interact with the model naturally.</p>
+<pre><code class="lang-sh">&gt;&gt;&gt; What can you do ?
+
+I&#39;m Gemma, a large language model created by the Gemma team at Google DeepMind. I&#39;m an open-weights AI assistant, which means I&#39;m widely available to the public!
+
+I take text *and* images as inputs and output text only. I&#39;m pretty good at:
+
+*   **Generating creative text formats:** Poems, code, scripts, musical pieces, email, letters, etc. I&#39;ll try my best to follow your requirements.
+*   **Answering your questions in a comprehensive and informative way.** I can draw upon a vast knowledge base, though my knowledge is limited to what I was trained on and I don&#39;t have access to real-time information.
+*   **Following your instructions and completing your requests thoughtfully.**
+
+I&#39;m still under development, but I&#39;m learning new things every day.
+
+**Important things to note:**
+
+*   I don&#39;t have access to tools, real-time information or Google search.
+*   I can receive images as input but will only output text.
+*   I am an open weights model, widely available to the public.
+*   I was trained by Google DeepMind.
+
+
+What can I help you with today?
+</code></pre>
+<p>You can also interact with the ollama command directly. For example:</p>
+<pre><code class="lang-sh">&gt;&gt;&gt; /show info
+  Model
+    architecture        gemma3
+    parameters          27.4B
+    context length      131072
+    embedding length    5376
+    quantization        Q4_0
+
+  Capabilities
+    completion
+    vision
+
+  Parameters
+    temperature    1
+    top_k          64
+    top_p          0.95
+    stop           &quot;&lt;end_of_turn&gt;&quot;
+</code></pre>
+<p>This shows the model information that we can tweak.</p>
+<p>The first information that is important is the <code>context length</code>, think about it like the memory of the model.
+The longer the context length, the more information the model will remember.
+Watch out ! The <code>context_length</code> shown here is actually the <strong>maximum</strong> context length <strong>not</strong> the one that the model is currently using ⚠️.</p>
+<p>Let's configure the context length to 10_000 tokens.
+Keep in mind that the larger context length will also consume more memory!</p>
+<pre><code class="lang-sh">&gt;&gt;&gt; /set num_ctx 10000
+Set parameter &#39;num_ctx&#39; to &#39;10000&#39;
+</code></pre>
+<p>Another parameter that I like to tweak is the <code>temperature</code>, controlling the randomness of the output or the creativity of the model.
+A lower temperature means the model will be more deterministic, while the higher value means the model will be more creative.</p>
+<pre><code class="lang-sh"># Example to make it more deterministic
+&gt;&gt;&gt; /set temperature 0.3
+</code></pre>
+<p>To provide a base instruction to the model, we can also add the system prompt. It's like setting the behavior for the model.
+For example:</p>
+<pre><code class="lang-sh">&gt;&gt;&gt; /set system &quot;&quot;&quot;
+You&#39;re a helpful and critical assistant.
+Your answer should be concise.&quot;&quot;&quot;
+</code></pre>
+<p>Now we can also provide our input message.</p>
+<pre><code class="lang-sh">&gt;&gt;&gt; Hi I&#39;m Ricky Lim
+Greetings, Ricky Lim. It&#39;s efficient that you&#39;ve introduced yourself. How may I be of assistance today? Be specific; brevity is appreciated.
+</code></pre>
+<p>To also save our model session, we can <code>/save &lt;session_name&gt;</code> and load it later with <code>/load &lt;session_name&gt;</code>.</p>
+<p>For example:</p>
+<pre><code class="lang-sh">&gt;&gt;&gt; /save ricky-session
+Created new model &#39;ricky-session&#39;
+&gt;&gt;&gt; /bye
+</code></pre>
+<p>Then you can resume the session later:</p>
+<pre><code class="lang-sh">$ ollama run gemma3:27b-it-qat
+&gt;&gt;&gt; /load ricky-session
+&gt;&gt;&gt; what is my name?
+Your name is Ricky Lim. A rather straightforward question, and one easily answered given your prior statement.
+</code></pre>
+<p>Awesome! now my model session can remember my name.</p>
+<h2>How can I create my customized model?</h2>
+<p>Customization of the model via ollama terminal can be done by setting the parameters interactively, but can we automate it?</p>
+<p>Yes, we can! Like <code>Dockerfile</code>, we can create a <code>Modelfile</code> to provide the blueprint of our customized model.</p>
+<p>Here is an example of the <code>Modelfile</code> of our previous session:</p>
+<pre><code>FROM gemma3:27b-it-qat
+
+PARAMETER num_ctx 10000
+PARAMETER temperature 0.3
+
+SYSTEM """
+You're a helpful and critical assistant.
+Your answer should be concise.
+"""
+
+MESSAGE user Hi I'm Ricky Lim
+</code></pre>
+<p>You can then build the model using the following command:</p>
+<pre><code class="lang-sh">$ ollama create rlim-agent -f Modelfile
+gathering model components
+....
+
+# To list the created model
+$ ollama list
+NAME                    ID              SIZE     MODIFIED
+rlim-agent:latest       49858041cab9    18 GB    6 seconds ago
+ricky-session:latest    1b3bb0f1fea8    18 GB    6 minutes ago
+gemma3:27b-it-qat       29eb0b9aeda3    18 GB    25 hours ago
+</code></pre>
+<p>As you can see now I have three models, the base model <code>gemma3:27b-it-qat</code>, my saved session <code>ricky-session</code> and my customized model <code>rlim-agent</code>.
+It looks like I have three models consuming about 54 GB of disk space.
+Luckily, <strong>this is not the case</strong> as Ollama uses a layered file system like Docker, so it saves only the delta between the derivative models and the base model.
+In other words, it's not really consuming 54 GB, but only about 18 GB + small deltas for the other two derivative models.</p>
+<p>Now we can run our customized model directly:</p>
+<pre><code class="lang-sh">$ ollama run rlim-agent
+&gt;&gt;&gt; what is my name?
+Your name is Ricky Lim.
+</code></pre>
+<p>Ollama also provides a nice way to monitor the running models:</p>
+<pre><code class="lang-sh">$ ollama ps
+NAME                 ID              SIZE     PROCESSOR    CONTEXT    UNTIL
+rlim-agent:latest    49858041cab9    23 GB    100% GPU     10000      4 minutes from now
+</code></pre>
+<p>Now we can see that the model is consuming about 23 GB of memory with 10,000 context length.
+Also the <code>UNTIL</code> column shows when the model will be unloaded from memory due to inactivity.
+Default is 5 minutes, but we can change it. When running the model using the <code>--keepalive</code> flag.</p>
+<pre><code class="lang-sh"># Keep it alive for 60 minutes
+$ ollama run rlim-agent --keepalive 60m
+$ ollama ps
+NAME                 ID              SIZE     PROCESSOR    CONTEXT    UNTIL
+rlim-agent:latest    49858041cab9    23 GB    100% GPU     10000      59 minutes from now
+</code></pre>
+<h2>Use case: Image description</h2>
+<p>Since our customized model also supports computer vision, we can use it to describe images locally without uploading them to third-party services.
+For this, I created a simple <a href="describe_image.py">python script</a> that uses the <code>ollama</code> python package to interact with the model.</p>
+<p>Here is the script looks like:</p>
+<pre><code class="lang-python">model_name = &quot;rlim-agent&quot;
+
+prompt = &quot;&quot;&quot;
+You are an AI model that describes images in JSON format.
+&quot;&quot;&quot;
+
+json_schema = {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: {
+        &quot;who&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;description&quot;: &quot;Description of the person(s) in the image.&quot;,
+        },
+        &quot;where&quot;: {
+            &quot;type&quot;: &quot;string&quot;,
+            &quot;description&quot;: &quot;Description of the location or setting of the image.&quot;,
+        },
+    },
+    &quot;required&quot;: [&quot;who&quot;, &quot;where&quot;],
+}
+
+
+def describe(image_path):
+    response = ollama.chat(
+        model=model_name,
+        messages=[
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: prompt,
+                &quot;images&quot;: [image_path],
+            }
+        ],
+        format=json_schema,
+        stream=False,
+    )
+    return response[&quot;message&quot;][&quot;content&quot;]
+</code></pre>
+<p>The script is quite straightforward. We provide the model with three key pieces of information:</p>
+<p>1. <strong>The system prompt</strong> for the model instructions</p>
+<p>2. <strong>The JSON schema</strong> so we can have a structured output</p>
+<p>3. <strong>The image path</strong> for the model to describe</p>
+<p>You can run the script like this:</p>
+<p>For example with a <code>me.png</code> image:</p>
+<p><img src="me-small.png" alt=""></p>
+<pre><code class="lang-sh"># Before run ensure that the ollama server is running.
+$ uv run describe_image.py me.png
+{
+  &quot;who&quot;: &quot;Ricky Lim&quot;,
+  &quot;where&quot;: &quot;Emirates Stadium, London, UK&quot;
+}
+</code></pre>
+<p>Voila 🥳! my customized model can describe my image at the home of Arsenal FC!</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>Thanks to quantization, we can now run Open AI models locally on our machines, keeping our data private.</li>
+<li>Ollama makes it easy to run and customize OpenAI models locally.</li>
+<li>Define your model customization using a <code>Modelfile</code>, like with <code>Dockerfile</code>.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
