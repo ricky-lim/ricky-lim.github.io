@@ -1,0 +1,337 @@
+title: Running OpenAI models locally
+---
+author: Ricky Lim
+---
+pub_date: 2025-11-19
+---
+main_image: image.png
+---
+body:
+
+Running open AI models locally offers several advantages, particularly when it comes to **data privacy**.
+Think about when you want to **summarize** or **parse** information from your sensitive documents like your bank statements or medical records.
+Would you want to upload them to a third-party AI service? Probably ***not***.
+
+In this post, I'll share my experience running OpenAI models locally on my personal laptop using Ollama.
+
+## What are OpenAI models?
+
+At their core, AI models are simply **token generators** that produce one token after another to produce text.
+Here's a simplified look at how they work:
+
+**1\. Tokenization**
+
+Your input is first brokend down into tokens. A single word may be split into multiple tokens.
+Why tokens? Instead of human words that can be ambiguous with different languages, tokens are standardized units for the model to consume.
+
+The tokenizer outputs a list of numerical **token ids**.
+
+**2\. Passing tokens through the model**
+
+These token IDs are consumed into the model, which consists of many interconnected layers like neurons.
+Each connection has a weight that was learned during training.
+
+**3\. Generating the next token**
+
+The model then generate candidate next tokens.
+
+For example:
+
+**"The most used programming language for data science is <python: 80%>, <R: 15%>, <Javascript: 5%>".**
+
+The percentage is the probability of each token to be selected and this can be configured within the model parameters.
+
+Final output:
+
+**"The most used programming language for data science is python".**
+
+
+### What does "Open" mean in "OpenAI models"?
+
+"open" in this context mainly refers to the **model weights** being open sourced, not the training code or the training data.
+This means when you run the model locally, you're using these **pre-trained** weights.
+
+The good news is that the performance of Open AI models have caught up significantly, making them practical for local use.
+
+## Can we run on my machine?
+
+Thanks to quantization techniques, we can now run these models without requiring massive virtual memory.
+
+In short, quantization converts model weights from floats to integers, which shrinks the model size dramatically (about 1/4 of the original).
+
+To quickly estimate the lower-bound memory requirements for a model, I use this simple "back-of-the-envelope" rule:
+
+```
+Memory (in GB) = (Model size in billions of parameters) x 3 GB
+```
+For example `gemma3:27b` has 27 billion parameters, so it requires roughly `27 x 3 = 81 GB`.
+With quantization, that drops to about 1/4, which is around `20 GB`.
+
+## How do I run it on my machine?
+
+My go-to tool is [Ollama](https://ollama.com/), which works like Docker but for AI models.
+
+You can install Ollama from their [official website](https://ollama.com/download).
+
+Once installed, you can now run OpenAI models locally.
+
+```
+$ ollama run gemma3:27b-it-qat
+```
+
+If you run it for the first time, it will pull the model from their registry and load it into memory to run.
+
+Once run, you can interact with the model naturally.
+
+```sh
+>>> What can you do ?
+
+I'm Gemma, a large language model created by the Gemma team at Google DeepMind. I'm an open-weights AI assistant, which means I'm widely available to the public!
+
+I take text *and* images as inputs and output text only. I'm pretty good at:
+
+*   **Generating creative text formats:** Poems, code, scripts, musical pieces, email, letters, etc. I'll try my best to follow your requirements.
+*   **Answering your questions in a comprehensive and informative way.** I can draw upon a vast knowledge base, though my knowledge is limited to what I was trained on and I don't have access to real-time information.
+*   **Following your instructions and completing your requests thoughtfully.**
+
+I'm still under development, but I'm learning new things every day.
+
+**Important things to note:**
+
+*   I don't have access to tools, real-time information or Google search.
+*   I can receive images as input but will only output text.
+*   I am an open weights model, widely available to the public.
+*   I was trained by Google DeepMind.
+
+
+What can I help you with today?
+```
+
+You can also interact with the ollama command directly. For example:
+
+```sh
+>>> /show info
+  Model
+    architecture        gemma3
+    parameters          27.4B
+    context length      131072
+    embedding length    5376
+    quantization        Q4_0
+
+  Capabilities
+    completion
+    vision
+
+  Parameters
+    temperature    1
+    top_k          64
+    top_p          0.95
+    stop           "<end_of_turn>"
+```
+
+This shows the model information that we can tweak.
+
+The first information that is important is the `context length`, think about it like the memory of the model.
+The longer the context length, the more information the model will remember.
+Watch out ! The `context_length` shown here is actually the **maximum** context length **not** the one that the model is currently using ⚠️.
+
+Let's configure the context length to 10_000 tokens.
+Keep in mind that the larger context length will also consume more memory!
+
+```sh
+>>> /set num_ctx 10000
+Set parameter 'num_ctx' to '10000'
+```
+
+Another parameter that I like to tweak is the `temperature`, controlling the randomness of the output or the creativity of the model.
+A lower temperature means the model will be more deterministic, while the higher value means the model will be more creative.
+
+```sh
+# Example to make it more deterministic
+>>> /set temperature 0.3
+```
+
+To provide a base instruction to the model, we can also add the system prompt. It's like setting the behavior for the model.
+For example:
+
+```sh
+>>> /set system """
+You're a helpful and critical assistant.
+Your answer should be concise."""
+```
+
+Now we can also provide our input message.
+
+```sh
+>>> Hi I'm Ricky Lim
+Greetings, Ricky Lim. It's efficient that you've introduced yourself. How may I be of assistance today? Be specific; brevity is appreciated.
+```
+
+To also save our model session, we can `/save <session_name>` and load it later with `/load <session_name>`.
+
+For example:
+
+```sh
+>>> /save ricky-session
+Created new model 'ricky-session'
+>>> /bye
+```
+
+Then you can resume the session later:
+
+```sh
+$ ollama run gemma3:27b-it-qat
+>>> /load ricky-session
+>>> what is my name?
+Your name is Ricky Lim. A rather straightforward question, and one easily answered given your prior statement.
+```
+
+Awesome! now my model session can remember my name.
+
+## How can I create my customized model?
+
+Customization of the model via ollama terminal can be done by setting the parameters interactively, but can we automate it?
+
+Yes, we can! Like `Dockerfile`, we can create a `Modelfile` to provide the blueprint of our customized model.
+
+Here is an example of the `Modelfile` of our previous session:
+
+```
+FROM gemma3:27b-it-qat
+
+PARAMETER num_ctx 10000
+PARAMETER temperature 0.3
+
+SYSTEM """
+You're a helpful and critical assistant.
+Your answer should be concise.
+"""
+
+MESSAGE user Hi I'm Ricky Lim
+```
+
+You can then build the model using the following command:
+
+```sh
+$ ollama create rlim-agent -f Modelfile
+gathering model components
+....
+
+# To list the created model
+$ ollama list
+NAME                    ID              SIZE     MODIFIED
+rlim-agent:latest       49858041cab9    18 GB    6 seconds ago
+ricky-session:latest    1b3bb0f1fea8    18 GB    6 minutes ago
+gemma3:27b-it-qat       29eb0b9aeda3    18 GB    25 hours ago
+
+```
+
+As you can see now I have three models, the base model `gemma3:27b-it-qat`, my saved session `ricky-session` and my customized model `rlim-agent`.
+It looks like I have three models consuming about 54 GB of disk space.
+Luckily, **this is not the case** as Ollama uses a layered file system like Docker, so it saves only the delta between the derivative models and the base model.
+In other words, it's not really consuming 54 GB, but only about 18 GB + small deltas for the other two derivative models.
+
+Now we can run our customized model directly:
+
+```sh
+$ ollama run rlim-agent
+>>> what is my name?
+Your name is Ricky Lim.
+```
+
+Ollama also provides a nice way to monitor the running models:
+
+```sh
+$ ollama ps
+NAME                 ID              SIZE     PROCESSOR    CONTEXT    UNTIL
+rlim-agent:latest    49858041cab9    23 GB    100% GPU     10000      4 minutes from now
+```
+Now we can see that the model is consuming about 23 GB of memory with 10,000 context length.
+Also the `UNTIL` column shows when the model will be unloaded from memory due to inactivity.
+Default is 5 minutes, but we can change it. When running the model using the `--keepalive` flag.
+
+```sh
+# Keep it alive for 60 minutes
+$ ollama run rlim-agent --keepalive 60m
+$ ollama ps
+NAME                 ID              SIZE     PROCESSOR    CONTEXT    UNTIL
+rlim-agent:latest    49858041cab9    23 GB    100% GPU     10000      59 minutes from now
+```
+
+## Use case: Image description
+
+Since our customized model also supports computer vision, we can use it to describe images locally without uploading them to third-party services.
+For this, I created a simple [python script](./describe_image.py) that uses the `ollama` python package to interact with the model.
+
+Here is the script looks like:
+
+```python
+model_name = "rlim-agent"
+
+prompt = """
+You are an AI model that describes images in JSON format.
+"""
+
+json_schema = {
+    "type": "object",
+    "properties": {
+        "who": {
+            "type": "string",
+            "description": "Description of the person(s) in the image.",
+        },
+        "where": {
+            "type": "string",
+            "description": "Description of the location or setting of the image.",
+        },
+    },
+    "required": ["who", "where"],
+}
+
+
+def describe(image_path):
+    response = ollama.chat(
+        model=model_name,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+                "images": [image_path],
+            }
+        ],
+        format=json_schema,
+        stream=False,
+    )
+    return response["message"]["content"]
+
+```
+
+The script is quite straightforward. We provide the model with three key pieces of information:
+
+1\. **The system prompt** for the model instructions
+
+2\. **The JSON schema** so we can have a structured output
+
+3\. **The image path** for the model to describe
+
+You can run the script like this:
+
+For example with a `me.png` image:
+
+![](./me-small.png)
+
+```sh
+# Before run ensure that the ollama server is running.
+$ uv run describe_image.py me.png
+{
+  "who": "Ricky Lim",
+  "where": "Emirates Stadium, London, UK"
+}
+```
+
+Voila 🥳! my customized model can describe my image at the home of Arsenal FC!
+
+## Key takeaways
+
+- Thanks to quantization, we can now run Open AI models locally on our machines, keeping our data private.
+- Ollama makes it easy to run and customize OpenAI models locally.
+- Define your model customization using a `Modelfile`, like with `Dockerfile`.
