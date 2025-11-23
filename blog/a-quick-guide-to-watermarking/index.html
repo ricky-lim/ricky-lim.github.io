@@ -120,16 +120,16 @@
   <p>In many situations - whether it's for personal (e.g travel documents) or professional setting (e.g business contracts) - we're dealing with sensitive documents.
 We want to ensure that these documents are marked as CONFIDENTIAL.
 Adding a watermark is a simple way to make this explicit.</p>
-<p>Here’s how you can do it using Python with the watermark library:</p>
+<p>Here’s how you can do it using Python with the pdf-watermark library:</p>
 <ul>
 <li><strong>Single File Example</strong>: Add a grid watermark to a report called report.pdf:</li>
 </ul>
-<pre><code class="lang-bash">$ uvx watermark grid report.pdf &quot;CONFIDENTIAL&quot; -h 3 -v 3 -s watermarked_report.pdf
+<pre><code class="lang-bash">$ uvx pdf-watermark grid report.pdf &quot;CONFIDENTIAL&quot; -h 3 -v 3 -s watermarked_report.pdf
 </code></pre>
 <ul>
 <li><strong>Batch Processing</strong>: Apply the same grid watermark to all PDFs in a folder:</li>
 </ul>
-<pre><code class="lang-bash">$ uvx watermark grid report_folder &quot;CONFIDENTIAL&quot; -h 3 -v 3 -s watermarked_folder
+<pre><code class="lang-bash">$ uvx pdf-watermark grid report_folder &quot;CONFIDENTIAL&quot; -h 3 -v 3 -s watermarked_folder
 </code></pre>
 <p>This approach is quick, and works for both individual files and batches.</p>
 <h2>Key Takeaways</h2>
