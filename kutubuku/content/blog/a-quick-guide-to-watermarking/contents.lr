@@ -10,18 +10,18 @@ In many situations - whether it's for personal (e.g travel documents) or profess
 We want to ensure that these documents are marked as CONFIDENTIAL.
 Adding a watermark is a simple way to make this explicit.
 
-Here’s how you can do it using Python with the watermark library:
+Here’s how you can do it using Python with the pdf-watermark library:
 
 - **Single File Example**: Add a grid watermark to a report called report.pdf:
 
 ```bash
-$ uvx watermark grid report.pdf "CONFIDENTIAL" -h 3 -v 3 -s watermarked_report.pdf
+$ uvx pdf-watermark grid report.pdf "CONFIDENTIAL" -h 3 -v 3 -s watermarked_report.pdf
 ```
 
 - **Batch Processing**: Apply the same grid watermark to all PDFs in a folder:
 
 ```bash
-$ uvx watermark grid report_folder "CONFIDENTIAL" -h 3 -v 3 -s watermarked_folder
+$ uvx pdf-watermark grid report_folder "CONFIDENTIAL" -h 3 -v 3 -s watermarked_folder
 ```
 
 This approach is quick, and works for both individual files and batches.
