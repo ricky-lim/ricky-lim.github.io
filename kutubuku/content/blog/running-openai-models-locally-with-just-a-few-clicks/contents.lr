@@ -1,0 +1,32 @@
+title: Running OpenAI models locally with just a few clicks
+---
+author: Ricky Lim
+---
+pub_date: 2025-11-23
+---
+main_image: image.png
+---
+body:
+
+Are you a scientist who wants to leverage powerful AI models but concerned about data privacy and complex technical setups?
+
+Good news! you can run open AI models locally with just a few clicks using LM Studio.
+
+In this post, I'll share my experience how to get started with LM Studio with only a few clicks ***no coding needed.***
+
+## Introducing LM Studio
+
+LM studio is an open-source user-friendly desktop application that works on Linux, MacOs, and also windows.
+Let's get started in just 3 simple steps:
+
+1\. **Download LM studio**: lmstudio.ai and with just a few clicks, you can have on your machine.
+
+2\. **Choose an AI model**: Once installed, you can browse and download various open AI models.
+In there, you can browse the model capabilities, and also the hardware requirements, particularly with the memory needed.
+
+3\. **Start Chatting**:
+Just type your question and also you can attach files like your next research proposal to get help with drafting it.
+
+## Key Takeaways
+
+Never feel FOMO again. With LM Studio, you can run powerful open AI models locally on your machine with just a few clicks.
