@@ -1,0 +1,173 @@
+title: Building a Pythonic DateRange: Elegant Iteration Over Dates
+---
+author: Ricky Lim
+---
+pub_date: 2025-12-07
+---
+main_image: image.png
+---
+body:
+
+During my coding journey, I need a `range`-like functionality that could iterate over dates.
+Unfortunately, Python standard library does not yet provide such functionality.
+Also I wanted to avoid using third-party libraries for this.
+Then, I delegated to my coding assistant.
+
+Here is my prompt:
+
+> Implement python solution to iterate each date given the start_date and end_date. Both in the format "YYYY-MM-DD" and inclusive. Provide verified doctests that demonstrate expected behavior.
+
+The solution that my coding assistant provided is as below, I omitted the doctest for brevity.
+
+```python
+
+def date_range(start_date: str, end_date: str) -> Iterator[str]:
+    """
+    Generate dates between start_date and end_date (inclusive).
+
+    Args:
+        start_date: ISO format date string "YYYY-MM-DD"
+        end_date: ISO format date string "YYYY-MM-DD"
+
+    Yields:
+        str: Date strings in ISO format "YYYY-MM-DD"
+
+    """
+    start = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+
+    return (
+        (start + timedelta(days=n)).isoformat()
+        for n in range((end - start).days + 1)
+    )
+```
+The implementation is pretty straightforward. I kind of like the solution using generator expression to save memory.
+
+The solution is available in [this file](date_utils.py).
+You can run the doctests:
+
+```sh
+python -m doctest date_utils.py -v
+```
+
+The tests confirm the expected behaviour I was aiming for, and the implementation is simple.
+So next, let's improve it to be more pythonic by implementing a `DateRange` class.
+
+```
+class DateRange:
+    """
+    Iterator class for date ranges between start_date (inclusive) and end_date (inclusive)
+    """
+    def __init__(self, start_date: str, end_date: str):
+        self.start = date.fromisoformat(start_date)
+        self.end = date.fromisoformat(end_date)
+
+        if self.start > self.end:
+            raise ValueError(
+                f"start_date ({start_date}) must be <= end_date ({end_date})"
+            )
+        self._dates = [
+            (self.start + timedelta(days=n)).isoformat()
+            for n in range((self.end - self.start).days + 1)
+        ]
+
+    def __len__(self) -> int:
+        return len(self._dates)
+
+    def __getitem__(self, index: int) -> str:
+        return self._dates[index]
+```
+
+A special method that we mostly use is `__init__`.
+This method is used to initialize our user-defined class.
+We call them special methods as it's meant to be called by the Python Interpreter and **not by us**.
+As such we don't call `DateRange.__init__()` but we use `DateRange()` and Python will then call `__init__`.
+
+Our `__init__` methods does the following:
+
+- Convert our start and end date from string to `date` objects
+- Validate that the start date is not after the end date.
+- Build a list of all dates in the range, ready for iteration.
+
+```
+>>> dr = DateRange("2025-12-01", "2025-12-05")
+```
+
+Two other special methods that we implemented to harness the power of python is `__len__` and `__getitem__`.
+Thanks to composition, our `__len__` and `__getitem__` simply delegate to the underlying list of dates we built in `__init__`.
+The trade-off here is that we use more memory to store the list of dates, compared to our previous generator-based function `date_range`.
+
+### `__len__`
+
+This special method allows us to call our class with built-in `len()` to check the size over the date range.
+
+```
+>>> len(dr)
+5
+```
+
+### `__getitem__`
+
+Implementing `__getitem__` unlocks powerful functionality in Python such as:
+
+- Iteration: Special method can also be called implicitly. For example during the statement `for i in x`.
+In this statement, the Python interpreter calls the `iter(x)`.
+It first check if `x.__iter__()` is available if NOT it will use `x.__getitem__`
+
+With this implementation we can iterate over the date range:
+
+```
+>>> for d in dr:
+...    print(d)
+2025-12-01
+2025-12-02
+2025-12-03
+2025-12-04
+2025-12-05
+```
+
+Also we can iterate in reverse:
+
+```
+>>> for d in reversed(dr):
+...    print(d)
+2025-12-05
+2025-12-04
+2025-12-03
+2025-12-02
+2025-12-01
+```
+
+- Slicing: We can use Python's slice syntax to get a subset of dates.
+
+```
+# The first three dates
+>>> dr[:3]
+['2025-12-01', '2025-12-02', '2025-12-03']
+# Dates from index 1 to 2
+>>> dr[1:2]
+['2025-12-02']
+```
+
+- Membership Testing: Use `in` operator to check if a date is in the range.
+
+```
+>>> "2025-12-02" in dr
+True
+>>> "2025-12-06" in dr
+False
+```
+
+- Random pick: Enable random pick from the date range by leveraging Python built-in `random.choice()`.
+
+```
+>>> import random
+>>> random.choice(dr)
+'2025-12-04'
+```
+
+## Key Takeaways
+
+- By implementing special methods like `__len__` and `__getitem__`, we can make our user-defined classes behave like built-in Python types.
+- This allows use to leverage standard Python operations like `len()`, iteration, slicing, and membership testing.
+- Plus, we can also take advantage of Python's rich standard library, such as using `random.choice()` to avoid reinventing the wheel.
