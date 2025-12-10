@@ -2,7 +2,7 @@ title: Building a Pythonic DateRange: Elegant Iteration Over Dates
 ---
 author: Ricky Lim
 ---
-pub_date: 2025-12-07
+pub_date: 2025-12-10
 ---
 main_image: image.png
 ---
@@ -10,7 +10,7 @@ body:
 
 During my coding journey, I need a `range`-like functionality that could iterate over dates.
 Unfortunately, Python standard library does not yet provide such functionality.
-Also I wanted to avoid using third-party libraries for this.
+Also pulling-in third-party libraries ***was not*** an option for my use case.
 Then, I delegated to my coding assistant.
 
 Here is my prompt:
@@ -41,17 +41,59 @@ def date_range(start_date: str, end_date: str) -> Iterator[str]:
         for n in range((end - start).days + 1)
     )
 ```
-The implementation is pretty straightforward. I kind of like the solution using generator expression to save memory.
 
-The solution is available in [this file](date_utils.py).
-You can run the doctests:
+I'm quite satisfied with the solution.
+The implementation is straightforward.
+Also, I ***kind of*** like the solution using generator expression to **save memory**.
+
+I confirmed that the implementation works as expected by running the provided doctests:
 
 ```sh
-python -m doctest date_utils.py -v
+$ python -m doctest date_utils.py -v
+Trying:
+    list(date_range("2025-12-01", "2025-12-05"))
+Expecting:
+    ['2025-12-01', '2025-12-02', '2025-12-03', '2025-12-04', '2025-12-05']
+ok
+Trying:
+    list(date_range("2025-12-31", "2026-01-02"))
+Expecting:
+    ['2025-12-31', '2026-01-01', '2026-01-02']
+ok
+Trying:
+    list(date_range("2024-02-28", "2024-03-01"))
+Expecting:
+    ['2024-02-28', '2024-02-29', '2024-03-01']
+ok
+Trying:
+    list(date_range("2025-12-07", "2025-12-07"))
+Expecting:
+    ['2025-12-07']
+ok
+Trying:
+    len(list(date_range("2025-01-01", "2025-12-31")))
+Expecting:
+    365
+ok
+Trying:
+    gen = date_range("2025-12-01", "2025-12-03")
+Expecting nothing
+ok
+Trying:
+    next(gen)
+Expecting:
+    '2025-12-01'
+ok
+Trying:
+    list(gen)  # consumes remaining items
+Expecting:
+    ['2025-12-02', '2025-12-03']
+ok
 ```
 
 The tests confirm the expected behaviour I was aiming for, and the implementation is simple.
-So next, let's improve it to be more pythonic by implementing a `DateRange` class.
+
+So next, let's improve it to be more **pythonic** by implementing a `DateRange` class.
 
 ```
 class DateRange:
@@ -78,15 +120,15 @@ class DateRange:
         return self._dates[index]
 ```
 
-A special method that we mostly use is `__init__`.
+A special method that we are familiar with is `__init__`.
 This method is used to initialize our user-defined class.
-We call them special methods as it's meant to be called by the Python Interpreter and **not by us**.
+We call them special methods as it's meant to be called by the **Python Interpreter** and **not by us**.
 As such we don't call `DateRange.__init__()` but we use `DateRange()` and Python will then call `__init__`.
 
 Our `__init__` methods does the following:
 
 - Convert our start and end date from string to `date` objects
-- Validate that the start date is not after the end date.
+- Validate that the start date is **not** after the end date.
 - Build a list of all dates in the range, ready for iteration.
 
 ```
@@ -95,7 +137,9 @@ Our `__init__` methods does the following:
 
 Two other special methods that we implemented to harness the power of python is `__len__` and `__getitem__`.
 Thanks to composition, our `__len__` and `__getitem__` simply delegate to the underlying list of dates we built in `__init__`.
+
 The trade-off here is that we use more memory to store the list of dates, compared to our previous generator-based function `date_range`.
+When the date ranges are usually **not** in the order of **millions**, this is acceptable.
 
 ### `__len__`
 
@@ -112,9 +156,9 @@ Implementing `__getitem__` unlocks powerful functionality in Python such as:
 
 - Iteration: Special method can also be called implicitly. For example during the statement `for i in x`.
 In this statement, the Python interpreter calls the `iter(x)`.
-It first check if `x.__iter__()` is available if NOT it will use `x.__getitem__`
+It first check if `x.__iter__()` is implemented if NOT it will use `x.__getitem__`
 
-With this implementation we can iterate over the date range:
+With this implementation we can iterate over the date range. It is using the x.__getitem__() under the hood.:
 
 ```
 >>> for d in dr:
@@ -126,7 +170,7 @@ With this implementation we can iterate over the date range:
 2025-12-05
 ```
 
-Also we can iterate in reverse:
+Also we can iterate in reverse by using `reversed()` built-in function:
 
 ```
 >>> for d in reversed(dr):
@@ -138,7 +182,7 @@ Also we can iterate in reverse:
 2025-12-01
 ```
 
-- Slicing: We can use Python's slice syntax to get a subset of dates.
+- Slicing: We can use Python's slice syntax to get only a subset of dates.
 
 ```
 # The first three dates
@@ -166,8 +210,14 @@ False
 '2025-12-04'
 ```
 
+Feel like to try it out yourself?
+The code is available in [this file](date_utils.py).
+
+
 ## Key Takeaways
 
+- For simple needs, try building your own solutions before reaching for third-party libraries. Thanks to AI assistants, it's easier than ever.
+- Make sure you understand the code that is generated by AI assistants, and improve it to be more expressive by leveraging Python features, aka **Pythonic**.
 - By implementing special methods like `__len__` and `__getitem__`, we can make our user-defined classes behave like built-in Python types.
-- This allows use to leverage standard Python operations like `len()`, iteration, slicing, and membership testing.
-- Plus, we can also take advantage of Python's rich standard library, such as using `random.choice()` to avoid reinventing the wheel.
+- This unlocks standard Python operations like `len()`, iteration, slicing, and membership testing.
+- Plus, we can also take advantage of Python's rich standard library, such as using `reversed()` and `random.choice()` to avoid reinventing the wheel.
