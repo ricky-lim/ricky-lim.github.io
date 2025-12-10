@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
+
+  <title>Building a Pythonic DateRange: Elegant Iteration Over Dates — kutubuku</title>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <!-- Left side: Logo and Hamburger -->
+          <div class="d-flex align-items-center">
+            <!-- Hamburger button -->
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Brand/Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
+                   alt="rlim"
+                   class="logo-rlim me-2">
+            </a>
+          </div>
+
+          <!-- Right side: Search Form (always visible) -->
+          <div class="navbar-search-main w-50">
+            <form class="search-form d-flex" action="../../search/" method="get">
+              <div class="input-group">
+                <input type="search"
+                       class="form-control form-control-sm search-input"
+                       name="q"
+                       placeholder="Search..."
+                       aria-label="Search">
+                <button class="btn btn-sm search-btn" type="submit" aria-label="Search">  <!-- Added btn-sm -->
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Bootstrap Offcanvas -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+        <img src="../../static/rlim.png"
+             alt="rlim"
+             class="logo-rlim me-2">
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav flex-grow-1">
+        <li class="nav-item">
+          <a class="nav-link"
+             href="../../">Welcome</a>
+        </li>
+        
+          <li class="nav-item">
+            <a class="nav-link active"
+               href="../">Blog</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../search/">Search</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link"
+               href="../../about/">About</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+  
+  <div class="blog-post" data-pagefind-body>
+
+  <div class="blog-post-header">
+    
+      <img src="image.png" alt="Main image for Building a Pythonic DateRange: Elegant Iteration Over Dates" class="main-image" />
+    
+    <div class="blog-post-header-content">
+      
+        <h1 data-pagefind-meta="title">Building a Pythonic DateRange: Elegant Iteration Over Dates</h1>
+      
+    </div>
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-12-10
+  </p>
+  <p>During my coding journey, I need a <code>range</code>-like functionality that could iterate over dates.
+Unfortunately, Python standard library does not yet provide such functionality.
+Also pulling-in third-party libraries <strong><em>was not</em></strong> an option for my use case.
+Then, I delegated to my coding assistant.</p>
+<p>Here is my prompt:</p>
+<blockquote><p>Implement python solution to iterate each date given the start_date and end_date. Both in the format "YYYY-MM-DD" and inclusive. Provide verified doctests that demonstrate expected behavior.</p>
+</blockquote>
+<p>The solution that my coding assistant provided is as below, I omitted the doctest for brevity.</p>
+<pre><code class="lang-python">
+def date_range(start_date: str, end_date: str) -&gt; Iterator[str]:
+    &quot;&quot;&quot;
+    Generate dates between start_date and end_date (inclusive).
+
+    Args:
+        start_date: ISO format date string &quot;YYYY-MM-DD&quot;
+        end_date: ISO format date string &quot;YYYY-MM-DD&quot;
+
+    Yields:
+        str: Date strings in ISO format &quot;YYYY-MM-DD&quot;
+
+    &quot;&quot;&quot;
+    start = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+
+    return (
+        (start + timedelta(days=n)).isoformat()
+        for n in range((end - start).days + 1)
+    )
+</code></pre>
+<p>I'm quite satisfied with the solution.
+The implementation is straightforward.
+Also, I <strong><em>kind of</em></strong> like the solution using generator expression to <strong>save memory</strong>.</p>
+<p>I confirmed that the implementation works as expected by running the provided doctests:</p>
+<pre><code class="lang-sh">$ python -m doctest date_utils.py -v
+Trying:
+    list(date_range(&quot;2025-12-01&quot;, &quot;2025-12-05&quot;))
+Expecting:
+    [&#39;2025-12-01&#39;, &#39;2025-12-02&#39;, &#39;2025-12-03&#39;, &#39;2025-12-04&#39;, &#39;2025-12-05&#39;]
+ok
+Trying:
+    list(date_range(&quot;2025-12-31&quot;, &quot;2026-01-02&quot;))
+Expecting:
+    [&#39;2025-12-31&#39;, &#39;2026-01-01&#39;, &#39;2026-01-02&#39;]
+ok
+Trying:
+    list(date_range(&quot;2024-02-28&quot;, &quot;2024-03-01&quot;))
+Expecting:
+    [&#39;2024-02-28&#39;, &#39;2024-02-29&#39;, &#39;2024-03-01&#39;]
+ok
+Trying:
+    list(date_range(&quot;2025-12-07&quot;, &quot;2025-12-07&quot;))
+Expecting:
+    [&#39;2025-12-07&#39;]
+ok
+Trying:
+    len(list(date_range(&quot;2025-01-01&quot;, &quot;2025-12-31&quot;)))
+Expecting:
+    365
+ok
+Trying:
+    gen = date_range(&quot;2025-12-01&quot;, &quot;2025-12-03&quot;)
+Expecting nothing
+ok
+Trying:
+    next(gen)
+Expecting:
+    &#39;2025-12-01&#39;
+ok
+Trying:
+    list(gen)  # consumes remaining items
+Expecting:
+    [&#39;2025-12-02&#39;, &#39;2025-12-03&#39;]
+ok
+</code></pre>
+<p>The tests confirm the expected behaviour I was aiming for, and the implementation is simple.</p>
+<p>So next, let's improve it to be more <strong>pythonic</strong> by implementing a <code>DateRange</code> class.</p>
+<pre><code>class DateRange:
+    """
+    Iterator class for date ranges between start_date (inclusive) and end_date (inclusive)
+    """
+    def __init__(self, start_date: str, end_date: str):
+        self.start = date.fromisoformat(start_date)
+        self.end = date.fromisoformat(end_date)
+
+        if self.start &gt; self.end:
+            raise ValueError(
+                f"start_date ({start_date}) must be &lt;= end_date ({end_date})"
+            )
+        self._dates = [
+            (self.start + timedelta(days=n)).isoformat()
+            for n in range((self.end - self.start).days + 1)
+        ]
+
+    def __len__(self) -&gt; int:
+        return len(self._dates)
+
+    def __getitem__(self, index: int) -&gt; str:
+        return self._dates[index]
+</code></pre>
+<p>A special method that we are familiar with is <code>__init__</code>.
+This method is used to initialize our user-defined class.
+We call them special methods as it's meant to be called by the <strong>Python Interpreter</strong> and <strong>not by us</strong>.
+As such we don't call <code>DateRange.__init__()</code> but we use <code>DateRange()</code> and Python will then call <code>__init__</code>.</p>
+<p>Our <code>__init__</code> methods does the following:</p>
+<ul>
+<li>Convert our start and end date from string to <code>date</code> objects</li>
+<li>Validate that the start date is <strong>not</strong> after the end date.</li>
+<li>Build a list of all dates in the range, ready for iteration.</li>
+</ul>
+<pre><code>&gt;&gt;&gt; dr = DateRange("2025-12-01", "2025-12-05")
+</code></pre>
+<p>Two other special methods that we implemented to harness the power of python is <code>__len__</code> and <code>__getitem__</code>.
+Thanks to composition, our <code>__len__</code> and <code>__getitem__</code> simply delegate to the underlying list of dates we built in <code>__init__</code>.</p>
+<p>The trade-off here is that we use more memory to store the list of dates, compared to our previous generator-based function <code>date_range</code>.
+When the date ranges are usually <strong>not</strong> in the order of <strong>millions</strong>, this is acceptable.</p>
+<h3><code>__len__</code></h3>
+<p>This special method allows us to call our class with built-in <code>len()</code> to check the size over the date range.</p>
+<pre><code>&gt;&gt;&gt; len(dr)
+5
+</code></pre>
+<h3><code>__getitem__</code></h3>
+<p>Implementing <code>__getitem__</code> unlocks powerful functionality in Python such as:</p>
+<ul>
+<li>Iteration: Special method can also be called implicitly. For example during the statement <code>for i in x</code>.
+In this statement, the Python interpreter calls the <code>iter(x)</code>.
+It first check if <code>x.__iter__()</code> is implemented if NOT it will use <code>x.__getitem__</code></li>
+</ul>
+<p>With this implementation we can iterate over the date range. It is using the x.<strong>getitem</strong>() under the hood.:</p>
+<pre><code>&gt;&gt;&gt; for d in dr:
+...    print(d)
+2025-12-01
+2025-12-02
+2025-12-03
+2025-12-04
+2025-12-05
+</code></pre>
+<p>Also we can iterate in reverse by using <code>reversed()</code> built-in function:</p>
+<pre><code>&gt;&gt;&gt; for d in reversed(dr):
+...    print(d)
+2025-12-05
+2025-12-04
+2025-12-03
+2025-12-02
+2025-12-01
+</code></pre>
+<ul>
+<li>Slicing: We can use Python's slice syntax to get only a subset of dates.</li>
+</ul>
+<pre><code># The first three dates
+&gt;&gt;&gt; dr[:3]
+['2025-12-01', '2025-12-02', '2025-12-03']
+# Dates from index 1 to 2
+&gt;&gt;&gt; dr[1:2]
+['2025-12-02']
+</code></pre>
+<ul>
+<li>Membership Testing: Use <code>in</code> operator to check if a date is in the range.</li>
+</ul>
+<pre><code>&gt;&gt;&gt; "2025-12-02" in dr
+True
+&gt;&gt;&gt; "2025-12-06" in dr
+False
+</code></pre>
+<ul>
+<li>Random pick: Enable random pick from the date range by leveraging Python built-in <code>random.choice()</code>.</li>
+</ul>
+<pre><code>&gt;&gt;&gt; import random
+&gt;&gt;&gt; random.choice(dr)
+'2025-12-04'
+</code></pre>
+<p>Feel like to try it out yourself?
+The code is available in <a href="date_utils.py">this file</a>.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>For simple needs, try building your own solutions before reaching for third-party libraries. Thanks to AI assistants, it's easier than ever.</li>
+<li>Make sure you understand the code that is generated by AI assistants, and improve it to be more expressive by leveraging Python features, aka <strong>Pythonic</strong>.</li>
+<li>By implementing special methods like <code>__len__</code> and <code>__getitem__</code>, we can make our user-defined classes behave like built-in Python types.</li>
+<li>This unlocks standard Python operations like <code>len()</code>, iteration, slicing, and membership testing.</li>
+<li>Plus, we can also take advantage of Python's rich standard library, such as using <code>reversed()</code> and <code>random.choice()</code> to avoid reinventing the wheel.</li>
+</ul>
+
+
+  </div>
+
+
+  </div>
+
+  <footer>
+    &copy; Copyright 2025 by Ricky Lim.
+    <br>
+    Proudly built using <a class="lektor-link" href="https://www.getlektor.com/">Lektor</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+</body>
+</html>
