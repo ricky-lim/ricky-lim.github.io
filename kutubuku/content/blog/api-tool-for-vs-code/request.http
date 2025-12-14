@@ -1,0 +1,13 @@
+@BASE_URL=https://quotes.toscrape.com
+
+GET {{BASE_URL}}/api/quotes?page=1
+###
+
+@page=2
+GET {{BASE_URL}}/api/quotes?page={{page}}
+###
+
+@API_KEY= {{$dotenv API_KEY}}
+GET {{BASE_URL}}/api/quotes
+Authorization: Bearer {{API_KEY}}
+###

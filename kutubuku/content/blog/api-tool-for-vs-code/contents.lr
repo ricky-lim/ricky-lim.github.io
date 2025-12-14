@@ -1,0 +1,55 @@
+title: API Tool for VS Code
+---
+author: Ricky Lim
+---
+pub_date: 2025-12-17
+---
+main_image: image.png
+---
+body:
+
+You're using VS Code and need to test APIs quickly without juggling curl commands, browser tabs, or Postman?
+The extension "REST Client" by Huachao Mao, lets you bring API testing into a single, text-based workflow within VS Code.
+
+## What is the REST Client extension?
+
+This extension lets you send HTTP requests directly from a plain text file in VS Code.
+The requests are in a simple syntax and execute with just click "Send Request" above the request line.
+On top of that as everything is in text files, we can easily version control our API requests alongside our code.
+
+## Example Usage
+
+To start using it, first download the extension from the VS Code marketplace, search for "REST Client" by Huachao Mao and install it.
+Then create a text file with a `.http` or `.rest` extension.
+The syntax is straightforward with first line being the HTTP method and URL, followed by optional headers and body.
+The request is ended with a line containing only `###`.
+
+For example, to make a GET request to fetch quotes from an API, you can write:
+
+```http
+GET https://api.example.com/quotes?page=1
+###
+```
+
+To create also define a variable for the base URL and page number.
+This is handy when you want to make multiple requests to the same API with different paths or parameters.
+
+```http
+@BASE_URL = https://api.example.com
+@page = 1
+GET {{BASE_URL}}/quotes?page={{page}}
+###
+```
+
+Also we can use our API keys stored in environment files (`.env`).
+
+```http
+@API_KEY= {{$dotenv API_KEY}}
+GET {{BASE_URL}}/quotes
+Authorization: Bearer {{API_KEY}}
+###
+
+## Key Takeaways
+
+The REST Client extension provides a lightweight tool for anyone working with HTTP APIs directly in VS Code.
+It can streamline your workflow by keeping everything in one place, easy to version control and share with your team.
