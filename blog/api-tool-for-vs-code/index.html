@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="icon" type="image/x-icon" href="../../../static/favicon.ico">
-  <link rel="apple-touch-icon" href="../../../static/favicon.png">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../../../static/style.css">
-  <link rel="stylesheet" href="../../../static/search.css">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
 
-  <title>Blog — kutubuku</title>
+  <title>API Tool for VS Code — kutubuku</title>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
@@ -31,8 +31,8 @@
             </button>
 
             <!-- Brand/Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="../../../">
-              <img src="../../../static/rlim.png"
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
                    alt="rlim"
                    class="logo-rlim me-2">
             </a>
@@ -40,7 +40,7 @@
 
           <!-- Right side: Search Form (always visible) -->
           <div class="navbar-search-main w-50">
-            <form class="search-form d-flex" action="../../../search/" method="get">
+            <form class="search-form d-flex" action="../../search/" method="get">
               <div class="input-group">
                 <input type="search"
                        class="form-control form-control-sm search-input"
@@ -64,7 +64,7 @@
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-        <img src="../../../static/rlim.png"
+        <img src="../../static/rlim.png"
              alt="rlim"
              class="logo-rlim me-2">
       </h5>
@@ -74,22 +74,22 @@
       <ul class="navbar-nav flex-grow-1">
         <li class="nav-item">
           <a class="nav-link"
-             href="../../../">Welcome</a>
+             href="../../">Welcome</a>
         </li>
         
           <li class="nav-item">
             <a class="nav-link active"
-               href="../../">Blog</a>
+               href="../">Blog</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../search/">Search</a>
+               href="../../search/">Search</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../about/">About</a>
+               href="../../about/">About</a>
           </li>
         
       </ul>
@@ -99,75 +99,63 @@
   <div class="page">
     
   
-  <div class="blog-post">
-    <h3><a href="../../duckdb-for-scientists-simplicity-meets-spark-like-performance/">DuckDb for Scientists: Simplicity Meets Spark-like Performance</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../identifiers-in-databases-ids-uuids-or-slugs/">Identifiers in Databases: IDs, UUIDs, or Slugs</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../fixing-cors-with-cdk/">Fixing Cors with CDK</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../to-bridge-to-host-or-something-between-a-dockerian-network/">To Bridge, to Host, or Something Between: A Dockerian Network</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../to-mount-or-to-volume-a-guide-to-docker-data-persistence/">To Mount or to Volume? A Guide to Docker Data Persistence</a></h3>
-  </div>
-  
+  <div class="blog-post" data-pagefind-body>
 
-  <div class="pagination-bottom">
+  <div class="blog-post-header">
     
-  <div class="pagination">
+      <img src="image.png" alt="Main image for API Tool for VS Code" class="main-image" />
     
+    <div class="blog-post-header-content">
       
-        <a href="../6/" class="prev">← Previous</a>
-      
-
-      
-      <a href="../../" >1</a>
-
-      
-      
-        <span class="ellipsis">...</span>
-      
-
-      
-      
-        
-          <a href="../6/" >6</a>
-        
-      
-        
-          <a href="./" class="active">7</a>
-        
-      
-        
-          <a href="../8/" >8</a>
-        
-      
-
-      
-      
-        <span class="ellipsis">...</span>
-      
-
-      
-      
-        <a href="../11/" >11</a>
-      
-
-      
-        <a href="../8/" class="next">Next →</a>
+        <h1 data-pagefind-meta="title">API Tool for VS Code</h1>
       
     </div>
-  
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2025-12-17
+  </p>
+  <p>If you're using VS Code and need to test APIs or to make HTTP requests quickly without juggling curl commands, browser tabs, Postman, or Bruno?
+The extension "REST Client" by Huachao Mao, lets you just that with a single, text-based workflow within VS Code.</p>
+<h2>What is the REST Client extension?</h2>
+<p>This extension lets you send HTTP requests directly from a plain text file in VS Code.
+The requests are in a <strong>simple</strong> syntax and execute with just click <strong>"Send Request"</strong> above the request line.
+In addition to that as everything is in text files, we can easily version control our API requests alongside our code.</p>
+<p>This how it looks like in action 🎬:</p>
+<p><img src="example.png" alt="REST Client Example"></p>
+<h2>Example Usage</h2>
+<p>To start using it, first download the extension from the VS Code marketplace, search for <strong>"REST Client"</strong> by <strong>Huachao Mao</strong> and install it.
+Then create a text file with a <code>.http</code> or <code>.rest</code> extension.
+The syntax is straightforward with first line being the HTTP method and URL, followed by optional headers and body.
+The request is ended with a line containing only <code>###</code>.</p>
+<p>For example, to make a GET request to fetch quotes from an API, you can write:</p>
+<pre><code class="lang-http">GET https://api.example.com/quotes?page=1
+###
+</code></pre>
+<p>You can also define a variable for the base URL and page number.
+This is handy when you want to make multiple requests to the same API but with different paths or parameters.</p>
+<pre><code class="lang-http">@BASE_URL = https://api.example.com
+@page = 1
+GET {{BASE_URL}}/quotes?page={{page}}
+###
+</code></pre>
+<p>Last but not least, you can use API keys stored in environment files (<code>.env</code>) 🔐.</p>
+<pre><code class="lang-http">@API_KEY= {{$dotenv API_KEY}}
+GET {{BASE_URL}}/quotes
+Authorization: Bearer {{API_KEY}}
+###
+</code></pre>
+<h2>Key Takeaways</h2>
+<p>The REST Client extension provides a lightweight tool for anyone working with HTTP directly in VS Code.
+It can streamline your workflow by keeping everything in one place, easy to version control and share with your team.</p>
+
 
   </div>
+
 
   </div>
 
