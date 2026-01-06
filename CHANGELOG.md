@@ -1,7 +1,7 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
-## NEXT
+## [0.8.0] - 2026-01-06
 
 ### Changed
 
