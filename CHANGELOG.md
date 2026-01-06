@@ -1,6 +1,13 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
+## NEXT
+
+### Changed
+
+- Changed copyright to 2026
+- Changed blog intro and about
+
 ## [0.7.0] - 2025-08-03
 
 ### Added
