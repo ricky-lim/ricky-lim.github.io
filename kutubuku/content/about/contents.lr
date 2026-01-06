@@ -4,34 +4,14 @@ body:
 
 ```bash
 $ cat /etc/passwd | grep ricky
-> Professional: Where Software Meets Infrastructure
+> Someone who enjoys working where science and technology meet and experimenting with new things.
 
 $ history | grep background
-> Molecular Biologist turned Code Craftsman
-> Bioinformatician by training
-> Pipeline developer of genomic sequences
-> Scientific programmer bridging Scientists and ITs
-> Software engineer who worked on laboratory automation
-> Cloud engineer building scalable infrastructures
-
-$ tree ~/expertise/
-├── infrastructure
-│   ├── aws-cdk
-│   └── docker
-│   └── linux
-├── web
-│   ├── rest-api
-│   └── dashboard
-└── bioinformatics
-    ├── genomics-pipelines
-    ├── high-performance-computing
-    └── epigenetics
-
-$ ps aux | grep tech-stack
-> Python: Django, FastAPI, Flask
-> Cloud: AWS, Docker
-> Typescript: cdk
-> Database: PostgreSQL, MongoDB
+> I build data pipelines that (usually) scale
+> I design cloud infrastructure and try to keep it simple
+> I refactor aging lab systems and help them migrate patiently into the cloud
+> I wrangle genomic data, one sequence at a time
+> I write scientific software so biologists don't have to
 
 $ echo $CONTACT
 > Email: rlim.email@gmail.com

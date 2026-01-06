@@ -1,11 +1,10 @@
-title: Welcome to kutubuku!
+title: 👋 Hi, Welcome to my blog!
 ---
 body:
 
-Join me in embracing the power of terminal!
+This is my personal blog of things I've learned, mistakes I've made (or wish I hadn't), and the occasional small wins - mostly from spending too much time at the command line.
+If you also enjoy command line, you're welcome to read along and learn together.
 
 ```bash
-Current Status:
 $ whoami
-ricky-lim
-```
+ricky-lim```
