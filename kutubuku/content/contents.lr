@@ -1,10 +1,21 @@
-title: 👋 Hi, Welcome to my blog!
+title: Welcome to my blog!
 ---
 body:
 
-This is my personal blog of things I've learned, mistakes I've made (or wish I hadn't), and the occasional small wins - mostly from spending too much time at the command line.
-If you also enjoy command line, you're welcome to read along and learn together.
 
-```bash
-$ whoami
-ricky-lim```
+👋 Hi, **I'm Ricky**. This blog where I share what I've learned mostly from spending too much time with terminal.
+
+## 🔬 What I Do
+
+- Build data pipelines that (usually) scale
+- Design cloud infrastructure (and keep it simple!)
+- Automate boring, repetitive tasks with terminal so humans don't have to suffer
+- Refactor aging IT systems and help them move slowly into the cloud
+- Write scientific software so biologists don't have to
+
+## 💡 Philosophy
+
+If you want to go quickly, go alone. If you want to go far, go together
+
+## 📬 Get in Touch
+<pre><code>Email: rlim.email@gmail.com</code></pre>
