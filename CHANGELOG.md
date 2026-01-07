@@ -1,6 +1,12 @@
 ## Changelog
 [![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
+## NEXT
+
+### Changed
+
+- Removed about and moved it into welcome page
+
 ## [0.8.0] - 2026-01-06
 
 ### Changed
