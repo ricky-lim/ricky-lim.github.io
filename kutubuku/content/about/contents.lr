@@ -1,18 +1,1 @@
 title: About
----
-body:
-
-```bash
-$ cat /etc/passwd | grep ricky
-> Someone who enjoys working where science and technology meet and experimenting with new things.
-
-$ history | grep background
-> I build data pipelines that (usually) scale
-> I design cloud infrastructure and try to keep it simple
-> I refactor aging lab systems and help them migrate patiently into the cloud
-> I wrangle genomic data, one sequence at a time
-> I write scientific software so biologists don't have to
-
-$ echo $CONTACT
-> Email: rlim.email@gmail.com
-```
