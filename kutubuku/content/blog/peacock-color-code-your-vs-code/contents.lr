@@ -1,0 +1,32 @@
+title: Peacock: Color-Code Your VS Code
+---
+author: Ricky Lim
+---
+pub_date: 2026-01-08
+---
+main_image: image.png
+---
+body:
+
+Imagine you're working on several projects at once, and all of sudden you have ***tons*** of VS Code windows open.
+It can feel that your work becomes a chaotic mess, trying to find out which window belongs to which project.
+
+One of the solution to tame that chaos that works well for me is I **color code** my VS Code windows with an extension called **Peacock** by John Papa.
+
+## What Peacock Does
+
+Peacock gives each of your VS Code windows a unique **color-code** in the `title bar`.
+Instead of seeing the same color over and over, you'll see something like "VS Code - Green" for my greenfield project, "VS Code - Blue" for my legacy project.
+Each project now have its own unique color!
+
+## How to Install
+
+- Search for "Peacock" by John Papa in the VS Code extension and install it.
+- After installation, open the Command Palette (`shift+cmd+p` for mac or `shift+ctrl+p` for windows) and type **"Peacock"** to access its command options.
+When in doubt, I choose `Peacock: Surprise Me with a Random Color`.
+To me with a few of key presses, a color code is settled and give me a peace of mind.
+
+## Key Takeaways
+
+Color code your VS Code windows with Peacock, and Your future self (and your eyes' retina) will thank you.
+A small change that makes a big difference to me when working with multiple projects.
