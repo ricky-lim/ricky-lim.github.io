@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="icon" type="image/x-icon" href="../../../static/favicon.ico">
-  <link rel="apple-touch-icon" href="../../../static/favicon.png">
+  <link rel="icon" type="image/x-icon" href="../../static/favicon.ico">
+  <link rel="apple-touch-icon" href="../../static/favicon.png">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../../../static/style.css">
-  <link rel="stylesheet" href="../../../static/search.css">
+  <link rel="stylesheet" href="../../static/style.css">
+  <link rel="stylesheet" href="../../static/search.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.6, user-scalable=no">
 
-  <title>Blog — kutubuku</title>
+  <title>Peacock: Color-Code Your VS Code — kutubuku</title>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
@@ -31,8 +31,8 @@
             </button>
 
             <!-- Brand/Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="../../../">
-              <img src="../../../static/rlim.png"
+            <a class="navbar-brand d-flex align-items-center" href="../../">
+              <img src="../../static/rlim.png"
                    alt="rlim"
                    class="logo-rlim me-2">
             </a>
@@ -40,7 +40,7 @@
 
           <!-- Right side: Search Form (always visible) -->
           <div class="navbar-search-main w-50">
-            <form class="search-form d-flex" action="../../../search/" method="get">
+            <form class="search-form d-flex" action="../../search/" method="get">
               <div class="input-group">
                 <input type="search"
                        class="form-control form-control-sm search-input"
@@ -64,7 +64,7 @@
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-        <img src="../../../static/rlim.png"
+        <img src="../../static/rlim.png"
              alt="rlim"
              class="logo-rlim me-2">
       </h5>
@@ -74,17 +74,17 @@
       <ul class="navbar-nav flex-grow-1">
         <li class="nav-item">
           <a class="nav-link"
-             href="../../../">Welcome</a>
+             href="../../">Welcome</a>
         </li>
         
           <li class="nav-item">
             <a class="nav-link active"
-               href="../../">Blog</a>
+               href="../">Blog</a>
           </li>
         
           <li class="nav-item">
             <a class="nav-link"
-               href="../../../search/">Search</a>
+               href="../../search/">Search</a>
           </li>
         
       </ul>
@@ -94,75 +94,47 @@
   <div class="page">
     
   
-  <div class="blog-post">
-    <h3><a href="../../least-privilege-matters/">Least Privilege Matters</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../duckdb-for-scientists-simplicity-meets-spark-like-performance/">DuckDb for Scientists: Simplicity Meets Spark-like Performance</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../identifiers-in-databases-ids-uuids-or-slugs/">Identifiers in Databases: IDs, UUIDs, or Slugs</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../fixing-cors-with-cdk/">Fixing Cors with CDK</a></h3>
-  </div>
-  
-  <div class="blog-post">
-    <h3><a href="../../to-bridge-to-host-or-something-between-a-dockerian-network/">To Bridge, to Host, or Something Between: A Dockerian Network</a></h3>
-  </div>
-  
+  <div class="blog-post" data-pagefind-body>
 
-  <div class="pagination-bottom">
+  <div class="blog-post-header">
     
-  <div class="pagination">
+      <img src="image.png" alt="Main image for Peacock: Color-Code Your VS Code" class="main-image" />
     
+    <div class="blog-post-header-content">
       
-        <a href="../6/" class="prev">← Previous</a>
-      
-
-      
-      <a href="../../" >1</a>
-
-      
-      
-        <span class="ellipsis">...</span>
-      
-
-      
-      
-        
-          <a href="../6/" >6</a>
-        
-      
-        
-          <a href="./" class="active">7</a>
-        
-      
-        
-          <a href="../8/" >8</a>
-        
-      
-
-      
-      
-        <span class="ellipsis">...</span>
-      
-
-      
-      
-        <a href="../11/" >11</a>
-      
-
-      
-        <a href="../8/" class="next">Next →</a>
+        <h1 data-pagefind-meta="title">Peacock: Color-Code Your VS Code</h1>
       
     </div>
-  
+  </div>
+
+  <p class="meta">
+    written by
+    
+      Ricky Lim
+    
+    on 2026-01-08
+  </p>
+  <p>Imagine you're working on several projects at once, and all of sudden you have <strong><em>tons</em></strong> of VS Code windows open.
+It can feel that your work becomes a chaotic mess, trying to find out which window belongs to which project.</p>
+<p>One of the solution to tame that chaos that works well for me is I <strong>color code</strong> my VS Code windows with an extension called <strong>Peacock</strong> by John Papa.</p>
+<h2>What Peacock Does</h2>
+<p>Peacock gives each of your VS Code windows a unique <strong>color-code</strong> in the <code>title bar</code>.
+Instead of seeing the same color over and over, you'll see something like "VS Code - Green" for my greenfield project, "VS Code - Blue" for my legacy project.
+Each project now have its own unique color!</p>
+<h2>How to Install</h2>
+<ul>
+<li>Search for "Peacock" by John Papa in the VS Code extension and install it.</li>
+<li>After installation, open the Command Palette (<code>shift+cmd+p</code> for mac or <code>shift+ctrl+p</code> for windows) and type <strong>"Peacock"</strong> to access its command options.
+When in doubt, I choose <code>Peacock: Surprise Me with a Random Color</code>.
+To me with a few of key presses, a color code is settled and give me a peace of mind.</li>
+</ul>
+<h2>Key Takeaways</h2>
+<p>Color code your VS Code windows with Peacock, and Your future self (and your eyes' retina) will thank you.
+A small change that makes a big difference to me when working with multiple projects.</p>
+
 
   </div>
+
 
   </div>
 
