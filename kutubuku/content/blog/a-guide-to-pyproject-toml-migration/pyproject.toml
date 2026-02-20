@@ -3,7 +3,7 @@ name = "microbe-in-flask"
 version = "0.1.0"
 requires-python = ">=3.12.3"
 dependencies = [
-    "flask==2.2.5",
+    "flask==3.1.3",
     "requests>=2.32.3",
 ]
 
